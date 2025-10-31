@@ -65,15 +65,15 @@ export const authAPI = {
 
 // Hierarchical API calls for Sectors → Branches → Specializations
 export const getSectors = async () => {
-  return apiRequest('/users/sectors');
+  return apiRequest('/sectors');
 };
 
 export const getBranches = async (sectorId) => {
-  return apiRequest(`/users/sectors/${sectorId}/branches`);
+  return apiRequest(`/sectors/${sectorId}/branches`);
 };
 
 export const getSpecializations = async (branchId) => {
-  return apiRequest(`/users/branches/${branchId}/specializations`);
+  return apiRequest(`/branches/${branchId}/specializations`);
 };
 
 // Save user's selections to database
