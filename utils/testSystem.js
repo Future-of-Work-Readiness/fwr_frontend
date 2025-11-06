@@ -465,6 +465,22 @@ export const saveTestResult = (userId, testId, score, answers, timeSpent) => {
   
   results.push(newResult);
   localStorage.setItem(`testResults_${userId}`, JSON.stringify(results));
+  try {
+    // Update cached user readiness scores based on latest average
+    const userRaw = localStorage.getItem('currentUser');
+    if (userRaw) {
+      const user = JSON.parse(userRaw);
+      if (user && user.id === userId) {
+        const stats = getUserTestStats(userId);
+        const readiness = stats.averageScore || 0;
+        user.readiness_score = readiness;
+        // naive mapping of categories; can be replaced with backend categories later
+        user.technical_score = Math.round(readiness * 0.9);
+        user.soft_skills_score = Math.round(readiness * 0.85);
+        localStorage.setItem('currentUser', JSON.stringify(user));
+      }
+    }
+  } catch {}
   
   return newResult;
 };
@@ -554,6 +570,26 @@ export const getAvailableTests = (filterOptions = {}) => {
   }
   
   return tests;
+};
+
+// Compute readiness summary from stored results
+export const getReadinessSnapshot = (userId) => {
+  const stats = getUserTestStats(userId);
+  const overall = stats.averageScore || 0;
+  return {
+    overall,
+    technical: Math.round(overall * 0.9),
+    soft: Math.round(overall * 0.85)
+  };
+};
+
+// Return recent attempts sorted desc by completedAt
+export const getRecentAttempts = (userId, limit = 5) => {
+  const all = getTestResults(userId);
+  return all
+    .slice()
+    .sort((a, b) => new Date(b.completedAt) - new Date(a.completedAt))
+    .slice(0, limit);
 };
 
 // Get a specific test by ID

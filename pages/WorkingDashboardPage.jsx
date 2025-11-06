@@ -4,6 +4,10 @@ import { useNavigate } from 'react-router-dom';
 export default function WorkingDashboardPage() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [dashboard, setDashboard] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     // Check if user is logged in
@@ -12,8 +16,92 @@ export default function WorkingDashboardPage() {
       navigate('/');
       return;
     }
-    setUser(JSON.parse(userData));
+    const parsed = JSON.parse(userData);
+    setUser(parsed);
+
+    const fetchDashboard = async (isRefresh = false) => {
+      if (isRefresh) {
+        setRefreshing(true);
+      } else {
+        setLoading(true);
+      }
+      setError(null);
+      try {
+        const res = await fetch(`http://localhost:8000/api/dashboard?user_id=${parsed.id}`);
+        if (!res.ok) {
+          const t = await res.text();
+          throw new Error(`Dashboard error ${res.status}: ${t}`);
+        }
+        const data = await res.json();
+        setDashboard(data);
+        // Mirror key readiness fields to local currentUser for consistency elsewhere
+        try {
+          const updated = { ...parsed };
+          updated.readiness_score = Math.round(data.readiness.overall);
+          updated.technical_score = Math.round(data.readiness.technical);
+          updated.soft_skills_score = Math.round(data.readiness.soft);
+          localStorage.setItem('currentUser', JSON.stringify(updated));
+          setUser(updated);
+        } catch {}
+      } catch (e) {
+        setError(e.message || 'Failed to load dashboard');
+      } finally {
+        setLoading(false);
+        setRefreshing(false);
+      }
+    };
+
+    // Initial load
+    fetchDashboard();
+
+    // Periodic refresh every 30 seconds
+    const intervalId = setInterval(() => {
+      fetchDashboard(true);
+    }, 30000);
+
+    // Refresh on window focus
+    const onFocus = () => fetchDashboard(true);
+    window.addEventListener('focus', onFocus);
+
+    // Cleanup
+    return () => {
+      clearInterval(intervalId);
+      window.removeEventListener('focus', onFocus);
+    };
   }, [navigate]);
+
+  const handleRefresh = () => {
+    const userData = localStorage.getItem('currentUser');
+    if (userData) {
+      const parsed = JSON.parse(userData);
+      const fetchDashboard = async () => {
+        setRefreshing(true);
+        setError(null);
+        try {
+          const res = await fetch(`http://localhost:8000/api/dashboard?user_id=${parsed.id}`);
+          if (!res.ok) {
+            const t = await res.text();
+            throw new Error(`Dashboard error ${res.status}: ${t}`);
+          }
+          const data = await res.json();
+          setDashboard(data);
+          try {
+            const updated = { ...parsed };
+            updated.readiness_score = Math.round(data.readiness.overall);
+            updated.technical_score = Math.round(data.readiness.technical);
+            updated.soft_skills_score = Math.round(data.readiness.soft);
+            localStorage.setItem('currentUser', JSON.stringify(updated));
+            setUser(updated);
+          } catch {}
+        } catch (e) {
+          setError(e.message || 'Failed to load dashboard');
+        } finally {
+          setRefreshing(false);
+        }
+      };
+      fetchDashboard();
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('currentUser');
@@ -44,6 +132,12 @@ export default function WorkingDashboardPage() {
       background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
       fontFamily: 'system-ui, -apple-system, sans-serif'
     }}>
+      <style>{`
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
       {/* Header */}
       <header style={{
         backgroundColor: 'rgba(255, 255, 255, 0.95)',
@@ -86,6 +180,52 @@ export default function WorkingDashboardPage() {
               {user.name}
             </span>
           </div>
+          <button
+            onClick={handleRefresh}
+            disabled={refreshing}
+            style={{
+              padding: '0.75rem 1.5rem',
+              backgroundColor: refreshing ? '#9ca3af' : '#3b82f6',
+              color: 'white',
+              border: 'none',
+              borderRadius: '15px',
+              cursor: refreshing ? 'not-allowed' : 'pointer',
+              fontWeight: '600',
+              transition: 'all 0.3s',
+              boxShadow: refreshing ? 'none' : '0 4px 15px rgba(59, 130, 246, 0.3)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem'
+            }}
+            onMouseOver={(e) => {
+              if (!refreshing) {
+                e.target.style.backgroundColor = '#2563eb';
+                e.target.style.transform = 'translateY(-2px)';
+              }
+            }}
+            onMouseOut={(e) => {
+              if (!refreshing) {
+                e.target.style.backgroundColor = '#3b82f6';
+                e.target.style.transform = 'translateY(0)';
+              }
+            }}
+          >
+            {refreshing ? (
+              <>
+                <span style={{ 
+                  display: 'inline-block',
+                  animation: 'spin 1s linear infinite',
+                  fontSize: '1rem'
+                }}>🔄</span>
+                <span>Refreshing...</span>
+              </>
+            ) : (
+              <>
+                <span>🔄</span>
+                <span>Refresh</span>
+              </>
+            )}
+          </button>
           <button
             onClick={handleLogout}
             style={{
@@ -154,12 +294,16 @@ export default function WorkingDashboardPage() {
               gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
               gap: '2rem'
             }}>
-              {[
-                { icon: '📚', label: 'Readiness Score', value: user.readiness_score || 'N/A', color: '#3b82f6', bg: '#eff6ff' },
-                { icon: '⚡', label: 'Technical Skills', value: user.technical_score || 'N/A', color: '#10b981', bg: '#f0fdf4' },
-                { icon: '🤝', label: 'Soft Skills', value: user.soft_skills_score || 'N/A', color: '#f59e0b', bg: '#fef3c7' },
-                { icon: '👑', label: 'Leadership', value: user.leadership_score || 'N/A', color: '#ec4899', bg: '#fce7f3' }
-              ].map((stat, index) => (
+              {(() => {
+                const readiness = dashboard?.readiness;
+                const items = [
+                  { icon: '📚', label: 'Readiness Score', value: readiness ? Math.round(readiness.overall) : (user.readiness_score || 'N/A'), color: '#3b82f6', bg: '#eff6ff' },
+                  { icon: '⚡', label: 'Technical Skills', value: readiness ? Math.round(readiness.technical) : (user.technical_score || 'N/A'), color: '#10b981', bg: '#f0fdf4' },
+                  { icon: '🤝', label: 'Soft Skills', value: readiness ? Math.round(readiness.soft) : (user.soft_skills_score || 'N/A'), color: '#f59e0b', bg: '#fef3c7' },
+                  { icon: '👑', label: 'Leadership', value: user.leadership_score || 'N/A', color: '#ec4899', bg: '#fce7f3' }
+                ];
+                return items;
+              })().map((stat, index) => (
                 <div
                   key={index}
                   style={{
@@ -204,6 +348,68 @@ export default function WorkingDashboardPage() {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+
+          {/* Quick Actions */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+            gap: '1.5rem',
+            marginBottom: '1.5rem'
+          }}>
+            <div style={{
+              backgroundColor: 'white',
+              padding: '2rem',
+              borderRadius: '8px',
+              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+              cursor: 'pointer',
+              transition: 'all 0.3s'
+            }}
+            onClick={() => navigate('/goals')}
+            onMouseOver={(e) => {
+              e.currentTarget.style.transform = 'translateY(-5px)';
+              e.currentTarget.style.boxShadow = '0 10px 25px rgba(0,0,0,0.15)';
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.1)';
+            }}
+            >
+              <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🎯</div>
+              <h3 style={{ 
+                fontSize: '1.5rem', 
+                fontWeight: 'bold', 
+                marginBottom: '1rem',
+                color: '#1f2937'
+              }}>
+                Goals & Reflection
+              </h3>
+              <p style={{ 
+                color: '#6b7280', 
+                marginBottom: '1.5rem',
+                lineHeight: '1.6'
+              }}>
+                Set goals, track your progress, and reflect on your learning journey.
+              </p>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate('/goals');
+                }}
+                style={{
+                  width: '100%',
+                  padding: '0.75rem 1.5rem',
+                  backgroundColor: '#8b5cf6',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontWeight: '600'
+                }}
+              >
+                📝 View Goals
+              </button>
             </div>
           </div>
 
@@ -342,22 +548,76 @@ export default function WorkingDashboardPage() {
             boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
             marginTop: '2rem'
           }}>
-            <h3 style={{ 
-              fontSize: '1.5rem', 
-              fontWeight: 'bold', 
-              marginBottom: '1.5rem',
-              color: '#1f2937'
-            }}>
-              📋 Recent Activity
-            </h3>
-            <div style={{
-              padding: '2rem',
-              textAlign: 'center',
-              color: '#6b7280'
-            }}>
-              <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📊</div>
-              <p>No recent assessments found. Start your first assessment to see your progress here!</p>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+              <h3 style={{ 
+                fontSize: '1.5rem', 
+                fontWeight: 'bold', 
+                color: '#1f2937',
+                margin: 0
+              }}>
+                📋 Recent Activity
+              </h3>
+              {refreshing && (
+                <span style={{ 
+                  fontSize: '0.875rem', 
+                  color: '#6b7280',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem'
+                }}>
+                  <span style={{ 
+                    display: 'inline-block',
+                    animation: 'spin 1s linear infinite',
+                    fontSize: '0.875rem'
+                  }}>🔄</span>
+                  Updating...
+                </span>
+              )}
             </div>
+            {loading && (
+              <div style={{ padding: '2rem', textAlign: 'center', color: '#6b7280' }}>Loading dashboard…</div>
+            )}
+            {!loading && error && (
+              <div style={{ padding: '1rem', color: '#b91c1c', background: '#fee2e2', border: '1px solid #fecaca', borderRadius: '8px' }}>
+                {error}
+              </div>
+            )}
+            {!loading && !error && (
+              (() => {
+                const items = dashboard?.recent_attempts || [];
+                if (!items || items.length === 0) {
+                  return (
+                    <div style={{
+                      padding: '2rem',
+                      textAlign: 'center',
+                      color: '#6b7280'
+                    }}>
+                      <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📊</div>
+                      <p>No recent assessments found. Start your first assessment to see your progress here!</p>
+                    </div>
+                  );
+                }
+                return (
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '0.75rem' }}>
+                    {items.map((it) => (
+                      <div key={it.id} style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        padding: '0.75rem 1rem',
+                        border: '1px solid #e5e7eb',
+                        borderRadius: '8px',
+                        backgroundColor: '#fafafa'
+                      }}>
+                        <div style={{ color: '#374151', fontWeight: 600 }}>Quiz: {String(it.quiz_id)}</div>
+                        <div style={{ color: it.passed ? '#059669' : '#dc2626', fontWeight: 700 }}>{Math.round(it.score)}%</div>
+                        <div style={{ color: '#6b7280', fontSize: '0.875rem' }}>{it.completed_at ? new Date(it.completed_at).toLocaleString() : ''}</div>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()
+            )}
           </div>
         </div>
       </div>

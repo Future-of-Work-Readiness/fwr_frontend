@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { CheckCircle, XCircle, Clock, Trophy, ArrowLeft, RotateCcw, Target } from 'lucide-react';
+import { getReadinessSnapshot } from '../utils/testSystem';
 
 const TestResultsPage = () => {
   const navigate = useNavigate();
@@ -12,8 +13,35 @@ const TestResultsPage = () => {
     score, 
     timeSpent, 
     result, 
-    autoSubmit = false 
+    autoSubmit = false,
+    attemptId
   } = location.state || {};
+
+  const [backendData, setBackendData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchResult = async () => {
+      if (!attemptId) return;
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await fetch(`http://localhost:8000/api/results/${attemptId}`);
+        if (!res.ok) {
+          const t = await res.text();
+          throw new Error(`Results error ${res.status}: ${t}`);
+        }
+        const data = await res.json();
+        setBackendData(data);
+      } catch (e) {
+        setError(e.message || 'Failed to load results');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchResult();
+  }, [attemptId]);
 
   if (!test || !result) {
     return (
@@ -61,6 +89,10 @@ const TestResultsPage = () => {
   const performance = getPerformanceMessage(score);
   const Icon = performance.icon;
 
+  const displayScore = backendData?.attempt?.score ?? score;
+  const displayPassed = backendData?.attempt?.passed ?? result?.passed;
+  const displayTitle = backendData?.quiz?.title || test?.title || 'Test Results';
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       {/* Header */}
@@ -75,7 +107,7 @@ const TestResultsPage = () => {
             </button>
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Test Results</h1>
-              <p className="text-gray-600 mt-1">{test.title}</p>
+              <p className="text-gray-600 mt-1">{displayTitle}</p>
             </div>
           </div>
         </div>
@@ -99,13 +131,49 @@ const TestResultsPage = () => {
             <Icon className={`h-16 w-16 mx-auto mb-4 ${getScoreColor(score)}`} />
             <h2 className="text-3xl font-bold text-gray-900 mb-2">{performance.message}</h2>
             <div className={`text-6xl font-bold mb-4 ${getScoreColor(score)}`}>
-              {score}%
+              {Math.round(displayScore)}%
             </div>
             <p className="text-gray-600 text-lg">
-              {result.passed ? 'You passed the test!' : 'You need 70% to pass. Try again!'}
+              {displayPassed ? 'You passed the test!' : 'You need 70% to pass. Try again!'}
             </p>
           </div>
         </div>
+
+        {/* Readiness Impact (backend preferred, local fallback) */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          {(() => {
+            try {
+              const readiness = backendData?.readiness;
+              const userRaw = localStorage.getItem('currentUser');
+              const user = userRaw ? JSON.parse(userRaw) : null;
+              const localSnap = user ? getReadinessSnapshot(user.id) : null;
+              const overall = readiness ? Math.round(readiness.overall) : (localSnap ? localSnap.overall : 0);
+              const technical = readiness ? Math.round(readiness.technical) : (localSnap ? localSnap.technical : 0);
+              const soft = readiness ? Math.round(readiness.soft) : (localSnap ? localSnap.soft : 0);
+              const items = [
+                { label: 'Overall Readiness', value: `${overall}%`, color: 'text-blue-700', bg: 'bg-blue-50' },
+                { label: 'Technical', value: `${technical}%`, color: 'text-green-700', bg: 'bg-green-50' },
+                { label: 'Soft Skills', value: `${soft}%`, color: 'text-yellow-700', bg: 'bg-yellow-50' },
+                { label: 'Passed', value: displayPassed ? 'Yes' : 'No', color: displayPassed ? 'text-emerald-700' : 'text-red-700', bg: displayPassed ? 'bg-emerald-50' : 'bg-red-50' }
+              ];
+              return items.map((it, idx) => (
+                <div key={idx} className={`rounded-lg p-6 ${it.bg} border border-gray-200 text-center`}>
+                  <div className="text-sm text-gray-600 mb-1">{it.label}</div>
+                  <div className={`text-2xl font-bold ${it.color}`}>{it.value}</div>
+                </div>
+              ));
+            } catch {
+              return null;
+            }
+          })()}
+        </div>
+
+        {loading && (
+          <div className="bg-white rounded-lg p-4 mb-6 border border-gray-200 text-gray-600">Loading results…</div>
+        )}
+        {!loading && error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6 text-red-700">{error}</div>
+        )}
 
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">

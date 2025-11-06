@@ -12,6 +12,7 @@ import TestHubPage from '../pages/TestHubPage';
 import TestPage from '../pages/TestPage';
 import TestTakingPage from '../pages/TestTakingPage';
 import TestResultsPage from '../pages/TestResultsPage';
+import GoalsPage from '../pages/GoalsPage';
 import ConnectionTestPage from '../pages/ConnectionTestPage';
 import DatabaseTestPage from '../pages/DatabaseTestPage';
 import SimpleTestPage from '../pages/SimpleTestPage';
@@ -88,6 +89,14 @@ function App() {
           element={
             <ProtectedRoute>
               <TestResultsPage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/goals" 
+          element={
+            <ProtectedRoute>
+              <GoalsPage />
             </ProtectedRoute>
           } 
         />

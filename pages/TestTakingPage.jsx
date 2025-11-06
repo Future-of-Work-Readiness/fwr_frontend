@@ -16,6 +16,7 @@ const TestTakingPage = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [quizIdState, setQuizIdState] = useState(null);
 
   useEffect(() => {
     const currentUser = getCurrentUser();
@@ -81,6 +82,7 @@ const TestTakingPage = () => {
         };
         
         setTest(transformedTest);
+        setQuizIdState(quizId);
         setTimeLeft(transformedTest.estimatedTime * 60);
         setStartTime(Date.now());
         setLoading(false);
@@ -138,10 +140,15 @@ const TestTakingPage = () => {
       let backendResult = null;
       let score = 0;
       let correctCount = 0;
+      let createdAttemptId = null;
       
       try {
         // Start quiz attempt - backend expects user_id as query parameter
-        const startResponse = await fetch(`http://localhost:8000/api/quizzes/${quizId}/start?user_id=${user.id}`, {
+        const quizIdForSubmit = quizIdState ?? (test && test.id ? parseInt(test.id) : null);
+        if (!quizIdForSubmit || isNaN(quizIdForSubmit)) {
+          throw new Error(`Cannot determine quiz ID for submission`);
+        }
+        const startResponse = await fetch(`http://localhost:8000/api/quizzes/${quizIdForSubmit}/start?user_id=${user.id}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' }
         });
@@ -149,6 +156,7 @@ const TestTakingPage = () => {
         if (startResponse.ok) {
           const startData = await startResponse.json();
           const attemptId = startData.attempt_id;
+          createdAttemptId = attemptId;
           
           // Prepare answers for submission
           const submissionAnswers = test.questions.map((q, idx) => {
@@ -172,6 +180,21 @@ const TestTakingPage = () => {
             score = backendResult.score || 0;
             correctCount = backendResult.correct || 0;
             console.log('Quiz submitted successfully to backend:', backendResult);
+            // Update local currentUser with backend readiness snapshot if present
+            try {
+              if (backendResult.readiness) {
+                const userRaw = localStorage.getItem('currentUser');
+                if (userRaw) {
+                  const u = JSON.parse(userRaw);
+                  if (u && u.id === user.id) {
+                    u.readiness_score = Math.round(backendResult.readiness.overall);
+                    u.technical_score = Math.round(backendResult.readiness.technical);
+                    u.soft_skills_score = Math.round(backendResult.readiness.soft);
+                    localStorage.setItem('currentUser', JSON.stringify(u));
+                  }
+                }
+              }
+            } catch {}
           }
         }
       } catch (backendError) {
@@ -200,7 +223,8 @@ const TestTakingPage = () => {
           timeSpent,
           result: backendResult || localResult,
           autoSubmit,
-          passed: score >= 70
+          passed: score >= 70,
+          attemptId: createdAttemptId
         }
       });
     } catch (error) {
