@@ -1,17 +1,32 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BookOpen, Zap, PlayCircle, Target, Award, TrendingUp, Clock, User, LogOut } from 'lucide-react';
-import { getCurrentUser, logoutUser } from '../utils/auth';
+import { getCurrentUser, logoutUser, refreshUserData } from '../utils/auth';
 import { getSpecializationDetails } from '../utils/hierarchicalApi';
 
 export default function DashboardPage() {
   const navigate = useNavigate();
   const [specializationName, setSpecializationName] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [userData, setUserData] = useState(null);
   
   // Get current user data
-  const currentUser = getCurrentUser();
+  const initialUser = getCurrentUser();
+  const currentUser = userData || initialUser;
   const specializationId = currentUser?.specializationId || currentUser?.specialization_id;
+  
+  // Refresh user data from backend on mount
+  useEffect(() => {
+    const refreshData = async () => {
+      if (initialUser?.id) {
+        const result = await refreshUserData(initialUser.id);
+        if (result.success) {
+          setUserData(result.user);
+        }
+      }
+    };
+    refreshData();
+  }, []);
   
   // Fetch specialization details from backend
   useEffect(() => {

@@ -13,6 +13,7 @@ import TestPage from '../pages/TestPage';
 import TestTakingPage from '../pages/TestTakingPage';
 import TestResultsPage from '../pages/TestResultsPage';
 import GoalsPage from '../pages/GoalsPage';
+import PeerBenchmarkingPage from '../pages/PeerBenchmarkingPage';
 import ConnectionTestPage from '../pages/ConnectionTestPage';
 import DatabaseTestPage from '../pages/DatabaseTestPage';
 import SimpleTestPage from '../pages/SimpleTestPage';
@@ -97,6 +98,14 @@ function App() {
           element={
             <ProtectedRoute>
               <GoalsPage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/peer-benchmark" 
+          element={
+            <ProtectedRoute>
+              <PeerBenchmarkingPage />
             </ProtectedRoute>
           } 
         />

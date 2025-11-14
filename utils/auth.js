@@ -169,3 +169,22 @@ export const updateUserScores = (scores) => {
   }
   return { success: false, error: 'No user logged in' };
 };
+
+// Refresh user data from backend
+export const refreshUserData = async (userId) => {
+  try {
+    const response = await fetch(`http://localhost:8000/api/users/${userId}`);
+    if (response.ok) {
+      const userData = await response.json();
+      const user = createUser(userData);
+      setCurrentUser(user);
+      console.log('User data refreshed:', user);
+      return { success: true, user };
+    } else {
+      throw new Error('Failed to refresh user data');
+    }
+  } catch (error) {
+    console.error('Refresh error:', error);
+    return { success: false, error: error.message };
+  }
+};

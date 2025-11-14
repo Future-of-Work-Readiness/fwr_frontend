@@ -24,7 +24,7 @@ export const getCompleteHierarchy = async () => {
  */
 export const getSectors = async () => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/sectors`);
+    const response = await fetch(`${API_BASE_URL}/sectors`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -42,7 +42,7 @@ export const getSectors = async () => {
  */
 export const getBranchesBySector = async (sectorId) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/sectors/${sectorId}/branches`);
+    const response = await fetch(`${API_BASE_URL}/sectors/${sectorId}/branches`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -60,7 +60,7 @@ export const getBranchesBySector = async (sectorId) => {
  */
 export const getSpecializationsByBranch = async (branchId) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/branches/${branchId}/specializations`);
+    const response = await fetch(`${API_BASE_URL}/branches/${branchId}/specializations`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -78,7 +78,7 @@ export const getSpecializationsByBranch = async (branchId) => {
  */
 export const getSpecializationDetails = async (specializationId) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/specializations/${specializationId}`);
+    const response = await fetch(`${API_BASE_URL}/specializations/${specializationId}`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -96,7 +96,7 @@ export const getSpecializationDetails = async (specializationId) => {
  */
 export const getSectorHierarchy = async (sectorId) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/sectors/${sectorId}/hierarchy`);
+    const response = await fetch(`${API_BASE_URL}/sectors/${sectorId}/hierarchy`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -114,7 +114,7 @@ export const getSectorHierarchy = async (sectorId) => {
  */
 export const getBranchDetails = async (branchId) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/branches/${branchId}`);
+    const response = await fetch(`${API_BASE_URL}/branches/${branchId}`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }

@@ -187,6 +187,11 @@ const TestTakingPage = () => {
                 if (userRaw) {
                   const u = JSON.parse(userRaw);
                   if (u && u.id === user.id) {
+                    // Use camelCase for consistency with Dashboard
+                    u.readinessScore = Math.round(backendResult.readiness.overall);
+                    u.technicalScore = Math.round(backendResult.readiness.technical);
+                    u.softSkillsScore = Math.round(backendResult.readiness.soft);
+                    // Also update snake_case for backend compatibility
                     u.readiness_score = Math.round(backendResult.readiness.overall);
                     u.technical_score = Math.round(backendResult.readiness.technical);
                     u.soft_skills_score = Math.round(backendResult.readiness.soft);
