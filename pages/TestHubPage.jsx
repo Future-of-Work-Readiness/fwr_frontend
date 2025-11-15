@@ -11,7 +11,6 @@ const TestHubPage = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [tests, setTests] = useState([]);
-  const [filteredTests, setFilteredTests] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -25,30 +24,25 @@ const TestHubPage = () => {
     loadTests();
   }, [navigate]);
 
-  // Filter tests based on user's specialization
-  useEffect(() => {
-    if (user && tests.length > 0) {
-      const specializationId = user?.specializationId || user?.specialization_id;
-      if (specializationId) {
-        // Filter tests to only show those for the user's specialization
-        const filtered = tests.filter(test => test.specialization_id === specializationId);
-        setFilteredTests(filtered);
-      } else {
-        setFilteredTests(tests);
-      }
-    } else {
-      setFilteredTests(tests);
-    }
-  }, [user, tests]);
-
 
 
   const loadTests = async () => {
     try {
       setLoading(true);
 
-      // Fetch all quizzes from database API
-      const url = 'http://localhost:8000/api/quizzes';
+      // Get user's specialization ID
+      const currentUser = getCurrentUser();
+      const specializationId = currentUser?.specializationId || currentUser?.specialization_id;
+
+      if (!specializationId) {
+        console.error('No specialization ID found for user');
+        setTests([]);
+        setLoading(false);
+        return;
+      }
+
+      // Fetch quizzes for user's specialization only
+      const url = `http://localhost:8000/api/specializations/${specializationId}/quizzes`;
 
       const response = await fetch(url);
       if (!response.ok) throw new Error('Failed to fetch quizzes');
@@ -60,8 +54,8 @@ const TestHubPage = () => {
         title: quiz.title,
         description: quiz.description,
         category: quiz.specialization_name || 'General',
-        specialization_id: quiz.specialization_id,
-        difficulty: ['Beginner', 'Intermediate', 'Advanced', 'Expert'][quiz.difficulty - 1] || 'Beginner',
+        specialization_id: quiz.specialization_id || specializationId,
+        difficulty: ['Beginner', 'Intermediate', 'Advanced', 'Expert', 'Master'][quiz.difficulty - 1] || 'Beginner',
         estimatedTime: quiz.duration || 30,
         tags: [quiz.specialization_name || 'General'],
         questionCount: quiz.question_count || 0
@@ -71,9 +65,6 @@ const TestHubPage = () => {
       setLoading(false);
     } catch (error) {
       console.error('Error loading tests:', error);
-      // Note: Removed fallback to hardcoded tests - all data should come from database
-      // If API fails, show error message instead
-      setError('Failed to load quizzes. Please ensure the backend is running.');
       setTests([]);
       setLoading(false);
     }
@@ -119,7 +110,7 @@ const TestHubPage = () => {
               </div>
             </div>
             <div className="text-sm text-gray-500">
-              {filteredTests.length} test{filteredTests.length !== 1 ? 's' : ''} available
+              {tests.length} test{tests.length !== 1 ? 's' : ''} available
             </div>
           </div>
         </div>
@@ -127,7 +118,7 @@ const TestHubPage = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Tests Grid */}
-        {filteredTests.length === 0 ? (
+        {tests.length === 0 ? (
           <div className={`${cardStyles.default} text-center relative overflow-hidden`}>
             {/* Animated background for empty state */}
             <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-purple-50 opacity-50"></div>
@@ -139,16 +130,13 @@ const TestHubPage = () => {
                 No Tests Available
               </h3>
               <p className="text-gray-600 mb-4">
-                {tests.length === 0
-                  ? 'Tests are being prepared. Check back soon!'
-                  : 'No tests available for your specialization. Please contact support if you believe this is an error.'
-                }
+                No tests available for your specialization yet. Check back soon!
               </p>
             </div>
           </div>
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {filteredTests.map((test) => (
+            {tests.map((test) => (
               <div key={test.id} className={`${cardStyles.interactive} group relative overflow-hidden`}>
                 {/* Subtle gradient overlay on hover */}
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-purple-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
