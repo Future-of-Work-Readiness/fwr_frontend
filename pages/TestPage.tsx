@@ -1,3 +1,5 @@
+import React from 'react';
+
 export default function TestPage(): JSX.Element {
 	return (
 		<div className='min-h-screen bg-blue-100 flex items-center justify-center'>

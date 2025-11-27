@@ -8,13 +8,9 @@ import {
 	AlertCircle,
 	X
 } from 'lucide-react';
-import { getCurrentUser } from '../utils/auth';
-import {
-	getTestById,
-	calculateTestScore,
-	saveTestResult
-} from '../utils/testSystem';
-import type { User, Test, TestQuestion } from '../src/types';
+import { getCurrentUser, refreshUserData } from '../utils/auth';
+import { calculateTestScore, saveTestResult } from '../utils/testSystem';
+import type { User, Test } from '../src/types';
 
 const TestTakingPage = (): JSX.Element => {
 	const navigate = useNavigate();
@@ -246,7 +242,6 @@ const TestTakingPage = (): JSX.Element => {
 
 						// Refresh user data from backend to get latest scores
 						try {
-							const { refreshUserData } = await import('../utils/auth');
 							const refreshResult = await refreshUserData(user.id);
 							if (refreshResult.success) {
 								console.log(
@@ -422,9 +417,6 @@ const TestTakingPage = (): JSX.Element => {
 	const currentQuestion = test.questions?.[currentQuestionIndex];
 	const isLastQuestion =
 		test.questions && currentQuestionIndex === test.questions.length - 1;
-	const isAnswered = currentQuestion
-		? answers[currentQuestion.id] !== undefined
-		: false;
 
 	return (
 		<div className='min-h-screen bg-white'>

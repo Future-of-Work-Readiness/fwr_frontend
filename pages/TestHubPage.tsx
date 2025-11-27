@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
 	BookOpen,
@@ -162,7 +162,7 @@ const TestHubPage = (): JSX.Element => {
 										<div className='flex flex-col items-end gap-2'>
 											<span
 												className={`text-xs font-medium px-2.5 py-0.5 rounded-full transition-all duration-300 ${getDifficultyColor(
-													test.difficulty
+													test.difficulty || 'Beginner'
 												)}`}>
 												{test.difficulty}
 											</span>

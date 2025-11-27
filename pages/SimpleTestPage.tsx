@@ -1,3 +1,5 @@
+import React from 'react';
+
 export default function SimpleTestPage(): JSX.Element {
 	return (
 		<div style={{ padding: '20px' }}>

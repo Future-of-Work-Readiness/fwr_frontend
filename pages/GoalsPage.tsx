@@ -50,9 +50,6 @@ export default function GoalsPage(): JSX.Element {
 	const [showGoalForm, setShowGoalForm] = useState<boolean>(false);
 	const [showJournalForm, setShowJournalForm] = useState<boolean>(false);
 	const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
-	const [editingJournal, setEditingJournal] = useState<JournalEntry | null>(
-		null
-	);
 
 	interface GoalFormData {
 		title: string;
@@ -380,6 +377,11 @@ export default function GoalsPage(): JSX.Element {
 				</div>
 
 				{/* Two-Column Layout */}
+				{error && (
+					<div className='mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700'>
+						{error}
+					</div>
+				)}
 				<div className='grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8'>
 					{/* Where I Am Now */}
 					<div className='bg-white rounded-xl shadow-lg p-6'>
@@ -634,7 +636,6 @@ export default function GoalsPage(): JSX.Element {
 						{!showJournalForm && (
 							<button
 								onClick={() => {
-									setEditingJournal(null);
 									setJournalForm({ prompt: '', content: '' });
 									setShowJournalForm(true);
 								}}

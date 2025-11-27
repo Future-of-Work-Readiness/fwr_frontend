@@ -2,7 +2,7 @@ import React from 'react';
 import type { Sector, Specialization, Quiz, UserPreferences } from './types';
 
 // Simple working components
-function WorkingOnboarding(): JSX.Element {
+export function WorkingOnboarding(): JSX.Element {
 	const [sectors, setSectors] = React.useState<Sector[]>([]);
 	const [selectedSector, setSelectedSector] = React.useState<string>('');
 	const [specializations, setSpecializations] = React.useState<
@@ -227,7 +227,7 @@ function WorkingOnboarding(): JSX.Element {
 	);
 }
 
-function WorkingDashboard(): JSX.Element {
+export function WorkingDashboard(): JSX.Element {
 	const [userPreferences, setUserPreferences] =
 		React.useState<UserPreferences | null>(null);
 	const [quizzes, setQuizzes] = React.useState<Quiz[]>([]);

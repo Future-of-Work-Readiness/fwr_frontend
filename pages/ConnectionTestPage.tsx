@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { testConnection, authAPI, quizAPI } from '../utils/api';
 
 interface TestResult {

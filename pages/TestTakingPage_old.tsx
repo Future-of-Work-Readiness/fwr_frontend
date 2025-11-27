@@ -13,7 +13,7 @@ import {
 	calculateTestScore,
 	saveTestResult
 } from '../utils/testSystem';
-import type { User, Test, TestResult } from '../src/types';
+import type { User, Test, TestResult, TestQuestion } from '../src/types';
 
 export default function TestTakingPage(): JSX.Element {
 	const navigate = useNavigate();
@@ -56,8 +56,25 @@ export default function TestTakingPage(): JSX.Element {
 			);
 
 			if (test) {
-				setTestData(test);
-				setTimeLeft((test.duration || 30) * 60); // Convert minutes to seconds
+				const normalizedQuestions: TestQuestion[] = test.questions.map(
+					(question) => ({
+						...question,
+						type:
+							question.type === 'true-false' ? 'true-false' : 'multiple-choice'
+					})
+				);
+				const normalizedTest: Test = {
+					id: `${userIndustry.industry}-${userIndustry.branch}-${userIndustry.specialization}`,
+					title: test.title,
+					description: test.description,
+					category: userIndustry.industry,
+					difficulty: test.difficulty,
+					estimatedTime: test.duration,
+					questions: normalizedQuestions
+				};
+
+				setTestData(normalizedTest);
+				setTimeLeft((normalizedTest.estimatedTime || 30) * 60); // Convert minutes to seconds
 				setStartTime(Date.now());
 			} else {
 				// No test available for this specialization
@@ -115,7 +132,7 @@ export default function TestTakingPage(): JSX.Element {
 			? `${userIndustry.industry}-${userIndustry.branch}-${userIndustry.specialization}`
 			: testData.id.toString();
 
-		saveTestResult(currentUser.id, testId, score, userAnswers, timeSpent);
+		saveTestResult(currentUser.id, testId, score, answers, timeSpent);
 
 		const normalizedResult: TestResult = {
 			testId,
