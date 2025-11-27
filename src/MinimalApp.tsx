@@ -251,7 +251,6 @@ export function WorkingDashboard(): JSX.Element {
 	const fetchQuizzes = async (): Promise<void> => {
 		try {
 			const response = await fetch(`${API_BASE_URL}/quizzes`);
-			const response = await fetch(`${API_BASE_URL}/quizzes`);
 			if (response.ok) {
 				const data = (await response.json()) as Quiz[];
 				setQuizzes(data);
