@@ -1,12 +1,16 @@
-import React from 'react';
+import type { ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
 import { isLoggedIn } from '../utils/auth';
 
-export default function ProtectedRoute({ children }) {
-  if (!isLoggedIn()) {
-    // Redirect to landing page if not logged in
-    return <Navigate to="/" replace />;
-  }
+interface ProtectedRouteProps {
+	children: ReactNode;
+}
 
-  return children;
+export default function ProtectedRoute({ children }: ProtectedRouteProps) {
+	if (!isLoggedIn()) {
+		// Redirect to landing page if not logged in
+		return <Navigate to='/' replace />;
+	}
+
+	return children;
 }

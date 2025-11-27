@@ -1,7 +1,7 @@
 import React from 'react';
-import HierarchyTestPage from '../pages/HierarchyTestPage.jsx';
+import HierarchyTestPage from '../pages/HierarchyTestPage';
 
-function HierarchyDemo() {
+function HierarchyDemo(): JSX.Element {
   return <HierarchyTestPage />;
 }
 

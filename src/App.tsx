@@ -1,4 +1,3 @@
-import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 // Import pages for new user flow
@@ -22,7 +21,7 @@ import AdminPage from '../pages/AdminPage';
 // Import components
 import ProtectedRoute from '../components/ProtectedRoute';
 
-function App() {
+function App(): JSX.Element {
   return (
     <BrowserRouter>
       <Routes>

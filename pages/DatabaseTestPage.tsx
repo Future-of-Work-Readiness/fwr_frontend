@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import type { Sector, Specialization, Quiz, User } from '../src/types';
 
-const DatabaseTestPage = () => {
-	const [sectors, setSectors] = useState([]);
-	const [specializations, setSpecializations] = useState([]);
-	const [quizzes, setQuizzes] = useState([]);
-	const [user, setUser] = useState(null);
-	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState('');
+const DatabaseTestPage = (): JSX.Element => {
+	const [sectors, setSectors] = useState<Sector[]>([]);
+	const [specializations, setSpecializations] = useState<Specialization[]>([]);
+	const [quizzes, setQuizzes] = useState<Quiz[]>([]);
+	const [user, setUser] = useState<User | null>(null);
+	const [loading, setLoading] = useState<boolean>(false);
+	const [error, setError] = useState<string>('');
 
 	const API_BASE = import.meta.env.VITE_API_URL;
 
@@ -19,28 +20,34 @@ const DatabaseTestPage = () => {
 			const response = await fetch(`${API_BASE}/sectors`);
 			if (!response.ok) throw new Error('Failed to fetch sectors');
 
-			const data = await response.json();
-			setSectors(data.sectors);
+			const data = (await response.json()) as { sectors?: Sector[] };
+			const sectorsArray = data.sectors || [];
+			setSectors(sectorsArray);
 
 			// If we have sectors, fetch specializations for the first one
-			if (data.sectors.length > 0) {
+			if (sectorsArray.length > 0) {
 				const sectorsResponse = await fetch(
-					`${API_BASE}/sectors/${data.sectors[0].id}/specializations`
+					`${API_BASE}/sectors/${sectorsArray[0].id}/specializations`
 				);
 				if (sectorsResponse.ok) {
-					const specsData = await sectorsResponse.json();
-					setSpecializations(specsData.specializations);
+					const specsData = (await sectorsResponse.json()) as {
+						specializations?: Specialization[];
+					};
+					setSpecializations(specsData.specializations || []);
 				}
 			}
 
 			// Fetch quizzes
 			const quizzesResponse = await fetch(`${API_BASE}/quizzes`);
 			if (quizzesResponse.ok) {
-				const quizzesData = await quizzesResponse.json();
-				setQuizzes(quizzesData.quizzes);
+				const quizzesData = (await quizzesResponse.json()) as {
+					quizzes?: Quiz[];
+				};
+				setQuizzes(quizzesData.quizzes || []);
 			}
 		} catch (err) {
-			setError(`Database connection failed: ${err.message}`);
+			const error = err instanceof Error ? err : new Error('Unknown error');
+			setError(`Database connection failed: ${error.message}`);
 		} finally {
 			setLoading(false);
 		}
@@ -71,10 +78,11 @@ const DatabaseTestPage = () => {
 				throw new Error(`Registration failed: ${errorData}`);
 			}
 
-			const data = await response.json();
+			const data = (await response.json()) as { user: User };
 			setUser(data.user);
 		} catch (err) {
-			setError(`User registration failed: ${err.message}`);
+			const error = err instanceof Error ? err : new Error('Unknown error');
+			setError(`User registration failed: ${error.message}`);
 		} finally {
 			setLoading(false);
 		}

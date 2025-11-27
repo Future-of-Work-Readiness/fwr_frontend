@@ -1,31 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
 	BookOpen,
 	Clock,
-	User,
+	User as UserIcon,
 	ChevronRight,
-	ArrowLeft,
-	Sparkles
+	ArrowLeft
 } from 'lucide-react';
 import { getCurrentUser } from '../utils/auth';
-import { getAvailableTests } from '../utils/testSystem';
 import {
-	colors,
-	gradients,
 	buttonStyles,
 	cardStyles,
-	SkeletonLoader,
 	getDifficultyColor
 } from '../utils/designSystem';
+import type { Test, Quiz } from '../src/types';
 
-const API_BASE = import.meta.env.VITE_API_URL;
-
-const TestHubPage = () => {
+const TestHubPage = (): JSX.Element => {
 	const navigate = useNavigate();
-	const [user, setUser] = useState(null);
-	const [tests, setTests] = useState([]);
-	const [loading, setLoading] = useState(true);
+	const [tests, setTests] = useState<Test[]>([]);
+	const [loading, setLoading] = useState<boolean>(true);
 
 	useEffect(() => {
 		const currentUser = getCurrentUser();
@@ -34,18 +27,16 @@ const TestHubPage = () => {
 			return;
 		}
 
-		setUser(currentUser);
 		loadTests();
 	}, [navigate]);
 
-	const loadTests = async () => {
+	const loadTests = async (): Promise<void> => {
 		try {
 			setLoading(true);
 
 			// Get user's specialization ID
 			const currentUser = getCurrentUser();
-			const specializationId =
-				currentUser?.specializationId || currentUser?.specialization_id;
+			const specializationId = currentUser?.specializationId;
 
 			if (!specializationId) {
 				console.error('No specialization ID found for user');
@@ -62,20 +53,24 @@ const TestHubPage = () => {
 
 			const data = await response.json();
 			// Transform database format to frontend format
-			const transformedTests = (data.quizzes || []).map((quiz) => ({
-				id: quiz.id.toString(),
-				title: quiz.title,
-				description: quiz.description,
-				category: quiz.specialization_name || 'General',
-				specialization_id: quiz.specialization_id || specializationId,
-				difficulty:
-					['Beginner', 'Intermediate', 'Advanced', 'Expert', 'Master'][
-						quiz.difficulty - 1
-					] || 'Beginner',
-				estimatedTime: quiz.duration || 30,
-				tags: [quiz.specialization_name || 'General'],
-				questionCount: quiz.question_count || 0
-			}));
+			const transformedTests: Test[] = (data.quizzes || []).map(
+				(quiz: Quiz & { specialization_name?: string }) => ({
+					id: quiz.id.toString(),
+					title: quiz.title,
+					description: quiz.description,
+					category: quiz.specialization_name || 'General',
+					specialization_id: quiz.specialization_id || specializationId,
+					difficulty:
+						typeof quiz.difficulty === 'number'
+							? ['Beginner', 'Intermediate', 'Advanced', 'Expert', 'Master'][
+									quiz.difficulty - 1
+							  ] || 'Beginner'
+							: quiz.difficulty || 'Beginner',
+					estimatedTime: quiz.duration || 30,
+					tags: [quiz.specialization_name || 'General'],
+					questionCount: quiz.question_count || 0
+				})
+			);
 
 			setTests(transformedTests);
 			setLoading(false);
@@ -86,7 +81,7 @@ const TestHubPage = () => {
 		}
 	};
 
-	const startTest = (test) => {
+	const startTest = (test: Test): void => {
 		navigate('/test-taking', {
 			state: { testId: test.id }
 		});
@@ -191,7 +186,7 @@ const TestHubPage = () => {
 											<span>{test.estimatedTime} min</span>
 										</div>
 										<div className='flex items-center gap-1'>
-											<User className='h-4 w-4' />
+											<UserIcon className='h-4 w-4' />
 											<span>{test.questionCount || 0} questions</span>
 										</div>
 									</div>

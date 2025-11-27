@@ -1,20 +1,43 @@
-import React, { useState, useEffect } from 'react';
-import { getSectors, getBranches, getSpecializations } from '../utils/api';
+import { useState, useEffect } from 'react';
+import type {
+	AdminTab,
+	AdminStats,
+	AdminSector,
+	AdminBranch,
+	AdminSpecialization,
+	AdminUser,
+	Message,
+	FormDataType
+} from '../src/types';
 
 const API_BASE = import.meta.env.VITE_API_URL;
 
-function AdminPage() {
-	const [activeTab, setActiveTab] = useState('stats');
-	const [stats, setStats] = useState(null);
-	const [sectors, setSectors] = useState([]);
-	const [branches, setBranches] = useState([]);
-	const [specializations, setSpecializations] = useState([]);
-	const [users, setUsers] = useState([]);
-	const [loading, setLoading] = useState(false);
-	const [message, setMessage] = useState(null);
+interface FormDataState {
+	sector: { name: string; description: string };
+	branch: { name: string; description: string; sector_id: string };
+	specialization: { name: string; description: string; branch_id: string };
+	user: {
+		name: string;
+		email: string;
+		readiness_score: string;
+		technical_score: string;
+	};
+}
+
+function AdminPage(): JSX.Element {
+	const [activeTab, setActiveTab] = useState<AdminTab>('stats');
+	const [stats, setStats] = useState<AdminStats | null>(null);
+	const [sectors, setSectors] = useState<AdminSector[]>([]);
+	const [branches, setBranches] = useState<AdminBranch[]>([]);
+	const [specializations, setSpecializations] = useState<AdminSpecialization[]>(
+		[]
+	);
+	const [users, setUsers] = useState<AdminUser[]>([]);
+	const [loading, setLoading] = useState<boolean>(false);
+	const [message, setMessage] = useState<Message | null>(null);
 
 	// Form states
-	const [formData, setFormData] = useState({
+	const [formData, setFormData] = useState<FormDataState>({
 		sector: { name: '', description: '' },
 		branch: { name: '', description: '', sector_id: '' },
 		specialization: { name: '', description: '', branch_id: '' },
@@ -25,47 +48,62 @@ function AdminPage() {
 		loadData();
 	}, [activeTab]);
 
-	const loadData = async () => {
+	const loadData = async (): Promise<void> => {
 		setLoading(true);
 		try {
 			if (activeTab === 'stats') {
 				const response = await fetch(`${API_BASE}/admin/stats`);
-				const data = await response.json();
+				const data = (await response.json()) as AdminStats;
 				setStats(data);
 			} else if (activeTab === 'sectors') {
 				const response = await fetch(`${API_BASE}/admin/sectors`);
-				const data = await response.json();
+				const data = (await response.json()) as AdminSector[];
 				setSectors(data);
 			} else if (activeTab === 'branches') {
 				const response = await fetch(`${API_BASE}/admin/branches`);
-				const data = await response.json();
+				const data = (await response.json()) as AdminBranch[];
 				setBranches(data);
 			} else if (activeTab === 'specializations') {
 				const response = await fetch(`${API_BASE}/admin/specializations`);
-				const data = await response.json();
+				const data = (await response.json()) as AdminSpecialization[];
 				setSpecializations(data);
 			} else if (activeTab === 'users') {
 				const response = await fetch(`${API_BASE}/admin/users`);
-				const data = await response.json();
+				const data = (await response.json()) as AdminUser[];
 				setUsers(data);
 			}
 		} catch (error) {
-			showMessage('Error loading data: ' + error.message, 'error');
+			const err = error instanceof Error ? error : new Error('Unknown error');
+			showMessage('Error loading data: ' + err.message, 'error');
 		} finally {
 			setLoading(false);
 		}
 	};
 
-	const showMessage = (msg, type = 'success') => {
+	const showMessage = (
+		msg: string,
+		type: 'success' | 'error' = 'success'
+	): void => {
 		setMessage({ text: msg, type });
 		setTimeout(() => setMessage(null), 3000);
 	};
 
-	const handleCreate = async (type) => {
+	const handleCreate = async (type: FormDataType): Promise<void> => {
 		setLoading(true);
 		try {
 			const endpoint = `${API_BASE}/admin/${type}`;
-			const data = formData[type];
+			// Map form data keys to API endpoints
+			const formKey =
+				type === 'sectors'
+					? 'sector'
+					: type === 'branches'
+					? 'branch'
+					: type === 'specializations'
+					? 'specialization'
+					: type === 'users'
+					? 'user'
+					: type;
+			const data = formData[formKey as keyof FormDataState];
 
 			const response = await fetch(endpoint, {
 				method: 'POST',
@@ -74,24 +112,36 @@ function AdminPage() {
 			});
 
 			if (!response.ok) {
-				const error = await response.json();
+				const error = (await response.json()) as { detail?: string };
 				throw new Error(error.detail || 'Failed to create');
 			}
 
 			showMessage(`${type} created successfully!`, 'success');
 			setFormData((prev) => ({
 				...prev,
-				[type]: { name: '', description: '', sector_id: '', branch_id: '' }
+				[type]:
+					type === 'sector'
+						? { name: '', description: '' }
+						: type === 'branch'
+						? { name: '', description: '', sector_id: '' }
+						: type === 'specialization'
+						? { name: '', description: '', branch_id: '' }
+						: { name: '', email: '', readiness_score: '', technical_score: '' }
 			}));
 			loadData();
 		} catch (error) {
-			showMessage(error.message, 'error');
+			const err = error instanceof Error ? error : new Error('Unknown error');
+			showMessage(err.message, 'error');
 		} finally {
 			setLoading(false);
 		}
 	};
 
-	const handleUpdate = async (type, id, updates) => {
+	const handleUpdate = async (
+		type: FormDataType,
+		id: string | number,
+		updates: Record<string, unknown>
+	): Promise<void> => {
 		setLoading(true);
 		try {
 			const response = await fetch(`${API_BASE}/admin/${type}/${id}`, {
@@ -105,13 +155,17 @@ function AdminPage() {
 			showMessage(`${type} updated successfully!`, 'success');
 			loadData();
 		} catch (error) {
-			showMessage(error.message, 'error');
+			const err = error instanceof Error ? error : new Error('Unknown error');
+			showMessage(err.message, 'error');
 		} finally {
 			setLoading(false);
 		}
 	};
 
-	const handleDelete = async (type, id) => {
+	const handleDelete = async (
+		type: FormDataType,
+		id: string | number
+	): Promise<void> => {
 		if (!window.confirm(`Are you sure you want to delete this ${type}?`))
 			return;
 
@@ -126,7 +180,8 @@ function AdminPage() {
 			showMessage(`${type} deleted successfully!`, 'success');
 			loadData();
 		} catch (error) {
-			showMessage(error.message, 'error');
+			const err = error instanceof Error ? error : new Error('Unknown error');
+			showMessage(err.message, 'error');
 		} finally {
 			setLoading(false);
 		}
@@ -152,20 +207,26 @@ function AdminPage() {
 
 				{/* Tabs */}
 				<div className='flex space-x-4 mb-6 border-b'>
-					{['stats', 'sectors', 'branches', 'specializations', 'users'].map(
-						(tab) => (
-							<button
-								key={tab}
-								onClick={() => setActiveTab(tab)}
-								className={`px-4 py-2 font-medium ${
-									activeTab === tab
-										? 'border-b-2 border-blue-500 text-blue-600'
-										: 'text-gray-600 hover:text-gray-900'
-								}`}>
-								{tab.charAt(0).toUpperCase() + tab.slice(1)}
-							</button>
-						)
-					)}
+					{(
+						[
+							'stats',
+							'sectors',
+							'branches',
+							'specializations',
+							'users'
+						] as AdminTab[]
+					).map((tab) => (
+						<button
+							key={tab}
+							onClick={() => setActiveTab(tab)}
+							className={`px-4 py-2 font-medium ${
+								activeTab === tab
+									? 'border-b-2 border-blue-500 text-blue-600'
+									: 'text-gray-600 hover:text-gray-900'
+							}`}>
+							{tab.charAt(0).toUpperCase() + tab.slice(1)}
+						</button>
+					))}
 				</div>
 
 				{/* Content */}

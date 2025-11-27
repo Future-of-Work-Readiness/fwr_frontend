@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
+import type { User, Sector, Specialization, Quiz, FormData } from './types';
 
-function SimpleWorkingApp() {
-	const [currentPage, setCurrentPage] = useState('landing');
-	const [user, setUser] = useState(null);
-	const [sectors, setSectors] = useState([]);
-	const [specializations, setSpecializations] = useState([]);
-	const [quizzes, setQuizzes] = useState([]);
-	const [selectedSector, setSelectedSector] = useState(null);
-	const [error, setError] = useState('');
-	const [loading, setLoading] = useState(false);
+type Page = 'landing' | 'register' | 'login' | 'onboarding' | 'dashboard';
+
+function SimpleWorkingApp(): JSX.Element {
+	const [currentPage, setCurrentPage] = useState<Page>('landing');
+	const [user, setUser] = useState<User | null>(null);
+	const [sectors, setSectors] = useState<Sector[]>([]);
+	const [specializations, setSpecializations] = useState<Specialization[]>([]);
+	const [quizzes, setQuizzes] = useState<Quiz[]>([]);
+	const [selectedSector, setSelectedSector] = useState<Sector | null>(null);
+	const [error, setError] = useState<string>('');
+	const [loading, setLoading] = useState<boolean>(false);
 
 	// API Base URL
 	const API_BASE = import.meta.env.VITE_API_URL;
@@ -18,12 +21,12 @@ function SimpleWorkingApp() {
 		fetchQuizzes();
 	}, []);
 
-	const fetchSectors = async () => {
+	const fetchSectors = async (): Promise<void> => {
 		try {
 			console.log('Fetching sectors...');
 			const response = await fetch(`${API_BASE}/sectors`);
 			if (response.ok) {
-				const data = await response.json();
+				const data = (await response.json()) as Sector[];
 				console.log('Sectors received:', data);
 				setSectors(data);
 			} else {
@@ -36,14 +39,16 @@ function SimpleWorkingApp() {
 		}
 	};
 
-	const fetchSpecializations = async (sectorId) => {
+	const fetchSpecializations = async (
+		sectorId: string | number
+	): Promise<void> => {
 		try {
 			console.log('Fetching specializations for sector:', sectorId);
 			const response = await fetch(
 				`${API_BASE}/sectors/${sectorId}/specializations`
 			);
 			if (response.ok) {
-				const data = await response.json();
+				const data = (await response.json()) as Specialization[];
 				console.log('Specializations received:', data);
 				setSpecializations(data);
 			} else {
@@ -54,12 +59,12 @@ function SimpleWorkingApp() {
 		}
 	};
 
-	const fetchQuizzes = async () => {
+	const fetchQuizzes = async (): Promise<void> => {
 		try {
 			console.log('Fetching quizzes...');
 			const response = await fetch(`${API_BASE}/quizzes`);
 			if (response.ok) {
-				const data = await response.json();
+				const data = (await response.json()) as Quiz[];
 				console.log('Quizzes received:', data);
 				setQuizzes(data);
 			} else {
@@ -70,7 +75,7 @@ function SimpleWorkingApp() {
 		}
 	};
 
-	const handleRegister = async (formData) => {
+	const handleRegister = async (formData: FormData): Promise<void> => {
 		setLoading(true);
 		setError('');
 		try {
@@ -84,12 +89,12 @@ function SimpleWorkingApp() {
 			});
 
 			if (response.ok) {
-				const data = await response.json();
+				const data = (await response.json()) as { user: User };
 				console.log('Registration successful:', data);
 				setUser(data.user);
 				setCurrentPage('onboarding');
 			} else {
-				const errorData = await response.json();
+				const errorData = (await response.json()) as { detail?: string };
 				setError(errorData.detail || 'Registration failed');
 			}
 		} catch (err) {
@@ -99,7 +104,9 @@ function SimpleWorkingApp() {
 		setLoading(false);
 	};
 
-	const handleLogin = async (formData) => {
+	const handleLogin = async (
+		formData: Pick<FormData, 'email' | 'password'>
+	): Promise<void> => {
 		setLoading(true);
 		setError('');
 		try {
@@ -113,12 +120,12 @@ function SimpleWorkingApp() {
 			});
 
 			if (response.ok) {
-				const data = await response.json();
+				const data = (await response.json()) as { user: User };
 				console.log('Login successful:', data);
 				setUser(data.user);
 				setCurrentPage('dashboard');
 			} else {
-				const errorData = await response.json();
+				const errorData = (await response.json()) as { detail?: string };
 				setError(errorData.detail || 'Login failed');
 			}
 		} catch (err) {
@@ -128,7 +135,7 @@ function SimpleWorkingApp() {
 		setLoading(false);
 	};
 
-	const handleSectorSelect = (sector) => {
+	const handleSectorSelect = (sector: Sector): void => {
 		console.log('Sector selected:', sector);
 		setSelectedSector(sector);
 		fetchSpecializations(sector.id);
@@ -189,13 +196,13 @@ function SimpleWorkingApp() {
 			<div style={{ padding: '20px', maxWidth: '400px', margin: '0 auto' }}>
 				<h2>Register</h2>
 				<form
-					onSubmit={(e) => {
+					onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
 						e.preventDefault();
-						const formData = new FormData(e.target);
+						const formData = new FormData(e.currentTarget);
 						handleRegister({
-							name: formData.get('name'),
-							email: formData.get('email'),
-							password: formData.get('password')
+							name: formData.get('name') as string,
+							email: formData.get('email') as string,
+							password: formData.get('password') as string
 						});
 					}}>
 					<div style={{ marginBottom: '10px' }}>
@@ -249,12 +256,12 @@ function SimpleWorkingApp() {
 			<div style={{ padding: '20px', maxWidth: '400px', margin: '0 auto' }}>
 				<h2>Login</h2>
 				<form
-					onSubmit={(e) => {
+					onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
 						e.preventDefault();
-						const formData = new FormData(e.target);
+						const formData = new FormData(e.currentTarget);
 						handleLogin({
-							email: formData.get('email'),
-							password: formData.get('password')
+							email: formData.get('email') as string,
+							password: formData.get('password') as string
 						});
 					}}>
 					<div style={{ marginBottom: '10px' }}>
