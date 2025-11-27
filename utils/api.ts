@@ -309,7 +309,9 @@ export const testConnection = async (): Promise<{
 	error?: string;
 }> => {
 	try {
-		const response = await fetch(`${API_BASE_URL}/`);
+		// Remove '/api' from API_BASE_URL if present
+		const baseUrl = API_BASE_URL.replace(/\/api\/?$/, '');
+		const response = await fetch(`${baseUrl}/`);
 		const data = await response.json();
 		return { success: true, data };
 	} catch (error) {
