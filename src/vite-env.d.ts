@@ -5,3 +5,4 @@ interface ImportMetaEnv {
 	// readonly VITE_PUBLIC_KEY?: string;
 	// add more env vars here...
 }
+

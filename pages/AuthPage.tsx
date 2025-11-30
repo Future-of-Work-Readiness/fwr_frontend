@@ -1,130 +1,158 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { motion } from 'motion/react';
 import { loginUser, registerUser } from '../utils/auth';
-import { API_BASE_URL } from '../utils/api';
-
-console.log('API URL:', API_BASE_URL);
-
-interface AuthFormData {
-	name: string;
-	email: string;
-	password: string;
-	confirmPassword: string;
-}
+import {
+	loginSchema,
+	signUpSchema,
+	type LoginFormData,
+	type SignUpFormData
+} from '../utils/schemas/authSchemas';
+import { showToast } from '../src/lib/toastConfig';
+import { Mail, Lock, User, AlertCircle, Zap } from 'lucide-react';
 
 export default function AuthPage(): JSX.Element {
 	const [isLogin, setIsLogin] = useState<boolean>(true);
-	const [formData, setFormData] = useState<AuthFormData>({
-		name: '',
-		email: '',
-		password: '',
-		confirmPassword: ''
-	});
 	const [error, setError] = useState<string>('');
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const navigate = useNavigate();
 
-	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-		setFormData({
-			...formData,
-			[e.target.name]: e.target.value
-		});
-		if (error) setError('');
-	};
+	// Login form
+	const loginForm = useForm<LoginFormData>({
+		resolver: zodResolver(loginSchema),
+		defaultValues: {
+			email: '',
+			password: ''
+		}
+	});
 
-	const handleSubmit = async (
-		e: React.FormEvent<HTMLFormElement>
-	): Promise<void> => {
-		e.preventDefault();
+	// Sign up form
+	const signUpForm = useForm<SignUpFormData>({
+		resolver: zodResolver(signUpSchema),
+		defaultValues: {
+			name: '',
+			email: '',
+			password: '',
+			confirmPassword: ''
+		}
+	});
+
+	// Use the appropriate form based on isLogin
+	const currentForm = isLogin ? loginForm : signUpForm;
+
+	const handleLogin = async (data: LoginFormData) => {
 		setIsLoading(true);
 		setError('');
 
 		try {
-			if (isLogin) {
-				// Login
-				const result = await loginUser(formData.email, formData.password);
-				if (result.success) {
-					navigate('/landing');
-				} else {
-					setError(result.error || 'Login failed');
-				}
+			const result = await loginUser(data.email, data.password);
+			if (result.success) {
+				showToast('success', 'Welcome back!');
+				navigate('/dashboard');
 			} else {
-				// Registration
-				if (formData.password !== formData.confirmPassword) {
-					setError('Passwords do not match');
-					setIsLoading(false);
-					return;
-				}
-
-				const result = await registerUser(
-					formData.name,
-					formData.email,
-					formData.password
-				);
-				if (result.success) {
-					navigate('/landing');
-				} else {
-					setError(result.error || 'Registration failed');
-				}
+				const errorMsg = result.error || 'Login failed';
+				setError(errorMsg);
+				showToast('error', 'Invalid email or password');
 			}
 		} catch (error) {
 			const err = error instanceof Error ? error : new Error('Unknown error');
-			setError('An error occurred: ' + err.message);
+			setError('Login failed: ' + err.message);
+			showToast('error', 'Login failed. Please try again.');
 		}
 
 		setIsLoading(false);
 	};
 
-	return (
-		<div className='min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-pink-800 flex items-center justify-center p-4'>
-			{/* Animated Background Elements */}
-			<div className='absolute inset-0 overflow-hidden pointer-events-none'>
-				<div className='absolute -top-40 -right-32 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse'></div>
-				<div className='absolute -bottom-32 -left-40 w-80 h-80 bg-yellow-500 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse'></div>
-				<div className='absolute top-40 left-40 w-80 h-80 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse'></div>
-			</div>
+	const handleSignUp = async (data: SignUpFormData) => {
+		setIsLoading(true);
+		setError('');
 
+		try {
+			const result = await registerUser(data.name, data.email, data.password);
+			if (result.success) {
+				showToast('success', 'Account created successfully!');
+				navigate('/onboarding');
+			} else {
+				const errorMsg = result.error || 'Registration failed';
+				setError(errorMsg);
+				showToast('error', 'Could not create account. Please try again.');
+			}
+		} catch (error) {
+			const err = error instanceof Error ? error : new Error('Unknown error');
+			setError('Registration failed: ' + err.message);
+			showToast('error', 'Could not create account. Please try again.');
+		}
+
+		setIsLoading(false);
+	};
+
+	const handleToggle = () => {
+		setIsLogin(!isLogin);
+		setError('');
+		// Reset forms when switching
+		loginForm.reset();
+		signUpForm.reset();
+	};
+
+	return (
+		<motion.div
+			className='min-h-screen bg-white flex items-center justify-center p-4'
+			initial={{ opacity: 0 }}
+			animate={{ opacity: 1 }}
+			transition={{ duration: 0.6, ease: 'easeOut' }}>
 			<div className='relative z-10 w-full max-w-md'>
 				{/* Header */}
-				<div className='text-center mb-8'>
+				<motion.div
+					className='text-center mb-8'
+					initial={{ opacity: 0, y: -20 }}
+					animate={{ opacity: 1, y: 0 }}
+					transition={{ duration: 0.6, ease: 'easeOut' }}>
 					<div className='inline-flex items-center space-x-3 mb-6'>
-						<div className='w-12 h-12 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-2xl flex items-center justify-center'>
-							<span className='text-white text-2xl font-bold'>🚀</span>
+						<div className='w-12 h-12 bg-[#3A7AFE] rounded-lg flex items-center justify-center'>
+							<Zap className='w-6 h-6 text-white' />
 						</div>
-						<span className='text-2xl font-bold text-white'>
-							Future Work Readiness
+						<span className='text-2xl font-bold text-[#1D2433]'>
+							FutureReady
 						</span>
 					</div>
 
-					<h1 className='text-3xl md:text-4xl font-bold text-white mb-2'>
+					<h1 className='text-3xl md:text-4xl font-bold text-[#1C1C1C] mb-2'>
 						{isLogin ? 'Welcome Back!' : 'Get Started!'}
 					</h1>
-					<p className='text-white/80'>
+					<p className='text-[#4B5563]'>
 						{isLogin
 							? 'Sign in to continue your journey'
 							: 'Create your account to begin'}
 					</p>
-				</div>
+				</motion.div>
 
 				{/* Auth Card */}
-				<div className='bg-white/95 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20'>
+				<motion.div
+					className='bg-white rounded-2xl p-8 shadow-sm border border-[#E5E7EB]'
+					initial={{ opacity: 0, y: 20 }}
+					animate={{ opacity: 1, y: 0 }}
+					transition={{ duration: 0.6, ease: 'easeOut', delay: 0.1 }}>
 					{/* Toggle Tabs */}
-					<div className='flex bg-gray-100 rounded-xl p-1 mb-6'>
+					<div className='flex bg-[#F7F9FC] rounded-lg p-1 mb-6'>
 						<button
-							onClick={() => setIsLogin(true)}
-							className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-all duration-300 ${
+							onClick={handleToggle}
+							type='button'
+							className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-all duration-200 ${
 								isLogin
-									? 'bg-white text-blue-600 shadow-md'
-									: 'text-gray-600 hover:text-blue-600'
+									? 'bg-white text-[#3A7AFE] shadow-sm'
+									: 'text-[#4B5563] hover:text-[#3A7AFE]'
 							}`}>
 							Sign In
 						</button>
 						<button
-							onClick={() => setIsLogin(false)}
-							className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-all duration-300 ${
+							onClick={handleToggle}
+							type='button'
+							className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-all duration-200 ${
 								!isLogin
-									? 'bg-white text-blue-600 shadow-md'
-									: 'text-gray-600 hover:text-blue-600'
+									? 'bg-white text-[#3A7AFE] shadow-sm'
+									: 'text-[#4B5563] hover:text-[#3A7AFE]'
 							}`}>
 							Register
 						</button>
@@ -132,121 +160,209 @@ export default function AuthPage(): JSX.Element {
 
 					{/* Error Message */}
 					{error && (
-						<div className='bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl mb-4 flex items-center space-x-2 animate-fade-in'>
-							<span>⚠️</span>
-							<span className='text-sm'>{error}</span>
-						</div>
+						<motion.div
+							className='mb-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center space-x-2'
+							initial={{ opacity: 0, x: -10 }}
+							animate={{ opacity: 1, x: 0 }}
+							exit={{ opacity: 0, x: -10 }}>
+							<AlertCircle className='w-5 h-5 text-red-500 flex-shrink-0' />
+							<p className='text-red-700 text-sm'>{error}</p>
+						</motion.div>
 					)}
 
-					{/* Form */}
-					<form onSubmit={handleSubmit} className='space-y-4'>
-						{/* Name field for registration */}
-						{!isLogin && (
+					{/* Login Form */}
+					{isLogin ? (
+						<form
+							onSubmit={loginForm.handleSubmit(handleLogin)}
+							className='space-y-5'>
 							<div>
-								<label className='block text-sm font-semibold text-gray-700 mb-2'>
-									👤 Full Name
+								<label className='block text-sm font-semibold text-[#1C1C1C] mb-2'>
+									Email Address
 								</label>
-								<input
-									type='text'
-									name='name'
-									value={formData.name}
-									onChange={handleInputChange}
-									required
-									className='w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all'
-									placeholder='Enter your full name'
-								/>
+								<div className='relative'>
+									<Mail className='absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400' />
+									<input
+										type='email'
+										{...loginForm.register('email')}
+										className={`w-full pl-10 pr-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-[#3A7AFE] focus:border-[#3A7AFE] transition-all ${
+											loginForm.formState.errors.email
+												? 'border-red-300 focus:border-red-500 focus:ring-red-200'
+												: 'border-gray-200'
+										}`}
+										placeholder='your@email.com'
+									/>
+								</div>
+								{loginForm.formState.errors.email && (
+									<p className='mt-1 text-sm text-red-600'>
+										{loginForm.formState.errors.email.message}
+									</p>
+								)}
 							</div>
-						)}
 
-						{/* Email */}
-						<div>
-							<label className='block text-sm font-semibold text-gray-700 mb-2'>
-								📧 Email Address
-							</label>
-							<input
-								type='email'
-								name='email'
-								value={formData.email}
-								onChange={handleInputChange}
-								required
-								className='w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all'
-								placeholder='your@email.com'
-							/>
-						</div>
-
-						{/* Password */}
-						<div>
-							<label className='block text-sm font-semibold text-gray-700 mb-2'>
-								🔒 Password
-							</label>
-							<input
-								type='password'
-								name='password'
-								value={formData.password}
-								onChange={handleInputChange}
-								required
-								className='w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all'
-								placeholder='Enter your password'
-							/>
-						</div>
-
-						{/* Confirm Password for registration */}
-						{!isLogin && (
 							<div>
-								<label className='block text-sm font-semibold text-gray-700 mb-2'>
-									🔐 Confirm Password
+								<label className='block text-sm font-semibold text-[#1C1C1C] mb-2'>
+									Password
 								</label>
-								<input
-									type='password'
-									name='confirmPassword'
-									value={formData.confirmPassword}
-									onChange={handleInputChange}
-									required
-									className='w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all'
-									placeholder='Confirm your password'
-								/>
+								<div className='relative'>
+									<Lock className='absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400' />
+									<input
+										type='password'
+										{...loginForm.register('password')}
+										className={`w-full pl-10 pr-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-[#3A7AFE] focus:border-[#3A7AFE] transition-all ${
+											loginForm.formState.errors.password
+												? 'border-red-300 focus:border-red-500 focus:ring-red-200'
+												: 'border-gray-200'
+										}`}
+										placeholder='••••••••'
+									/>
+								</div>
+								{loginForm.formState.errors.password && (
+									<p className='mt-1 text-sm text-red-600'>
+										{loginForm.formState.errors.password.message}
+									</p>
+								)}
 							</div>
-						)}
 
-						{/* Submit Button */}
-						<button
-							type='submit'
-							disabled={isLoading}
-							className='w-full py-3 mt-6 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none'>
-							{isLoading ? (
-								<span className='flex items-center justify-center space-x-2'>
-									<div className='w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin'></div>
-									<span>
-										{isLogin ? 'Signing In...' : 'Creating Account...'}
-									</span>
-								</span>
-							) : (
-								<span className='flex items-center justify-center space-x-2'>
-									<span>{isLogin ? '🚀 Sign In' : '✨ Create Account'}</span>
-								</span>
-							)}
-						</button>
-					</form>
+							<button
+								type='submit'
+								disabled={isLoading}
+								className='w-full bg-[#3A7AFE] hover:bg-[#2E6AE8] text-white py-4 rounded-xl font-semibold text-lg hover:shadow-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed'>
+								{isLoading ? 'Logging in...' : 'Login'}
+							</button>
+						</form>
+					) : (
+						/* Sign Up Form */
+						<form
+							onSubmit={signUpForm.handleSubmit(handleSignUp)}
+							className='space-y-5'>
+							<div>
+								<label className='block text-sm font-semibold text-[#1C1C1C] mb-2'>
+									Full Name
+								</label>
+								<div className='relative'>
+									<User className='absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400' />
+									<input
+										type='text'
+										{...signUpForm.register('name')}
+										className={`w-full pl-10 pr-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-[#3A7AFE] focus:border-[#3A7AFE] transition-all ${
+											signUpForm.formState.errors.name
+												? 'border-red-300 focus:border-red-500 focus:ring-red-200'
+												: 'border-gray-200'
+										}`}
+										placeholder='Enter your full name'
+									/>
+								</div>
+								{signUpForm.formState.errors.name && (
+									<p className='mt-1 text-sm text-red-600'>
+										{signUpForm.formState.errors.name.message}
+									</p>
+								)}
+							</div>
+
+							<div>
+								<label className='block text-sm font-semibold text-[#1C1C1C] mb-2'>
+									Email Address
+								</label>
+								<div className='relative'>
+									<Mail className='absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400' />
+									<input
+										type='email'
+										{...signUpForm.register('email')}
+										className={`w-full pl-10 pr-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-[#3A7AFE] focus:border-[#3A7AFE] transition-all ${
+											signUpForm.formState.errors.email
+												? 'border-red-300 focus:border-red-500 focus:ring-red-200'
+												: 'border-gray-200'
+										}`}
+										placeholder='your@email.com'
+									/>
+								</div>
+								{signUpForm.formState.errors.email && (
+									<p className='mt-1 text-sm text-red-600'>
+										{signUpForm.formState.errors.email.message}
+									</p>
+								)}
+							</div>
+
+							<div>
+								<label className='block text-sm font-semibold text-[#1C1C1C] mb-2'>
+									Password
+								</label>
+								<div className='relative'>
+									<Lock className='absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400' />
+									<input
+										type='password'
+										{...signUpForm.register('password')}
+										className={`w-full pl-10 pr-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-[#3A7AFE] focus:border-[#3A7AFE] transition-all ${
+											signUpForm.formState.errors.password
+												? 'border-red-300 focus:border-red-500 focus:ring-red-200'
+												: 'border-gray-200'
+										}`}
+										placeholder='Create a password'
+									/>
+								</div>
+								{signUpForm.formState.errors.password && (
+									<p className='mt-1 text-sm text-red-600'>
+										{signUpForm.formState.errors.password.message}
+									</p>
+								)}
+							</div>
+
+							<div>
+								<label className='block text-sm font-semibold text-[#1C1C1C] mb-2'>
+									Confirm Password
+								</label>
+								<div className='relative'>
+									<Lock className='absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400' />
+									<input
+										type='password'
+										{...signUpForm.register('confirmPassword')}
+										className={`w-full pl-10 pr-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-[#3A7AFE] focus:border-[#3A7AFE] transition-all ${
+											signUpForm.formState.errors.confirmPassword
+												? 'border-red-300 focus:border-red-500 focus:ring-red-200'
+												: 'border-gray-200'
+										}`}
+										placeholder='Confirm your password'
+									/>
+								</div>
+								{signUpForm.formState.errors.confirmPassword && (
+									<p className='mt-1 text-sm text-red-600'>
+										{signUpForm.formState.errors.confirmPassword.message}
+									</p>
+								)}
+							</div>
+
+							<button
+								type='submit'
+								disabled={isLoading}
+								className='w-full bg-[#3A7AFE] hover:bg-[#2E6AE8] text-white py-4 rounded-xl font-semibold text-lg hover:shadow-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed'>
+								{isLoading ? 'Creating Account...' : 'Create Account'}
+							</button>
+						</form>
+					)}
 
 					{/* Additional Options */}
 					<div className='mt-6 text-center'>
 						{isLogin && (
-							<a
-								href='#'
-								className='text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors'>
+							<button
+								type='button'
+								className='text-[#3A7AFE] hover:text-[#2E6AE8] text-sm font-medium transition-colors duration-200'>
 								Forgot your password?
-							</a>
+							</button>
 						)}
 					</div>
-				</div>
+				</motion.div>
 
 				{/* Footer */}
-				<div className='text-center mt-8'>
-					<p className='text-white/60 text-sm'>
+				<motion.div
+					className='text-center mt-8'
+					initial={{ opacity: 0 }}
+					animate={{ opacity: 1 }}
+					transition={{ duration: 0.6, ease: 'easeOut', delay: 0.2 }}>
+					<p className='text-[#4B5563] text-sm'>
 						Discover your potential and build skills for tomorrow's workforce
 					</p>
-				</div>
+				</motion.div>
 			</div>
-		</div>
+		</motion.div>
 	);
 }

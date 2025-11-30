@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'motion/react';
 import {
 	BookOpen,
 	Zap,
@@ -7,7 +8,11 @@ import {
 	Award,
 	TrendingUp,
 	Clock,
-	LogOut
+	LogOut,
+	BarChart3,
+	Users,
+	CheckCircle2,
+	Loader2
 } from 'lucide-react';
 import {
 	getCurrentUser,
@@ -16,6 +21,7 @@ import {
 	type FrontendUser
 } from '../utils/auth';
 import { getSpecializationDetails } from '../utils/hierarchicalApi';
+import { showToast } from '../src/lib/toastConfig';
 
 export default function DashboardPage(): JSX.Element {
 	const navigate = useNavigate();
@@ -65,7 +71,32 @@ export default function DashboardPage(): JSX.Element {
 
 	const handleLogout = (): void => {
 		logoutUser();
+		showToast('success', 'Logged out successfully');
 		navigate('/');
+	};
+
+	// Animation variants
+	const containerVariants = {
+		hidden: { opacity: 0 },
+		visible: {
+			opacity: 1,
+			transition: {
+				staggerChildren: 0.1,
+				delayChildren: 0.2
+			}
+		}
+	};
+
+	const itemVariants = {
+		hidden: { opacity: 0, y: 20 },
+		visible: {
+			opacity: 1,
+			y: 0,
+			transition: {
+				duration: 0.5,
+				ease: 'easeOut' as const
+			}
+		}
 	};
 
 	// Get recommendations based on specialization
@@ -118,7 +149,7 @@ export default function DashboardPage(): JSX.Element {
 			title: 'Knowledge Tests',
 			description: 'Test your understanding with comprehensive assessments',
 			icon: BookOpen,
-			color: 'blue',
+			color: 'bg-[#3A7AFE]',
 			onClick: () => navigate('/test-hub')
 		},
 		{
@@ -126,69 +157,82 @@ export default function DashboardPage(): JSX.Element {
 			title: 'Peer Benchmarking',
 			description: 'Compare your scores with peers in your specialization',
 			icon: TrendingUp,
-			color: 'bg-indigo-500',
+			color: 'bg-[#3A7AFE]',
 			onClick: () => navigate('/peer-benchmark')
 		},
 		{
-			id: 'skill-exercise',
-			title: 'Try a Skill-Based Exercise',
-			description: 'Practice hands-on skills',
-			icon: Zap,
-			color: 'bg-green-500',
-			onClick: () => navigate('/tests') // Will be updated when skill exercises are created
+			id: 'goals',
+			title: 'Set Goals',
+			description: 'Track your learning objectives and progress',
+			icon: Target,
+			color: 'bg-[#4CAF50]',
+			onClick: () => navigate('/goals')
 		}
 	];
 
 	return (
-		<div className='min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50'>
-			{/* Background decoration */}
-			<div className='absolute inset-0 overflow-hidden pointer-events-none'>
-				<div className='absolute -top-40 -right-32 w-80 h-80 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse'></div>
-				<div className='absolute -bottom-32 -left-40 w-80 h-80 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse'></div>
-			</div>
-
-			<div className='relative z-10 max-w-7xl mx-auto p-4'>
+		<motion.div
+			className='min-h-screen bg-white'
+			initial='hidden'
+			animate='visible'
+			variants={containerVariants}>
+			<div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-12'>
 				{/* Header */}
-				<div className='mb-8 flex justify-between items-center bg-white/80 backdrop-blur-md rounded-2xl p-6 shadow-lg border border-white/20'>
-					<div>
-						<h1 className='text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2'>
-							Welcome back, {currentUser?.name}! 👋
+				<motion.div
+					className='mb-6 md:mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white rounded-xl p-4 md:p-6 shadow-sm border border-[#E5E7EB]'
+					variants={itemVariants}>
+					<div className='flex-1'>
+						<h1 className='text-2xl md:text-3xl lg:text-4xl font-bold text-[#1C1C1C] mb-2'>
+							Welcome back, {currentUser?.name || 'User'}!
 						</h1>
-						<div className='flex items-center space-x-2 text-gray-600'>
-							<Target className='w-5 h-5 text-blue-500' />
-							<span className='text-sm font-medium'>
+						<div className='flex items-center space-x-2 text-[#4B5563]'>
+							<Target className='w-4 h-4 md:w-5 md:h-5 text-[#3A7AFE] flex-shrink-0' />
+							<span className='text-xs md:text-sm font-medium'>
 								Specialization:{' '}
-								{loading ? 'Loading...' : specializationName || 'Not specified'}
+								{loading ? (
+									<span className='inline-flex items-center'>
+										<Loader2 className='w-3 h-3 animate-spin mr-1' />
+										Loading...
+									</span>
+								) : (
+									specializationName || 'Not specified'
+								)}
 							</span>
 						</div>
 					</div>
 					<button
 						onClick={handleLogout}
-						className='flex items-center space-x-2 px-4 py-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all duration-300'>
-						<LogOut className='w-5 h-5' />
-						<span className='font-medium'>Logout</span>
+						className='flex items-center space-x-2 px-4 py-2 text-[#4B5563] hover:text-[#DC2626] hover:bg-[#fef2f2] rounded-lg transition-colors duration-200 w-full sm:w-auto justify-center'>
+						<LogOut className='w-4 h-4 md:w-5 md:h-5' />
+						<span className='font-medium text-sm md:text-base'>Logout</span>
 					</button>
-				</div>
+				</motion.div>
 
 				{/* Main Content Grid */}
-				<div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
+				<div className='grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6'>
 					{/* Left Column - Main Content */}
-					<div className='lg:col-span-2 space-y-6'>
+					<div className='lg:col-span-2 space-y-4 md:space-y-6'>
 						{/* Readiness Score Card */}
-						<div className='bg-white/80 backdrop-blur-md rounded-2xl shadow-xl p-8 border border-white/20'>
+						<motion.div
+							className='bg-white rounded-xl shadow-sm p-6 md:p-8 border border-[#E5E7EB]'
+							variants={itemVariants}>
 							<div className='flex items-center space-x-3 mb-6'>
-								<div className='w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center'>
-									<span className='text-white text-2xl'>📊</span>
+								<div className='w-10 h-10 md:w-12 md:h-12 bg-[#3A7AFE] rounded-lg flex items-center justify-center'>
+									<BarChart3 className='w-5 h-5 md:w-6 md:h-6 text-white' />
 								</div>
-								<h2 className='text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent'>
+								<h2 className='text-xl md:text-2xl font-semibold text-[#1C1C1C]'>
 									Future of Work Readiness Score
 								</h2>
 							</div>
 
-							<div className='flex items-center justify-center mb-8'>
-								<div className='relative w-48 h-48'>
+							<div className='flex items-center justify-center mb-6 md:mb-8'>
+								<motion.div
+									className='relative w-40 h-40 md:w-48 md:h-48'
+									initial={{ scale: 0.8, opacity: 0 }}
+									animate={{ scale: 1, opacity: 1 }}
+									transition={{ duration: 0.6, ease: 'easeOut' }}>
 									{/* Outer decorative circle */}
-									<div className='absolute inset-0 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 p-4'>
+									<div className='absolute inset-0 rounded-full bg-[#F7F9FC] p-4'>
 										<svg
 											className='w-full h-full transform -rotate-90'
 											viewBox='0 0 144 144'>
@@ -197,210 +241,253 @@ export default function DashboardPage(): JSX.Element {
 												cx='72'
 												cy='72'
 												r='60'
-												stroke='#f1f5f9'
+												stroke='#E5E7EB'
 												strokeWidth='12'
 												fill='none'
 											/>
 											{/* Progress circle */}
-											<circle
+											<motion.circle
 												cx='72'
 												cy='72'
 												r='60'
-												stroke='url(#gradient)'
+												stroke='#3A7AFE'
 												strokeWidth='12'
 												fill='none'
 												strokeLinecap='round'
 												strokeDasharray={`${2 * Math.PI * 60}`}
-												strokeDashoffset={`${
-													2 * Math.PI * 60 * (1 - readinessScore / 100)
-												}`}
-												className='transition-all duration-2000 ease-out'
+												initial={{ strokeDashoffset: 2 * Math.PI * 60 }}
+												animate={{
+													strokeDashoffset:
+														2 * Math.PI * 60 * (1 - readinessScore / 100)
+												}}
+												transition={{ duration: 1, ease: 'easeOut' }}
 											/>
-											<defs>
-												<linearGradient
-													id='gradient'
-													x1='0%'
-													y1='0%'
-													x2='100%'
-													y2='0%'>
-													<stop offset='0%' stopColor='#3b82f6' />
-													<stop offset='100%' stopColor='#8b5cf6' />
-												</linearGradient>
-											</defs>
 										</svg>
 									</div>
 									<div className='absolute inset-0 flex items-center justify-center'>
 										<div className='text-center'>
-											<div className='text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent'>
+											<motion.div
+												className='text-3xl md:text-4xl font-bold text-[#3A7AFE]'
+												initial={{ scale: 0 }}
+												animate={{ scale: 1 }}
+												transition={{ delay: 0.3, duration: 0.4 }}>
 												{readinessScore}%
-											</div>
-											<div className='text-sm text-gray-600 font-medium'>
+											</motion.div>
+											<div className='text-xs md:text-sm text-[#4B5563] font-medium mt-1'>
 												Future Ready
 											</div>
 										</div>
 									</div>
-								</div>
+								</motion.div>
 							</div>
 
-							<div className='grid grid-cols-3 gap-6'>
-								<div className='text-center p-4 rounded-xl bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200'>
-									<div className='text-3xl font-bold text-blue-600 mb-1'>
+							<div className='grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4'>
+								<motion.div
+									className='text-center p-4 rounded-xl bg-[#F7F9FC] border border-[#E5E7EB]'
+									variants={itemVariants}
+									whileHover={{ y: -2, scale: 1.02 }}>
+									<div className='text-xl md:text-2xl lg:text-3xl font-bold text-[#3A7AFE] mb-1'>
 										{technicalScore}%
 									</div>
-									<div className='text-sm text-blue-700 font-medium'>
+									<div className='text-xs md:text-sm text-[#4B5563] font-medium'>
 										Technical Skills
 									</div>
-								</div>
-								<div className='text-center p-4 rounded-xl bg-gradient-to-br from-green-50 to-green-100 border border-green-200'>
-									<div className='text-3xl font-bold text-green-600 mb-1'>
+								</motion.div>
+								<motion.div
+									className='text-center p-4 rounded-xl bg-[#f0fdf4] border border-[#dcfce7]'
+									variants={itemVariants}
+									whileHover={{ y: -2, scale: 1.02 }}>
+									<div className='text-xl md:text-2xl lg:text-3xl font-bold text-[#4CAF50] mb-1'>
 										{softSkillsScore}%
 									</div>
-									<div className='text-sm text-green-700 font-medium'>
+									<div className='text-xs md:text-sm text-[#16a34a] font-medium'>
 										Soft Skills
 									</div>
-								</div>
-								<div className='text-center p-4 rounded-xl bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200'>
-									<div className='text-3xl font-bold text-purple-600 mb-1'>
+								</motion.div>
+								<motion.div
+									className='text-center p-4 rounded-xl bg-[#F7F9FC] border border-[#E5E7EB]'
+									variants={itemVariants}
+									whileHover={{ y: -2, scale: 1.02 }}>
+									<div className='text-xl md:text-2xl lg:text-3xl font-bold text-[#3A7AFE] mb-1'>
 										{leadershipScore}%
 									</div>
-									<div className='text-sm text-purple-700 font-medium'>
+									<div className='text-xs md:text-sm text-[#4B5563] font-medium'>
 										Leadership
 									</div>
-								</div>
+								</motion.div>
 							</div>
-						</div>
+						</motion.div>
 
 						{/* Recommended Next Step */}
-						<div className='bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg shadow-lg p-6 text-white'>
+						<motion.div
+							className='bg-[#3A7AFE] rounded-xl shadow-sm p-6 text-white'
+							variants={itemVariants}
+							whileHover={{ scale: 1.01 }}>
 							<div className='flex items-center mb-3'>
-								<Target className='w-6 h-6 mr-2' />
-								<h2 className='text-xl font-semibold'>Recommended Next Step</h2>
+								<Target className='w-5 h-5 md:w-6 md:h-6 mr-2' />
+								<h2 className='text-lg md:text-xl font-semibold'>
+									Recommended Next Step
+								</h2>
 							</div>
 							<div className='mb-4'>
-								<h3 className='text-lg font-semibold mb-2'>
+								<h3 className='text-base md:text-lg font-semibold mb-2'>
 									{currentRecommendation.title}
 								</h3>
-								<p className='mb-2'>{currentRecommendation.description}</p>
-								<span className='inline-block bg-white bg-opacity-20 text-white text-sm px-3 py-1 rounded-full'>
+								<p className='mb-2 opacity-90 text-sm md:text-base'>
+									{currentRecommendation.description}
+								</p>
+								<span className='inline-block bg-white/20 text-white text-xs md:text-sm px-3 py-1 rounded-full'>
 									{currentRecommendation.category} Focus
 								</span>
 							</div>
 							<button
 								onClick={() => navigate('/test-hub')}
-								className='bg-white text-blue-600 px-4 py-2 rounded-lg font-semibold hover:bg-blue-50 transition-colors'>
+								className='bg-white text-[#3A7AFE] px-4 py-2 rounded-lg font-semibold hover:bg-[#F7F9FC] transition-colors duration-200 text-sm md:text-base'>
 								Start Test
 							</button>
-						</div>
+						</motion.div>
 
 						{/* Quick Access Cards */}
-						<div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-							{quickAccessCards.map((card) => {
+						<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
+							{quickAccessCards.map((card, index) => {
 								const IconComponent = card.icon;
 								return (
-									<div
+									<motion.div
 										key={card.id}
 										onClick={card.onClick}
-										className='bg-white rounded-lg shadow-lg p-6 cursor-pointer hover:shadow-xl transition-shadow'>
+										className='bg-white rounded-xl shadow-sm p-5 md:p-6 cursor-pointer hover:shadow-md transition-shadow duration-200 border border-[#E5E7EB]'
+										variants={itemVariants}
+										initial='hidden'
+										animate='visible'
+										transition={{ delay: index * 0.1 }}
+										whileHover={{ y: -4, scale: 1.02 }}
+										whileTap={{ scale: 0.98 }}>
 										<div
-											className={`${card.color} w-12 h-12 rounded-lg flex items-center justify-center mb-4`}>
-											<IconComponent className='w-6 h-6 text-white' />
+											className={`${card.color} w-10 h-10 md:w-12 md:h-12 rounded-lg flex items-center justify-center mb-3 md:mb-4`}>
+											<IconComponent className='w-5 h-5 md:w-6 md:h-6 text-white' />
 										</div>
-										<h3 className='text-lg font-semibold text-slate-800 mb-2'>
+										<h3 className='text-base md:text-lg font-semibold text-[#1C1C1C] mb-2'>
 											{card.title}
 										</h3>
-										<p className='text-gray-600 text-sm'>{card.description}</p>
-									</div>
+										<p className='text-[#4B5563] text-xs md:text-sm'>
+											{card.description}
+										</p>
+									</motion.div>
 								);
 							})}
 						</div>
 					</div>
 
 					{/* Right Column - Sidebar */}
-					<div className='space-y-6'>
+					<div className='space-y-4 md:space-y-6'>
 						{/* Navigation Menu */}
-						<div className='bg-white rounded-lg shadow-lg p-6'>
-							<h2 className='text-xl font-semibold text-slate-800 mb-4'>
+						<motion.div
+							className='bg-white rounded-xl shadow-sm p-5 md:p-6 border border-[#E5E7EB]'
+							variants={itemVariants}>
+							<h2 className='text-lg md:text-xl font-semibold text-[#1C1C1C] mb-4'>
 								Quick Navigation
 							</h2>
 							<nav className='space-y-2'>
-								<button
+								<motion.button
 									onClick={() => navigate('/test-hub')}
-									className='w-full flex items-center px-4 py-3 text-left hover:bg-gray-50 rounded-lg transition-colors'>
-									<BookOpen className='w-5 h-5 mr-3 text-blue-500' />
-									<span>Tests</span>
-								</button>
-								<button
-									onClick={() => navigate('/dashboard')}
-									className='w-full flex items-center px-4 py-3 text-left hover:bg-gray-50 rounded-lg transition-colors'>
-									<TrendingUp className='w-5 h-5 mr-3 text-green-500' />
-									<span>Skills</span>
-								</button>
-								<button
+									className='w-full flex items-center px-4 py-3 text-left hover:bg-[#F7F9FC] rounded-lg transition-colors duration-200 text-[#4B5563]'
+									whileHover={{ x: 4 }}
+									transition={{ duration: 0.2 }}>
+									<BookOpen className='w-4 h-4 md:w-5 md:h-5 mr-3 text-[#3A7AFE] flex-shrink-0' />
+									<span className='text-sm md:text-base'>Tests</span>
+								</motion.button>
+								<motion.button
+									onClick={() => navigate('/peer-benchmark')}
+									className='w-full flex items-center px-4 py-3 text-left hover:bg-[#F7F9FC] rounded-lg transition-colors duration-200 text-[#4B5563]'
+									whileHover={{ x: 4 }}
+									transition={{ duration: 0.2 }}>
+									<TrendingUp className='w-4 h-4 md:w-5 md:h-5 mr-3 text-[#4CAF50] flex-shrink-0' />
+									<span className='text-sm md:text-base'>Benchmarking</span>
+								</motion.button>
+								<motion.button
 									onClick={() => navigate('/goals')}
-									className='w-full flex items-center px-4 py-3 text-left hover:bg-gray-50 rounded-lg transition-colors'>
-									<Target className='w-5 h-5 mr-3 text-purple-500' />
-									<span>Goals</span>
-								</button>
-								<button
-									onClick={() => navigate('/dashboard')}
-									className='w-full flex items-center px-4 py-3 text-left hover:bg-gray-50 rounded-lg transition-colors'>
-									<Award className='w-5 h-5 mr-3 text-orange-500' />
-									<span>Badges</span>
-								</button>
+									className='w-full flex items-center px-4 py-3 text-left hover:bg-[#F7F9FC] rounded-lg transition-colors duration-200 text-[#4B5563]'
+									whileHover={{ x: 4 }}
+									transition={{ duration: 0.2 }}>
+									<Target className='w-4 h-4 md:w-5 md:h-5 mr-3 text-[#3A7AFE] flex-shrink-0' />
+									<span className='text-sm md:text-base'>Goals</span>
+								</motion.button>
+								<motion.button
+									onClick={() => navigate('/test-results')}
+									className='w-full flex items-center px-4 py-3 text-left hover:bg-[#F7F9FC] rounded-lg transition-colors duration-200 text-[#4B5563]'
+									whileHover={{ x: 4 }}
+									transition={{ duration: 0.2 }}>
+									<Award className='w-4 h-4 md:w-5 md:h-5 mr-3 text-[#EAB308] flex-shrink-0' />
+									<span className='text-sm md:text-base'>Results</span>
+								</motion.button>
 							</nav>
-						</div>
+						</motion.div>
 
 						{/* Recent Activity */}
-						<div className='bg-white rounded-lg shadow-lg p-6'>
-							<h2 className='text-xl font-semibold text-slate-800 mb-4'>
+						<motion.div
+							className='bg-white rounded-xl shadow-sm p-5 md:p-6 border border-[#E5E7EB]'
+							variants={itemVariants}>
+							<h2 className='text-lg md:text-xl font-semibold text-[#1C1C1C] mb-4'>
 								Recent Activity
 							</h2>
-							<div className='space-y-4'>
+							<div className='space-y-3 md:space-y-4'>
 								{recentActivities.length > 0 ? (
-									recentActivities.map((activity) => (
-										<div
+									recentActivities.map((activity, index) => (
+										<motion.div
 											key={activity.id}
-											className='flex items-start space-x-3'>
-											<div className='flex-shrink-0'>
+											className='flex items-start space-x-3'
+											initial={{ opacity: 0, x: -10 }}
+											animate={{ opacity: 1, x: 0 }}
+											transition={{ delay: index * 0.05 }}>
+											<div className='flex-shrink-0 mt-0.5'>
 												{activity.type === 'test' && (
-													<BookOpen className='w-5 h-5 text-blue-500' />
+													<BookOpen className='w-4 h-4 md:w-5 md:h-5 text-[#3A7AFE]' />
 												)}
 												{activity.type === 'badge' && (
-													<Award className='w-5 h-5 text-orange-500' />
+													<Award className='w-4 h-4 md:w-5 md:h-5 text-[#EAB308]' />
+												)}
+												{!activity.type && (
+													<CheckCircle2 className='w-4 h-4 md:w-5 md:h-5 text-[#4CAF50]' />
 												)}
 											</div>
 											<div className='flex-1 min-w-0'>
-												<p className='text-sm font-medium text-slate-800'>
+												<p className='text-xs md:text-sm font-medium text-[#1C1C1C]'>
 													{activity.title}
 												</p>
-												<div className='flex items-center space-x-2 mt-1'>
-													<Clock className='w-4 h-4 text-gray-400' />
-													<p className='text-xs text-gray-500'>
+												<div className='flex items-center flex-wrap gap-2 mt-1'>
+													<Clock className='w-3 h-3 md:w-4 md:h-4 text-[#9ca3af]' />
+													<p className='text-xs text-[#6b7280]'>
 														{activity.time}
 													</p>
 													{activity.score && (
-														<span className='text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full'>
+														<span className='text-xs bg-[#f0fdf4] text-[#16a34a] px-2 py-0.5 rounded-full'>
 															{activity.score}%
 														</span>
 													)}
 												</div>
 											</div>
-										</div>
+										</motion.div>
 									))
 								) : (
-									<div className='text-center py-8'>
-										<Target className='w-12 h-12 text-gray-300 mx-auto mb-3' />
-										<p className='text-gray-500 mb-2'>No activity yet</p>
-										<p className='text-sm text-gray-400'>
+									<motion.div
+										className='text-center py-6 md:py-8'
+										initial={{ opacity: 0 }}
+										animate={{ opacity: 1 }}
+										transition={{ delay: 0.3 }}>
+										<Target className='w-10 h-10 md:w-12 md:h-12 text-[#d1d5db] mx-auto mb-3' />
+										<p className='text-[#4B5563] mb-2 text-sm md:text-base'>
+											No activity yet
+										</p>
+										<p className='text-xs md:text-sm text-[#9ca3af]'>
 											Start taking tests to see your progress here!
 										</p>
-									</div>
+									</motion.div>
 								)}
 							</div>
-						</div>
+						</motion.div>
 					</div>
 				</div>
 			</div>
-		</div>
+		</motion.div>
 	);
 }

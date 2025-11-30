@@ -1,42 +1,37 @@
 // Design System for consistent UI/UX across the application
+// Neurodivergent-friendly color system - no gradients, soft colors only
 
 export const colors = {
-	primary: {
-		50: '#eff6ff',
-		100: '#dbeafe',
-		500: '#3b82f6',
-		600: '#2563eb',
-		700: '#1d4ed8',
-		900: '#1e3a8a'
+	brand: {
+		primary: '#3A7AFE',
+		secondary: '#1D2433'
 	},
-	secondary: {
-		50: '#faf5ff',
-		100: '#f3e8ff',
-		500: '#a855f7',
-		600: '#9333ea',
-		700: '#7c3aed',
-		900: '#581c87'
+	text: {
+		primary: '#1C1C1C',
+		secondary: '#4B5563'
 	},
+	bg: {
+		light: '#FFFFFF',
+		muted: '#F7F9FC'
+	},
+	border: '#E5E7EB',
 	success: {
 		50: '#f0fdf4',
 		100: '#dcfce7',
-		500: '#22c55e',
-		600: '#16a34a',
-		700: '#15803d'
+		500: '#4CAF50',
+		600: '#16a34a'
 	},
 	warning: {
 		50: '#fffbeb',
 		100: '#fef3c7',
-		500: '#f59e0b',
-		600: '#d97706',
-		700: '#b45309'
+		500: '#EAB308',
+		600: '#d97706'
 	},
 	error: {
 		50: '#fef2f2',
 		100: '#fee2e2',
-		500: '#ef4444',
-		600: '#dc2626',
-		700: '#b91c1c'
+		500: '#DC2626',
+		600: '#dc2626'
 	},
 	gray: {
 		50: '#f9fafb',
@@ -52,13 +47,7 @@ export const colors = {
 	}
 };
 
-export const gradients = {
-	primary: 'bg-gradient-to-r from-blue-600 to-purple-600',
-	secondary: 'bg-gradient-to-r from-purple-600 to-pink-600',
-	success: 'bg-gradient-to-r from-green-500 to-emerald-600',
-	warning: 'bg-gradient-to-r from-yellow-500 to-orange-600',
-	background: 'bg-gradient-to-br from-blue-50 via-white to-purple-50'
-};
+// Removed gradients - using solid colors only for accessibility
 
 export const shadows = {
 	sm: 'shadow-sm',
@@ -87,29 +76,29 @@ export const spacing = {
 	'3xl': '4rem'
 };
 
-// Common component styles
+// Common component styles - gentle animations, no scale transforms
 export const buttonStyles = {
-	primary: `${gradients.primary} text-white font-semibold px-6 py-3 rounded-xl hover:shadow-xl hover:scale-105 transition-all duration-300`,
+	primary: 'bg-[#3A7AFE] hover:bg-[#2E6AE8] text-white font-medium px-6 py-3 rounded-lg hover:shadow-md transition-all duration-200',
 	secondary:
-		'bg-white text-gray-700 border border-gray-300 px-6 py-3 rounded-xl hover:bg-gray-50 hover:shadow-md transition-all duration-300',
-	success: `${gradients.success} text-white font-semibold px-6 py-3 rounded-xl hover:shadow-xl hover:scale-105 transition-all duration-300`,
+		'bg-white text-[#4B5563] border border-[#E5E7EB] px-6 py-3 rounded-lg hover:bg-[#F7F9FC] hover:shadow-sm transition-all duration-200',
+	success: 'bg-[#4CAF50] hover:bg-[#16a34a] text-white font-medium px-6 py-3 rounded-lg hover:shadow-md transition-all duration-200',
 	danger:
-		'bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-3 rounded-xl hover:shadow-xl hover:scale-105 transition-all duration-300'
+		'bg-[#DC2626] hover:bg-[#b91c1c] text-white font-medium px-6 py-3 rounded-lg hover:shadow-md transition-all duration-200'
 };
 
 export const cardStyles = {
 	default:
-		'bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/20 p-6',
-	elevated: 'bg-white rounded-xl shadow-2xl p-6 border border-gray-100',
+		'bg-white rounded-xl shadow-sm border border-[#E5E7EB] p-6',
+	elevated: 'bg-white rounded-xl shadow-md p-6 border border-[#E5E7EB]',
 	interactive:
-		'bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 p-6'
+		'bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 border border-[#E5E7EB] p-6'
 };
 
 export const inputStyles = {
 	default:
-		'w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300',
+		'w-full px-4 py-3 border-2 border-[#E5E7EB] rounded-lg focus:ring-2 focus:ring-[#3A7AFE] focus:border-[#3A7AFE] transition-all duration-200',
 	error:
-		'w-full px-4 py-3 border-2 border-red-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-300'
+		'w-full px-4 py-3 border-2 border-[#DC2626] rounded-lg focus:ring-2 focus:ring-[#DC2626] focus:border-[#DC2626] transition-all duration-200'
 };
 
 type ColorScale = Record<string, string>;
@@ -132,7 +121,7 @@ interface SuccessAnimationProps {
 // Utility functions
 export const getScoreColor = (score: number): ColorScale => {
 	if (score >= 90) return colors.success;
-	if (score >= 70) return colors.primary;
+	if (score >= 70) return { 500: colors.brand.primary, 600: '#2E6AE8' };
 	if (score >= 50) return colors.warning;
 	return colors.error;
 };
@@ -141,15 +130,15 @@ export const getDifficultyColor = (
 	difficulty: DifficultyLevel | string
 ): string => {
 	const difficultyColors: Record<DifficultyLevel, string> = {
-		Beginner: 'bg-green-100 text-green-800',
-		Intermediate: 'bg-yellow-100 text-yellow-800',
-		Advanced: 'bg-orange-100 text-orange-800',
-		Expert: 'bg-red-100 text-red-800'
+		Beginner: 'bg-[#f0fdf4] text-[#16a34a]',
+		Intermediate: 'bg-[#fffbeb] text-[#d97706]',
+		Advanced: 'bg-[#fef3c7] text-[#b45309]',
+		Expert: 'bg-[#fef2f2] text-[#DC2626]'
 	};
 	if (difficulty in difficultyColors) {
 		return difficultyColors[difficulty as DifficultyLevel];
 	}
-	return 'bg-gray-100 text-gray-800';
+	return 'bg-[#F7F9FC] text-[#4B5563]';
 };
 
 // Loading skeleton component
@@ -165,11 +154,11 @@ export const ErrorState = ({
 	onRetry
 }: ErrorStateProps): JSX.Element => (
 	<div className='text-center py-8'>
-		<div className='text-red-500 text-6xl mb-4'>⚠️</div>
-		<h3 className='text-xl font-semibold text-gray-900 mb-2'>
+		<div className='text-[#DC2626] text-6xl mb-4'>⚠️</div>
+		<h3 className='text-xl font-semibold text-[#1C1C1C] mb-2'>
 			Something went wrong
 		</h3>
-		<p className='text-gray-600 mb-4'>{message}</p>
+		<p className='text-[#4B5563] mb-4'>{message}</p>
 		{onRetry && (
 			<button onClick={onRetry} className={`${buttonStyles.primary} text-sm`}>
 				Try Again
@@ -186,11 +175,11 @@ export const SuccessAnimation = ({
 	if (!show) return null;
 
 	return (
-		<div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'>
-			<div className='bg-white rounded-2xl p-8 text-center'>
+		<div className='fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50'>
+			<div className='bg-white rounded-xl p-8 text-center shadow-xl'>
 				<div className='text-6xl mb-4'>🎉</div>
-				<h3 className='text-2xl font-bold text-gray-900 mb-2'>Success!</h3>
-				<p className='text-gray-600'>Your action was completed successfully.</p>
+				<h3 className='text-2xl font-bold text-[#1C1C1C] mb-2'>Success!</h3>
+				<p className='text-[#4B5563]'>Your action was completed successfully.</p>
 				<button onClick={onComplete} className={`${buttonStyles.primary} mt-4`}>
 					Continue
 				</button>

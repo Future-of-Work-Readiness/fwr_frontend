@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { loginUser } from '../utils/auth';
-import WorkingSignUpModal from '../components/WorkingSignUpModal';
+import WorkingSignUpModal from '../src/components/WorkingSignUpModal';
 
 interface LoginData {
 	email: string;

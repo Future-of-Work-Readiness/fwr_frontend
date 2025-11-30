@@ -319,9 +319,9 @@ export default function GoalsPage(): JSX.Element {
 
 	if (!user) {
 		return (
-			<div className='min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center'>
+			<div className='min-h-screen bg-[#F7F9FC] flex items-center justify-center'>
 				<div className='text-center'>
-					<p className='text-gray-600'>Loading...</p>
+					<p className='text-[#4B5563]'>Loading...</p>
 				</div>
 			</div>
 		);
@@ -350,58 +350,58 @@ export default function GoalsPage(): JSX.Element {
 	];
 
 	return (
-		<div className='min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100'>
-			<div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
+		<div className='min-h-screen bg-[#F7F9FC]'>
+			<div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12'>
 				{/* Header */}
 				<div className='mb-8 flex items-center justify-between'>
 					<div>
-						<h1 className='text-4xl font-bold text-gray-900 mb-2'>
+						<h1 className='text-3xl md:text-4xl font-bold text-[#1C1C1C] mb-2'>
 							Self-Reflection & Goals
 						</h1>
-						<p className='text-gray-600'>
+						<p className='text-[#4B5563]'>
 							Track your progress and reflect on your journey
 						</p>
 					</div>
 					<button
 						onClick={() => navigate('/dashboard')}
-						className='px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg transition-colors'>
+						className='px-4 py-2 bg-white hover:bg-[#F7F9FC] text-[#4B5563] border border-[#E5E7EB] rounded-lg transition-colors duration-200'>
 						Back to Dashboard
 					</button>
 				</div>
 
 				{/* Two-Column Layout */}
 				{error && (
-					<div className='mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700'>
+					<div className='mb-6 rounded-lg border border-[#DC2626] bg-[#fef2f2] px-4 py-3 text-sm text-[#DC2626]'>
 						{error}
 					</div>
 				)}
 				<div className='grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8'>
 					{/* Where I Am Now */}
-					<div className='bg-white rounded-xl shadow-lg p-6'>
-						<h2 className='text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2'>
-							<Target className='h-6 w-6 text-blue-600' />
+					<div className='bg-white rounded-xl shadow-sm p-6 border border-[#E5E7EB]'>
+						<h2 className='text-2xl font-semibold text-[#1C1C1C] mb-4 flex items-center gap-2'>
+							<Target className='h-6 w-6 text-[#3A7AFE]' />
 							Where I Am Now
 						</h2>
 						<div className='space-y-4'>
-							<div className='p-4 bg-blue-50 rounded-lg'>
-								<div className='text-sm text-gray-600 mb-1'>
+							<div className='p-4 bg-[#F7F9FC] rounded-lg border border-[#E5E7EB]'>
+								<div className='text-sm text-[#4B5563] mb-1'>
 									Overall Readiness
 								</div>
-								<div className='text-3xl font-bold text-blue-600'>
+								<div className='text-3xl font-bold text-[#3A7AFE]'>
 									{Math.round(currentReadiness.overall)}%
 								</div>
 							</div>
-							<div className='p-4 bg-green-50 rounded-lg'>
-								<div className='text-sm text-gray-600 mb-1'>
+							<div className='p-4 bg-[#f0fdf4] rounded-lg border border-[#dcfce7]'>
+								<div className='text-sm text-[#4B5563] mb-1'>
 									Technical Skills
 								</div>
-								<div className='text-3xl font-bold text-green-600'>
+								<div className='text-3xl font-bold text-[#4CAF50]'>
 									{Math.round(currentReadiness.technical)}%
 								</div>
 							</div>
-							<div className='p-4 bg-yellow-50 rounded-lg'>
-								<div className='text-sm text-gray-600 mb-1'>Soft Skills</div>
-								<div className='text-3xl font-bold text-yellow-600'>
+							<div className='p-4 bg-[#fffbeb] rounded-lg border border-[#fef3c7]'>
+								<div className='text-sm text-[#4B5563] mb-1'>Soft Skills</div>
+								<div className='text-3xl font-bold text-[#EAB308]'>
 									{Math.round(currentReadiness.soft)}%
 								</div>
 							</div>
@@ -409,9 +409,9 @@ export default function GoalsPage(): JSX.Element {
 					</div>
 
 					{/* Where I Want To Be */}
-					<div className='bg-white rounded-xl shadow-lg p-6'>
-						<h2 className='text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2'>
-							<TrendingUp className='h-6 w-6 text-purple-600' />
+					<div className='bg-white rounded-xl shadow-sm p-6 border border-[#E5E7EB]'>
+						<h2 className='text-2xl font-semibold text-[#1C1C1C] mb-4 flex items-center gap-2'>
+							<TrendingUp className='h-6 w-6 text-[#3A7AFE]' />
 							Where I Want To Be
 						</h2>
 						{!showGoalForm ? (
@@ -427,7 +427,7 @@ export default function GoalsPage(): JSX.Element {
 									});
 									setShowGoalForm(true);
 								}}
-								className='w-full p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-purple-500 transition-colors flex items-center justify-center gap-2 text-gray-600'>
+								className='w-full p-4 border-2 border-dashed border-[#E5E7EB] rounded-lg hover:border-[#3A7AFE] transition-colors duration-200 flex items-center justify-center gap-2 text-[#4B5563]'>
 								<Plus className='h-5 w-5' />
 								Set a New Goal
 							</button>
@@ -580,10 +580,10 @@ export default function GoalsPage(): JSX.Element {
 													{progress}%
 												</span>
 											</div>
-											<div className='w-full bg-gray-200 rounded-full h-3'>
+											<div className='w-full bg-[#E5E7EB] rounded-full h-3'>
 												<div
 													className={`h-3 rounded-full transition-all ${
-														goal.is_completed ? 'bg-green-500' : 'bg-blue-500'
+														goal.is_completed ? 'bg-[#4CAF50]' : 'bg-[#3A7AFE]'
 													}`}
 													style={{ width: `${progress}%` }}
 												/>
@@ -620,10 +620,10 @@ export default function GoalsPage(): JSX.Element {
 				</div>
 
 				{/* Self-Reflection Journal */}
-				<div className='bg-white rounded-xl shadow-lg p-6'>
+				<div className='bg-white rounded-xl shadow-sm p-6 border border-[#E5E7EB]'>
 					<div className='flex items-center justify-between mb-4'>
-						<h2 className='text-2xl font-bold text-gray-900 flex items-center gap-2'>
-							<BookOpen className='h-6 w-6 text-indigo-600' />
+						<h2 className='text-2xl font-semibold text-[#1C1C1C] flex items-center gap-2'>
+							<BookOpen className='h-6 w-6 text-[#3A7AFE]' />
 							Self-Reflection Journal
 						</h2>
 						{!showJournalForm && (
@@ -632,7 +632,7 @@ export default function GoalsPage(): JSX.Element {
 									setJournalForm({ prompt: '', content: '' });
 									setShowJournalForm(true);
 								}}
-								className='px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg flex items-center gap-2'>
+								className='px-4 py-2 bg-[#3A7AFE] hover:bg-[#2E6AE8] text-white rounded-lg flex items-center gap-2 transition-colors duration-200'>
 								<Plus className='h-4 w-4' />
 								New Entry
 							</button>
@@ -669,7 +669,7 @@ export default function GoalsPage(): JSX.Element {
 							<div className='flex gap-2'>
 								<button
 									type='submit'
-									className='px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg'>
+									className='px-4 py-2 bg-[#3A7AFE] hover:bg-[#2E6AE8] text-white rounded-lg transition-colors duration-200'>
 									Save Entry
 								</button>
 								<button
@@ -678,7 +678,7 @@ export default function GoalsPage(): JSX.Element {
 										setShowJournalForm(false);
 										setJournalForm({ prompt: '', content: '' });
 									}}
-									className='px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg'>
+									className='px-4 py-2 bg-white hover:bg-[#F7F9FC] text-[#4B5563] border border-[#E5E7EB] rounded-lg transition-colors duration-200'>
 									Cancel
 								</button>
 							</div>
@@ -686,7 +686,7 @@ export default function GoalsPage(): JSX.Element {
 					)}
 
 					{journalEntries.length === 0 ? (
-						<div className='text-center py-8 text-gray-500'>
+						<div className='text-center py-8 text-[#4B5563]'>
 							<p>No journal entries yet. Start reflecting on your journey!</p>
 						</div>
 					) : (
@@ -696,20 +696,20 @@ export default function GoalsPage(): JSX.Element {
 									key={entry.id}
 									className='border border-gray-200 rounded-lg p-4'>
 									{entry.prompt && (
-										<div className='text-sm font-semibold text-indigo-600 mb-2'>
+										<div className='text-sm font-semibold text-[#3A7AFE] mb-2'>
 											{entry.prompt}
 										</div>
 									)}
-									<p className='text-gray-700 whitespace-pre-wrap'>
+									<p className='text-[#4B5563] whitespace-pre-wrap'>
 										{entry.content}
 									</p>
 									<div className='mt-3 flex items-center justify-between'>
-										<span className='text-xs text-gray-500'>
+										<span className='text-xs text-[#6b7280]'>
 											{new Date(entry.entry_date).toLocaleDateString()}
 										</span>
 										<button
 											onClick={() => handleDeleteJournal(entry.id)}
-											className='text-xs text-red-600 hover:text-red-800'>
+											className='text-xs text-[#DC2626] hover:text-[#b91c1c] transition-colors duration-200'>
 											Delete
 										</button>
 									</div>

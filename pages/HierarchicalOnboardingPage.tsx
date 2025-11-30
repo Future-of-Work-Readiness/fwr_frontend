@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { getSectorsHierarchical } from '../utils/hierarchicalApi';
 import {
 	colors,
-	gradients,
 	buttonStyles,
 	cardStyles,
 	SkeletonLoader

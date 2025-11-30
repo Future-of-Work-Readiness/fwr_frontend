@@ -1,3 +1,4 @@
+/// <reference types="vite/client" />
 import type { Branch, Quiz, Sector, Specialization, User } from '../src/types';
 
 // API service for connecting to FastAPI backend

@@ -58,16 +58,16 @@ export default function PeerBenchmarkingPage(): JSX.Element {
 		status: 'above' | 'below' | 'average'
 	): JSX.Element => {
 		if (status === 'above')
-			return <TrendingUp className='w-5 h-5 text-green-500' />;
+			return <TrendingUp className='w-5 h-5 text-[#4CAF50]' />;
 		if (status === 'below')
-			return <TrendingDown className='w-5 h-5 text-red-500' />;
-		return <Minus className='w-5 h-5 text-gray-500' />;
+			return <TrendingDown className='w-5 h-5 text-[#DC2626]' />;
+		return <Minus className='w-5 h-5 text-[#6b7280]' />;
 	};
 
 	const getStatusColor = (status: 'above' | 'below' | 'average'): string => {
-		if (status === 'above') return 'bg-green-50 border-green-200';
-		if (status === 'below') return 'bg-red-50 border-red-200';
-		return 'bg-gray-50 border-gray-200';
+		if (status === 'above') return 'bg-[#f0fdf4] border-[#dcfce7]';
+		if (status === 'below') return 'bg-[#fef2f2] border-[#fee2e2]';
+		return 'bg-[#F7F9FC] border-[#E5E7EB]';
 	};
 
 	const getStatusText = (
@@ -83,10 +83,10 @@ export default function PeerBenchmarkingPage(): JSX.Element {
 
 	if (loading) {
 		return (
-			<div className='min-h-screen bg-gray-50 flex items-center justify-center'>
+			<div className='min-h-screen bg-[#F7F9FC] flex items-center justify-center'>
 				<div className='text-center'>
-					<div className='animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4'></div>
-					<p className='text-gray-600'>Loading peer comparison...</p>
+					<div className='animate-spin rounded-full h-12 w-12 border-b-2 border-[#3A7AFE] mx-auto mb-4'></div>
+					<p className='text-[#4B5563]'>Loading peer comparison...</p>
 				</div>
 			</div>
 		);
@@ -94,23 +94,23 @@ export default function PeerBenchmarkingPage(): JSX.Element {
 
 	if (error) {
 		return (
-			<div className='min-h-screen bg-gray-50 p-4'>
+			<div className='min-h-screen bg-[#F7F9FC] p-4'>
 				<div className='max-w-4xl mx-auto'>
 					<button
 						onClick={() => navigate('/dashboard')}
-						className='flex items-center text-gray-600 hover:text-blue-600 mb-6'>
+						className='flex items-center text-[#4B5563] hover:text-[#3A7AFE] mb-6 transition-colors duration-200'>
 						<ArrowLeft className='w-5 h-5 mr-2' />
 						Back to Dashboard
 					</button>
-					<div className='bg-yellow-50 border border-yellow-200 rounded-lg p-6'>
+					<div className='bg-[#fffbeb] border border-[#fef3c7] rounded-lg p-6'>
 						<div className='flex items-start space-x-3'>
-							<AlertCircle className='w-6 h-6 text-yellow-600 flex-shrink-0 mt-1' />
+							<AlertCircle className='w-6 h-6 text-[#EAB308] flex-shrink-0 mt-1' />
 							<div>
-								<h3 className='font-semibold text-yellow-900 mb-2'>
+								<h3 className='font-semibold text-[#d97706] mb-2'>
 									Not Enough Data
 								</h3>
-								<p className='text-yellow-800'>{error}</p>
-								<p className='text-yellow-700 mt-2'>
+								<p className='text-[#d97706]'>{error}</p>
+								<p className='text-[#b45309] mt-2'>
 									Complete more quizzes and encourage others in your
 									specialization to join!
 								</p>
@@ -124,32 +124,32 @@ export default function PeerBenchmarkingPage(): JSX.Element {
 
 	if (!benchmarkData) {
 		return (
-			<div className='min-h-screen bg-gray-50 flex items-center justify-center'>
+			<div className='min-h-screen bg-[#F7F9FC] flex items-center justify-center'>
 				<div className='text-center'>
-					<p className='text-gray-600'>No benchmark data available.</p>
+					<p className='text-[#4B5563]'>No benchmark data available.</p>
 				</div>
 			</div>
 		);
 	}
 
 	return (
-		<div className='min-h-screen bg-gray-50 p-4'>
+		<div className='min-h-screen bg-[#F7F9FC] p-4'>
 			<div className='max-w-7xl mx-auto'>
 				{/* Header */}
 				<div className='mb-8'>
 					<button
 						onClick={() => navigate('/dashboard')}
-						className='flex items-center text-gray-600 hover:text-blue-600 mb-4'>
+						className='flex items-center text-[#4B5563] hover:text-[#3A7AFE] mb-4 transition-colors duration-200'>
 						<ArrowLeft className='w-5 h-5 mr-2' />
 						Back to Dashboard
 					</button>
 
 					<div className='flex items-center justify-between'>
 						<div>
-							<h1 className='text-3xl font-bold text-slate-800 mb-2'>
+							<h1 className='text-3xl font-bold text-[#1C1C1C] mb-2'>
 								Peer Benchmarking
 							</h1>
-							<p className='text-gray-600'>
+							<p className='text-[#4B5563]'>
 								Compare your performance with {benchmarkData.total_peers} peers
 								in{' '}
 								<span className='font-semibold'>
@@ -157,7 +157,7 @@ export default function PeerBenchmarkingPage(): JSX.Element {
 								</span>
 							</p>
 						</div>
-						<div className='hidden md:flex items-center space-x-2 text-gray-500'>
+						<div className='hidden md:flex items-center space-x-2 text-[#6b7280]'>
 							<Users className='w-5 h-5' />
 							<span className='text-sm'>
 								Last updated:{' '}
@@ -168,14 +168,14 @@ export default function PeerBenchmarkingPage(): JSX.Element {
 				</div>
 
 				{/* Overall Percentile Card */}
-				<div className='bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg shadow-lg p-6 mb-6 text-white'>
+				<div className='bg-[#3A7AFE] rounded-xl shadow-sm p-6 mb-6 text-white'>
 					<div className='flex items-center justify-between'>
 						<div>
-							<p className='text-blue-100 mb-2'>Your Overall Standing</p>
+							<p className='text-white/80 mb-2'>Your Overall Standing</p>
 							<h2 className='text-4xl font-bold mb-2'>
 								Top {100 - benchmarkData.overall_percentile}%
 							</h2>
-							<p className='text-blue-100'>
+							<p className='text-white/80'>
 								You score higher than{' '}
 								<span className='font-semibold'>
 									{benchmarkData.overall_percentile}%
@@ -192,15 +192,15 @@ export default function PeerBenchmarkingPage(): JSX.Element {
 					{benchmarkData.comparisons.map((comparison, index) => (
 						<div
 							key={index}
-							className={`bg-white rounded-lg shadow-lg p-6 border-2 ${getStatusColor(
+							className={`bg-white rounded-xl shadow-sm p-6 border-2 ${getStatusColor(
 								comparison.status
 							)}`}>
 							<div className='flex items-start justify-between mb-4'>
 								<div>
-									<h3 className='text-lg font-semibold text-slate-800 mb-1'>
+									<h3 className='text-lg font-semibold text-[#1C1C1C] mb-1'>
 										{comparison.category}
 									</h3>
-									<p className='text-sm text-gray-600'>
+									<p className='text-sm text-[#4B5563]'>
 										{getStatusText(comparison.status, comparison.difference)}
 									</p>
 								</div>
@@ -211,16 +211,16 @@ export default function PeerBenchmarkingPage(): JSX.Element {
 								{/* Your Score */}
 								<div>
 									<div className='flex justify-between items-center mb-2'>
-										<span className='text-sm font-medium text-gray-700'>
+										<span className='text-sm font-medium text-[#4B5563]'>
 											Your Score
 										</span>
-										<span className='text-lg font-bold text-blue-600'>
+										<span className='text-lg font-bold text-[#3A7AFE]'>
 											{comparison.your_score}%
 										</span>
 									</div>
-									<div className='w-full bg-gray-200 rounded-full h-3'>
+									<div className='w-full bg-[#E5E7EB] rounded-full h-3'>
 										<div
-											className='bg-blue-600 h-3 rounded-full transition-all duration-500'
+											className='bg-[#3A7AFE] h-3 rounded-full transition-all duration-500'
 											style={{ width: `${comparison.your_score}%` }}
 										/>
 									</div>
@@ -229,28 +229,28 @@ export default function PeerBenchmarkingPage(): JSX.Element {
 								{/* Peer Average */}
 								<div>
 									<div className='flex justify-between items-center mb-2'>
-										<span className='text-sm font-medium text-gray-700'>
+										<span className='text-sm font-medium text-[#4B5563]'>
 											Peer Average
 										</span>
-										<span className='text-lg font-bold text-gray-600'>
+										<span className='text-lg font-bold text-[#6b7280]'>
 											{comparison.peer_average}%
 										</span>
 									</div>
-									<div className='w-full bg-gray-200 rounded-full h-3'>
+									<div className='w-full bg-[#E5E7EB] rounded-full h-3'>
 										<div
-											className='bg-gray-400 h-3 rounded-full transition-all duration-500'
+											className='bg-[#9ca3af] h-3 rounded-full transition-all duration-500'
 											style={{ width: `${comparison.peer_average}%` }}
 										/>
 									</div>
 								</div>
 
 								{/* Percentile */}
-								<div className='pt-2 border-t border-gray-200'>
+								<div className='pt-2 border-t border-[#E5E7EB]'>
 									<div className='flex items-center justify-between'>
-										<span className='text-sm text-gray-600'>
+										<span className='text-sm text-[#4B5563]'>
 											Your Percentile
 										</span>
-										<span className='text-sm font-semibold text-slate-800'>
+										<span className='text-sm font-semibold text-[#1C1C1C]'>
 											{comparison.percentile}th percentile
 										</span>
 									</div>
@@ -263,14 +263,14 @@ export default function PeerBenchmarkingPage(): JSX.Element {
 				{/* Common Strengths and Gaps */}
 				<div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
 					{/* Common Strengths */}
-					<div className='bg-white rounded-lg shadow-lg p-6'>
+					<div className='bg-white rounded-xl shadow-sm p-6 border border-[#E5E7EB]'>
 						<div className='flex items-center space-x-2 mb-4'>
-							<CheckCircle className='w-6 h-6 text-green-600' />
-							<h3 className='text-xl font-semibold text-slate-800'>
+							<CheckCircle className='w-6 h-6 text-[#4CAF50]' />
+							<h3 className='text-xl font-semibold text-[#1C1C1C]'>
 								Common Strengths
 							</h3>
 						</div>
-						<p className='text-gray-600 mb-4'>
+						<p className='text-[#4B5563] mb-4'>
 							Areas where most peers in your specialization excel
 						</p>
 						{benchmarkData.common_strengths.length > 0 ? (
@@ -278,37 +278,37 @@ export default function PeerBenchmarkingPage(): JSX.Element {
 								{benchmarkData.common_strengths.map((strength, index) => (
 									<div
 										key={index}
-										className='p-4 bg-green-50 border border-green-200 rounded-lg'>
+										className='p-4 bg-[#f0fdf4] border border-[#dcfce7] rounded-lg'>
 										<div className='flex items-start justify-between mb-2'>
-											<h4 className='font-semibold text-green-900'>
+											<h4 className='font-semibold text-[#16a34a]'>
 												{strength.area}
 											</h4>
-											<span className='text-lg font-bold text-green-600'>
+											<span className='text-lg font-bold text-[#4CAF50]'>
 												{strength.percentage}%
 											</span>
 										</div>
-										<p className='text-sm text-green-800'>
+										<p className='text-sm text-[#15803d]'>
 											{strength.description}
 										</p>
 									</div>
 								))}
 							</div>
 						) : (
-							<p className='text-gray-500 italic'>
+							<p className='text-[#6b7280] italic'>
 								No common strengths identified yet.
 							</p>
 						)}
 					</div>
 
 					{/* Common Gaps */}
-					<div className='bg-white rounded-lg shadow-lg p-6'>
+					<div className='bg-white rounded-xl shadow-sm p-6 border border-[#E5E7EB]'>
 						<div className='flex items-center space-x-2 mb-4'>
-							<Target className='w-6 h-6 text-orange-600' />
-							<h3 className='text-xl font-semibold text-slate-800'>
+							<Target className='w-6 h-6 text-[#EAB308]' />
+							<h3 className='text-xl font-semibold text-[#1C1C1C]'>
 								Common Gaps
 							</h3>
 						</div>
-						<p className='text-gray-600 mb-4'>
+						<p className='text-[#4B5563] mb-4'>
 							Areas where most peers need improvement
 						</p>
 						{benchmarkData.common_gaps.length > 0 ? (
@@ -316,21 +316,21 @@ export default function PeerBenchmarkingPage(): JSX.Element {
 								{benchmarkData.common_gaps.map((gap, index) => (
 									<div
 										key={index}
-										className='p-4 bg-orange-50 border border-orange-200 rounded-lg'>
+										className='p-4 bg-[#fffbeb] border border-[#fef3c7] rounded-lg'>
 										<div className='flex items-start justify-between mb-2'>
-											<h4 className='font-semibold text-orange-900'>
+											<h4 className='font-semibold text-[#d97706]'>
 												{gap.area}
 											</h4>
-											<span className='text-lg font-bold text-orange-600'>
+											<span className='text-lg font-bold text-[#EAB308]'>
 												{gap.percentage}%
 											</span>
 										</div>
-										<p className='text-sm text-orange-800'>{gap.description}</p>
+										<p className='text-sm text-[#b45309]'>{gap.description}</p>
 									</div>
 								))}
 							</div>
 						) : (
-							<p className='text-gray-500 italic'>
+							<p className='text-[#6b7280] italic'>
 								No common gaps identified yet.
 							</p>
 						)}

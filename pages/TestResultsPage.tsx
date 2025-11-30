@@ -115,17 +115,17 @@ const TestResultsPage = (): JSX.Element => {
 		};
 
 		const getScoreColor = (score: number): string => {
-			if (score >= 90) return 'text-green-600';
-			if (score >= 70) return 'text-blue-600';
-			if (score >= 50) return 'text-yellow-600';
-			return 'text-red-600';
+			if (score >= 90) return 'text-[#4CAF50]';
+			if (score >= 70) return 'text-[#3A7AFE]';
+			if (score >= 50) return 'text-[#EAB308]';
+			return 'text-[#DC2626]';
 		};
 
 		const getScoreBgColor = (score: number): string => {
-			if (score >= 90) return 'bg-green-100 border-green-200';
-			if (score >= 70) return 'bg-blue-100 border-blue-200';
-			if (score >= 50) return 'bg-yellow-100 border-yellow-200';
-			return 'bg-red-100 border-red-200';
+			if (score >= 90) return 'bg-[#f0fdf4] border-[#dcfce7]';
+			if (score >= 70) return 'bg-[#F7F9FC] border-[#E5E7EB]';
+			if (score >= 50) return 'bg-[#fffbeb] border-[#fef3c7]';
+			return 'bg-[#fef2f2] border-[#fee2e2]';
 		};
 
 		const getPerformanceMessage = (
@@ -178,21 +178,21 @@ const TestResultsPage = (): JSX.Element => {
 			backendDataTyped?.quiz?.title || test?.title || 'Test Results';
 
 		return (
-			<div className='min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100'>
+			<div className='min-h-screen bg-[#F7F9FC]'>
 				{/* Header */}
-				<div className='bg-white shadow-sm border-b'>
+				<div className='bg-white shadow-sm border-b border-[#E5E7EB]'>
 					<div className='max-w-4xl mx-auto px-4 sm:px-6 lg:px-8'>
 						<div className='flex items-center py-6'>
 							<button
 								onClick={() => navigate('/test-hub')}
-								className='p-2 text-gray-600 hover:text-blue-600 transition-colors mr-4'>
+								className='p-2 text-[#4B5563] hover:text-[#3A7AFE] transition-colors duration-200 mr-4'>
 								<ArrowLeft className='h-5 w-5' />
 							</button>
 							<div>
-								<h1 className='text-3xl font-bold text-gray-900'>
+								<h1 className='text-3xl font-bold text-[#1C1C1C]'>
 									Test Results
 								</h1>
-								<p className='text-gray-600 mt-1'>{displayTitle}</p>
+								<p className='text-[#4B5563] mt-1'>{displayTitle}</p>
 							</div>
 						</div>
 					</div>
@@ -200,10 +200,10 @@ const TestResultsPage = (): JSX.Element => {
 
 				<div className='max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
 					{autoSubmit && (
-						<div className='bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6'>
+						<div className='bg-[#fffbeb] border border-[#fef3c7] rounded-lg p-4 mb-6'>
 							<div className='flex items-center'>
-								<Clock className='h-5 w-5 text-yellow-600 mr-2' />
-								<p className='text-yellow-800'>
+								<Clock className='h-5 w-5 text-[#EAB308] mr-2' />
+								<p className='text-[#d97706]'>
 									Time's up! Your test was automatically submitted.
 								</p>
 							</div>
@@ -218,13 +218,13 @@ const TestResultsPage = (): JSX.Element => {
 						{/* Animated background sparkles for high scores */}
 						{displayScore >= 90 && (
 							<div className='absolute inset-0 pointer-events-none'>
-								<Sparkles className='absolute top-4 right-4 h-6 w-6 text-yellow-400 animate-pulse' />
+								<Sparkles className='absolute top-4 right-4 h-6 w-6 text-[#EAB308] animate-pulse' />
 								<Star
-									className='absolute bottom-4 left-4 h-4 w-4 text-yellow-400 animate-bounce'
+									className='absolute bottom-4 left-4 h-4 w-4 text-[#EAB308] animate-bounce'
 									style={{ animationDelay: '0.5s' }}
 								/>
 								<Sparkles
-									className='absolute top-1/2 left-8 h-5 w-5 text-yellow-400 animate-pulse'
+									className='absolute top-1/2 left-8 h-5 w-5 text-[#EAB308] animate-pulse'
 									style={{ animationDelay: '1s' }}
 								/>
 							</div>
@@ -237,21 +237,21 @@ const TestResultsPage = (): JSX.Element => {
 								)} bg-opacity-10`}>
 								<Icon className={`h-12 w-12 ${getScoreColor(score)}`} />
 							</div>
-							<h2 className='text-3xl font-bold text-gray-900 mb-2'>
+							<h2 className='text-3xl font-bold text-[#1C1C1C] mb-2'>
 								{performance.message}
 							</h2>
 							<div
 								className={`text-6xl font-bold mb-4 ${getScoreColor(
 									score
-								)} transition-all duration-1000`}>
+								)} transition-all duration-600`}>
 								{Math.round(displayScore)}%
 							</div>
-							<p className='text-gray-600 text-lg'>
+							<p className='text-[#4B5563] text-lg'>
 								{displayPassed ? (
 									<span className='flex items-center justify-center gap-2'>
 										🎉 You passed the test!
 										{displayScore >= 90 && (
-											<Sparkles className='h-5 w-5 text-yellow-500 animate-pulse' />
+											<Sparkles className='h-5 w-5 text-[#EAB308] animate-pulse' />
 										)}
 									</span>
 								) : (
@@ -288,33 +288,33 @@ const TestResultsPage = (): JSX.Element => {
 									{
 										label: 'Overall Readiness',
 										value: `${overall}%`,
-										color: 'text-blue-700',
-										bg: 'bg-blue-50'
+										color: 'text-[#3A7AFE]',
+										bg: 'bg-[#F7F9FC]'
 									},
 									{
 										label: 'Technical',
 										value: `${technical}%`,
-										color: 'text-green-700',
-										bg: 'bg-green-50'
+										color: 'text-[#4CAF50]',
+										bg: 'bg-[#f0fdf4]'
 									},
 									{
 										label: 'Soft Skills',
 										value: `${soft}%`,
-										color: 'text-yellow-700',
-										bg: 'bg-yellow-50'
+										color: 'text-[#EAB308]',
+										bg: 'bg-[#fffbeb]'
 									},
 									{
 										label: 'Passed',
 										value: displayPassed ? 'Yes' : 'No',
-										color: displayPassed ? 'text-emerald-700' : 'text-red-700',
-										bg: displayPassed ? 'bg-emerald-50' : 'bg-red-50'
+										color: displayPassed ? 'text-[#4CAF50]' : 'text-[#DC2626]',
+										bg: displayPassed ? 'bg-[#f0fdf4]' : 'bg-[#fef2f2]'
 									}
 								];
 								return items.map((it, idx) => (
 									<div
 										key={idx}
-										className={`rounded-lg p-6 ${it.bg} border border-gray-200 text-center`}>
-										<div className='text-sm text-gray-600 mb-1'>{it.label}</div>
+										className={`rounded-lg p-6 ${it.bg} border border-[#E5E7EB] text-center`}>
+										<div className='text-sm text-[#4B5563] mb-1'>{it.label}</div>
 										<div className={`text-2xl font-bold ${it.color}`}>
 											{it.value}
 										</div>
@@ -327,21 +327,21 @@ const TestResultsPage = (): JSX.Element => {
 					</div>
 
 					{loading && (
-						<div className='bg-white rounded-lg p-4 mb-6 border border-gray-200 text-gray-600'>
+						<div className='bg-white rounded-lg p-4 mb-6 border border-[#E5E7EB] text-[#4B5563]'>
 							Loading results…
 						</div>
 					)}
 					{!loading && error && (
-						<div className='bg-red-50 border border-red-200 rounded-lg p-4 mb-6 text-red-700'>
+						<div className='bg-[#fef2f2] border border-[#fee2e2] rounded-lg p-4 mb-6 text-[#DC2626]'>
 							{error}
 						</div>
 					)}
 
 					{/* Stats */}
 					<div className='grid grid-cols-1 md:grid-cols-3 gap-6 mb-8'>
-						<div className='bg-white rounded-lg shadow-lg p-6 text-center'>
-							<Target className='h-8 w-8 text-blue-600 mx-auto mb-2' />
-							<div className='text-2xl font-bold text-gray-900'>
+						<div className='bg-white rounded-lg shadow-sm p-6 text-center border border-[#E5E7EB]'>
+							<Target className='h-8 w-8 text-[#3A7AFE] mx-auto mb-2' />
+							<div className='text-2xl font-bold text-[#1C1C1C]'>
 								{Object.keys(answers || {}).length}/
 								{test?.questions?.length || 0}
 							</div>

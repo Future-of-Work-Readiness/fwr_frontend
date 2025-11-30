@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import type { FormEvent, ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { registerUser } from '../utils/auth';
+import { registerUser } from '../../utils/auth';
 
 interface WorkingSignUpModalProps {
 	onClose: () => void;
@@ -146,10 +146,7 @@ export default function WorkingSignUpModal({
 						style={{
 							fontSize: '2rem',
 							fontWeight: '800',
-							background: 'linear-gradient(135deg, #667eea, #764ba2)',
-							backgroundClip: 'text',
-							WebkitBackgroundClip: 'text',
-							WebkitTextFillColor: 'transparent',
+							color: '#3A7AFE',
 							margin: 0
 						}}>
 						🚀 Join the Future!

@@ -60,12 +60,12 @@ export default function LandingPageAuth(): JSX.Element {
 			<main className='relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12'>
 				{/* Hero Section */}
 				<div className='text-center mb-16'>
-					<div className='inline-flex items-center space-x-2 bg-green-50 border border-green-200 rounded-full px-4 py-2 mb-8'>
+					{/* <div className='inline-flex items-center space-x-2 bg-green-50 border border-green-200 rounded-full px-4 py-2 mb-8'>
 						<div className='w-2 h-2 bg-green-500 rounded-full animate-pulse'></div>
 						<span className='text-green-700 text-sm font-semibold'>
 							Successfully Logged In
 						</span>
-					</div>
+					</div> */}
 
 					<h1 className='text-4xl md:text-6xl font-bold mb-6'>
 						<span className='bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent'>

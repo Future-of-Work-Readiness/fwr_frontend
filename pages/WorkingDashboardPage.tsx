@@ -120,7 +120,9 @@ export default function WorkingDashboardPage(): JSX.Element {
 						setUser(updated);
 					} catch {}
 				} catch (e) {
-					setError(e.message || 'Failed to load dashboard');
+					const errorMessage =
+						e instanceof Error ? e.message : 'Failed to load dashboard';
+					setError(errorMessage);
 				} finally {
 					setRefreshing(false);
 				}
@@ -135,7 +137,7 @@ export default function WorkingDashboardPage(): JSX.Element {
 		navigate('/');
 	};
 
-	const handleStartTest = (testType) => {
+	const handleStartTest = (testType: string) => {
 		navigate('/test-hub');
 	};
 

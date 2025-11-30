@@ -90,37 +90,37 @@ const TestHubPage = (): JSX.Element => {
 
 	if (loading) {
 		return (
-			<div className='min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center'>
-				<div className='bg-white p-8 rounded-xl shadow-lg'>
-					<div className='animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto'></div>
-					<p className='text-gray-600 mt-4'>Loading tests...</p>
+			<div className='min-h-screen bg-[#F7F9FC] flex items-center justify-center'>
+				<div className='bg-white p-8 rounded-xl shadow-sm border border-[#E5E7EB]'>
+					<div className='animate-spin rounded-full h-8 w-8 border-b-2 border-[#3A7AFE] mx-auto'></div>
+					<p className='text-[#4B5563] mt-4'>Loading tests...</p>
 				</div>
 			</div>
 		);
 	}
 
 	return (
-		<div className='min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100'>
+		<div className='min-h-screen bg-[#F7F9FC]'>
 			{/* Header */}
-			<div className='bg-white shadow-sm border-b'>
+			<div className='bg-white shadow-sm border-b border-[#E5E7EB]'>
 				<div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
 					<div className='flex justify-between items-center py-6'>
 						<div className='flex items-center gap-4'>
 							<button
 								onClick={() => navigate('/dashboard')}
-								className='p-2 text-gray-600 hover:text-blue-600 transition-colors'>
+								className='p-2 text-[#4B5563] hover:text-[#3A7AFE] transition-colors duration-200'>
 								<ArrowLeft className='h-5 w-5' />
 							</button>
 							<div>
-								<h1 className='text-3xl font-bold text-gray-900'>
+								<h1 className='text-3xl font-bold text-[#1C1C1C]'>
 									Knowledge Tests Hub
 								</h1>
-								<p className='text-gray-600 mt-1'>
+								<p className='text-[#4B5563] mt-1'>
 									Explore and take comprehensive tests to enhance your skills
 								</p>
 							</div>
 						</div>
-						<div className='text-sm text-gray-500'>
+						<div className='text-sm text-[#6b7280]'>
 							{tests.length} test{tests.length !== 1 ? 's' : ''} available
 						</div>
 					</div>
@@ -132,16 +132,14 @@ const TestHubPage = (): JSX.Element => {
 				{tests.length === 0 ? (
 					<div
 						className={`${cardStyles.default} text-center relative overflow-hidden`}>
-						{/* Animated background for empty state */}
-						<div className='absolute inset-0 bg-gradient-to-br from-blue-50 to-purple-50 opacity-50'></div>
 						<div className='relative z-10'>
-							<div className='inline-flex items-center justify-center w-20 h-20 rounded-full bg-gray-100 mb-4'>
-								<BookOpen className='h-10 w-10 text-gray-400' />
+							<div className='inline-flex items-center justify-center w-20 h-20 rounded-full bg-[#F7F9FC] mb-4'>
+								<BookOpen className='h-10 w-10 text-[#9ca3af]' />
 							</div>
-							<h3 className='text-xl font-semibold text-gray-900 mb-2'>
+							<h3 className='text-xl font-semibold text-[#1C1C1C] mb-2'>
 								No Tests Available
 							</h3>
-							<p className='text-gray-600 mb-4'>
+							<p className='text-[#4B5563] mb-4'>
 								No tests available for your specialization yet. Check back soon!
 							</p>
 						</div>
@@ -152,36 +150,33 @@ const TestHubPage = (): JSX.Element => {
 							<div
 								key={test.id}
 								className={`${cardStyles.interactive} group relative overflow-hidden`}>
-								{/* Subtle gradient overlay on hover */}
-								<div className='absolute inset-0 bg-gradient-to-br from-blue-50 to-purple-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300'></div>
-
 								<div className='relative z-10 p-6'>
 									<div className='flex items-start justify-between mb-4'>
-										<div className='p-2 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition-colors duration-300'>
-											<BookOpen className='h-6 w-6 text-blue-600' />
+										<div className='p-2 bg-[#3A7AFE]/10 rounded-lg group-hover:bg-[#3A7AFE]/20 transition-colors duration-200'>
+											<BookOpen className='h-6 w-6 text-[#3A7AFE]' />
 										</div>
 										<div className='flex flex-col items-end gap-2'>
 											<span
-												className={`text-xs font-medium px-2.5 py-0.5 rounded-full transition-all duration-300 ${getDifficultyColor(
+												className={`text-xs font-medium px-2.5 py-0.5 rounded-full transition-all duration-200 ${getDifficultyColor(
 													test.difficulty || 'Beginner'
 												)}`}>
 												{test.difficulty}
 											</span>
-											<span className='text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full group-hover:bg-gray-200 transition-colors'>
+											<span className='text-xs bg-[#F7F9FC] text-[#4B5563] px-2 py-1 rounded-full group-hover:bg-[#E5E7EB] transition-colors duration-200'>
 												{test.category}
 											</span>
 										</div>
 									</div>
 
-									<h3 className='text-xl font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors'>
+									<h3 className='text-xl font-semibold text-[#1C1C1C] mb-2 line-clamp-2 group-hover:text-[#3A7AFE] transition-colors duration-200'>
 										{test.title}
 									</h3>
 
-									<p className='text-gray-600 mb-4 line-clamp-3 text-sm'>
+									<p className='text-[#4B5563] mb-4 line-clamp-3 text-sm'>
 										{test.description}
 									</p>
 
-									<div className='flex items-center gap-4 text-sm text-gray-500 mb-6'>
+									<div className='flex items-center gap-4 text-sm text-[#6b7280] mb-6'>
 										<div className='flex items-center gap-1'>
 											<Clock className='h-4 w-4' />
 											<span>{test.estimatedTime} min</span>
@@ -199,12 +194,12 @@ const TestHubPage = (): JSX.Element => {
 												{test.tags.slice(0, 3).map((tag, index) => (
 													<span
 														key={index}
-														className='text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded group-hover:bg-blue-100 transition-colors'>
+														className='text-xs bg-[#3A7AFE]/10 text-[#3A7AFE] px-2 py-1 rounded group-hover:bg-[#3A7AFE]/20 transition-colors duration-200'>
 														{tag}
 													</span>
 												))}
 												{test.tags.length > 3 && (
-													<span className='text-xs text-gray-500'>
+													<span className='text-xs text-[#6b7280]'>
 														+{test.tags.length - 3} more
 													</span>
 												)}

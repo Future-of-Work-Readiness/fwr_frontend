@@ -405,7 +405,7 @@ const TestTakingPage = (): JSX.Element => {
 					</p>
 					<button
 						onClick={() => navigate('/test-hub')}
-						className='bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg'>
+						className='bg-[#3A7AFE] hover:bg-[#2E6AE8] text-white px-6 py-2 rounded-lg transition-colors duration-200'>
 						Back to Test Hub
 					</button>
 				</div>
@@ -420,19 +420,19 @@ const TestTakingPage = (): JSX.Element => {
 	return (
 		<div className='min-h-screen bg-white'>
 			{/* Header */}
-			<div className='bg-white border-b border-gray-200 px-6 py-4'>
+			<div className='bg-white border-b border-[#E5E7EB] px-6 py-4'>
 				<div className='max-w-4xl mx-auto flex items-center justify-between'>
 					<div className='flex items-center gap-4'>
 						<button
 							onClick={handleExit}
-							className='p-2 text-gray-500 hover:text-gray-700 transition-colors'>
+							className='p-2 text-[#6b7280] hover:text-[#1C1C1C] transition-colors duration-200'>
 							<X className='h-5 w-5' />
 						</button>
 						<div>
-							<h1 className='text-lg font-semibold text-gray-900'>
+							<h1 className='text-lg font-semibold text-[#1C1C1C]'>
 								{test.title}
 							</h1>
-							<p className='text-sm text-gray-500'>
+							<p className='text-sm text-[#6b7280]'>
 								Question {currentQuestionIndex + 1} of{' '}
 								{test.questions?.length || 0}
 							</p>
@@ -442,23 +442,23 @@ const TestTakingPage = (): JSX.Element => {
 					<div className='flex items-center gap-6'>
 						{/* Progress */}
 						<div className='flex items-center gap-2'>
-							<div className='w-32 bg-gray-200 rounded-full h-2'>
+							<div className='w-32 bg-[#E5E7EB] rounded-full h-2'>
 								<div
-									className='bg-blue-600 h-2 rounded-full transition-all duration-300'
+									className='bg-[#3A7AFE] h-2 rounded-full transition-all duration-300'
 									style={{ width: `${getProgress()}%` }}
 								/>
 							</div>
-							<span className='text-sm text-gray-600'>
+							<span className='text-sm text-[#4B5563]'>
 								{Object.keys(answers).length}/{test.questions?.length || 0}
 							</span>
 						</div>
 
 						{/* Timer */}
 						<div className='flex items-center gap-2'>
-							<Clock className='h-4 w-4 text-gray-500' />
+							<Clock className='h-4 w-4 text-[#6b7280]' />
 							<span
 								className={`text-sm font-mono ${
-									timeLeft < 300 ? 'text-red-600' : 'text-gray-700'
+									timeLeft < 300 ? 'text-[#DC2626]' : 'text-[#4B5563]'
 								}`}>
 								{formatTime(timeLeft)}
 							</span>
@@ -473,13 +473,13 @@ const TestTakingPage = (): JSX.Element => {
 					{/* Question */}
 					<div className='mb-8'>
 						{currentQuestion?.scenario && (
-							<div className='bg-blue-50 border-l-4 border-blue-400 p-4 mb-6'>
-								<h3 className='font-medium text-blue-900 mb-2'>Scenario:</h3>
-								<p className='text-blue-800'>{currentQuestion.scenario}</p>
+							<div className='bg-[#3A7AFE]/10 border-l-4 border-[#3A7AFE] p-4 mb-6'>
+								<h3 className='font-medium text-[#1D2433] mb-2'>Scenario:</h3>
+								<p className='text-[#4B5563]'>{currentQuestion.scenario}</p>
 							</div>
 						)}
 
-						<h2 className='text-xl font-semibold text-gray-900 mb-6'>
+						<h2 className='text-xl font-semibold text-[#1C1C1C] mb-6'>
 							{currentQuestion?.question || ''}
 						</h2>
 
@@ -493,25 +493,25 @@ const TestTakingPage = (): JSX.Element => {
 										onClick={() =>
 											currentQuestion && handleAnswer(currentQuestion.id, index)
 										}
-										className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
+										className={`w-full text-left p-4 rounded-lg border-2 transition-all duration-200 ${
 											currentQuestion && answers[currentQuestion.id] === index
-												? 'border-blue-500 bg-blue-50'
-												: 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+												? 'border-[#3A7AFE] bg-[#3A7AFE]/10'
+												: 'border-[#E5E7EB] hover:border-[#3A7AFE]/50 hover:bg-[#F7F9FC]'
 										}`}>
 										<div className='flex items-center gap-3'>
 											<div
 												className={`w-4 h-4 rounded-full border-2 ${
 													currentQuestion &&
 													answers[currentQuestion.id] === index
-														? 'border-blue-500 bg-blue-500'
-														: 'border-gray-300'
+														? 'border-[#3A7AFE] bg-[#3A7AFE]'
+														: 'border-[#d1d5db]'
 												}`}>
 												{currentQuestion &&
 													answers[currentQuestion.id] === index && (
 														<div className='w-2 h-2 bg-white rounded-full mx-auto mt-0.5' />
 													)}
 											</div>
-											<span className='text-gray-900'>{option}</span>
+											<span className='text-[#1C1C1C]'>{option}</span>
 										</div>
 									</button>
 								))}
@@ -522,25 +522,25 @@ const TestTakingPage = (): JSX.Element => {
 										onClick={() =>
 											currentQuestion && handleAnswer(currentQuestion.id, true)
 										}
-										className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
+										className={`w-full text-left p-4 rounded-lg border-2 transition-all duration-200 ${
 											currentQuestion && answers[currentQuestion.id] === true
-												? 'border-green-500 bg-green-50'
-												: 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+												? 'border-[#4CAF50] bg-[#f0fdf4]'
+												: 'border-[#E5E7EB] hover:border-[#4CAF50]/50 hover:bg-[#F7F9FC]'
 										}`}>
 										<div className='flex items-center gap-3'>
 											<div
 												className={`w-4 h-4 rounded-full border-2 ${
 													currentQuestion &&
 													answers[currentQuestion.id] === true
-														? 'border-green-500 bg-green-500'
-														: 'border-gray-300'
+														? 'border-[#4CAF50] bg-[#4CAF50]'
+														: 'border-[#d1d5db]'
 												}`}>
 												{currentQuestion &&
 													answers[currentQuestion.id] === true && (
 														<div className='w-2 h-2 bg-white rounded-full mx-auto mt-0.5' />
 													)}
 											</div>
-											<span className='text-gray-900'>True</span>
+											<span className='text-[#1C1C1C]'>True</span>
 										</div>
 									</button>
 
@@ -548,25 +548,25 @@ const TestTakingPage = (): JSX.Element => {
 										onClick={() =>
 											currentQuestion && handleAnswer(currentQuestion.id, false)
 										}
-										className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
+										className={`w-full text-left p-4 rounded-lg border-2 transition-all duration-200 ${
 											currentQuestion && answers[currentQuestion.id] === false
-												? 'border-red-500 bg-red-50'
-												: 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+												? 'border-[#DC2626] bg-[#fef2f2]'
+												: 'border-[#E5E7EB] hover:border-[#DC2626]/50 hover:bg-[#F7F9FC]'
 										}`}>
 										<div className='flex items-center gap-3'>
 											<div
 												className={`w-4 h-4 rounded-full border-2 ${
 													currentQuestion &&
 													answers[currentQuestion.id] === false
-														? 'border-red-500 bg-red-500'
-														: 'border-gray-300'
+														? 'border-[#DC2626] bg-[#DC2626]'
+														: 'border-[#d1d5db]'
 												}`}>
 												{currentQuestion &&
 													answers[currentQuestion.id] === false && (
 														<div className='w-2 h-2 bg-white rounded-full mx-auto mt-0.5' />
 													)}
 											</div>
-											<span className='text-gray-900'>False</span>
+											<span className='text-[#1C1C1C]'>False</span>
 										</div>
 									</button>
 								</>
@@ -575,11 +575,11 @@ const TestTakingPage = (): JSX.Element => {
 					</div>
 
 					{/* Navigation */}
-					<div className='flex items-center justify-between pt-8 border-t border-gray-200'>
+					<div className='flex items-center justify-between pt-8 border-t border-[#E5E7EB]'>
 						<button
 							onClick={handlePrevious}
 							disabled={currentQuestionIndex === 0}
-							className='flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed'>
+							className='flex items-center gap-2 px-4 py-2 text-[#4B5563] hover:text-[#1C1C1C] disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200'>
 							<ArrowLeft className='h-4 w-4' />
 							Previous
 						</button>
@@ -588,14 +588,14 @@ const TestTakingPage = (): JSX.Element => {
 							{isLastQuestion ? (
 								<button
 									onClick={() => handleSubmit()}
-									className='bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-medium flex items-center gap-2'>
+									className='bg-[#4CAF50] hover:bg-[#16a34a] text-white px-6 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors duration-200'>
 									<CheckCircle className='h-4 w-4' />
 									Submit Test
 								</button>
 							) : (
 								<button
 									onClick={handleNext}
-									className='bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium flex items-center gap-2'>
+									className='bg-[#3A7AFE] hover:bg-[#2E6AE8] text-white px-6 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors duration-200'>
 									Next
 									<ArrowRight className='h-4 w-4' />
 								</button>
@@ -607,23 +607,23 @@ const TestTakingPage = (): JSX.Element => {
 
 			{/* Exit Confirmation Modal */}
 			{showExitConfirm && (
-				<div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'>
-					<div className='bg-white rounded-lg p-6 max-w-md w-full mx-4'>
-						<h3 className='text-lg font-semibold text-gray-900 mb-4'>
+				<div className='fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50'>
+					<div className='bg-white rounded-xl p-6 max-w-md w-full mx-4 shadow-xl border border-[#E5E7EB]'>
+						<h3 className='text-lg font-semibold text-[#1C1C1C] mb-4'>
 							Exit Test?
 						</h3>
-						<p className='text-gray-600 mb-6'>
+						<p className='text-[#4B5563] mb-6'>
 							Are you sure you want to exit? Your progress will be lost.
 						</p>
 						<div className='flex gap-3'>
 							<button
 								onClick={() => setShowExitConfirm(false)}
-								className='flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50'>
+								className='flex-1 px-4 py-2 border border-[#E5E7EB] rounded-lg text-[#4B5563] hover:bg-[#F7F9FC] transition-colors duration-200'>
 								Cancel
 							</button>
 							<button
 								onClick={confirmExit}
-								className='flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg'>
+								className='flex-1 px-4 py-2 bg-[#DC2626] hover:bg-[#b91c1c] text-white rounded-lg transition-colors duration-200'>
 								Exit Test
 							</button>
 						</div>

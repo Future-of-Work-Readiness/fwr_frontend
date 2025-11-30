@@ -233,8 +233,12 @@ export const industryHierarchy = {
 };
 
 // Helper function to get industry recommendations based on specialization
-export const getSpecializationRecommendations = (industryId, branchId, specializationId) => {
-  const recommendations = {
+export const getSpecializationRecommendations = (
+  industryId: string,
+  branchId: string,
+  specializationId: string
+): { title: string; description: string; category: string } => {
+  const recommendations: Record<string, { title: string; description: string; category: string }> = {
     'technology-data-data-science': {
       title: 'Python for Data Science Fundamentals',
       description: 'Master Python libraries like pandas, numpy, and scikit-learn for data analysis.',
@@ -272,14 +276,18 @@ export const getSpecializationRecommendations = (industryId, branchId, specializ
 };
 
 // Helper function to get all specializations for a user's path
-export const getUserSpecializationPath = (industryId, branchId, specializationId) => {
-  const industry = industryHierarchy[industryId];
+export const getUserSpecializationPath = (
+  industryId: string,
+  branchId: string,
+  specializationId: string
+): { industry: string; branch: string; specialization: string; fullPath: string } | null => {
+  const industry = (industryHierarchy as Record<string, any>)[industryId];
   if (!industry) return null;
   
-  const branch = industry.branches[branchId];
+  const branch = (industry.branches as Record<string, any>)[branchId];
   if (!branch) return null;
   
-  const specialization = branch.specializations.find(s => s.id === specializationId);
+  const specialization = branch.specializations.find((s: { id: string }) => s.id === specializationId);
   if (!specialization) return null;
   
   return {
