@@ -46,7 +46,7 @@ export default function Navbar({
 							<button
 								onClick={() => navigate('/dashboard')}
 								className='text-[#4B5563] hover:text-[#3A7AFE] font-medium px-3 md:px-4 py-2 transition-colors duration-200'>
-								Your Dashboard
+								My Dashboard
 							</button>
 						)}
 						{currentUser && (

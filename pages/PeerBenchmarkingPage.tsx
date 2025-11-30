@@ -131,11 +131,6 @@ export default function PeerBenchmarkingPage(): JSX.Element {
 							<ArrowLeft className='w-4 h-4' />
 							<span className='hidden sm:inline'>Back</span>
 						</button>
-						<button
-							onClick={() => navigate('/dashboard')}
-							className='px-4 py-2 bg-[#3A7AFE] hover:bg-[#2E6AE8] text-white rounded-lg transition-colors duration-200 text-sm md:text-base'>
-							Dashboard
-						</button>
 					</div>
 					<motion.div
 						className='bg-[#fffbeb] border border-[#fef3c7] rounded-lg p-4 md:p-6'
