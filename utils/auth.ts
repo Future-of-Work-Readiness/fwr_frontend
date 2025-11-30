@@ -307,8 +307,7 @@ export const refreshUserData = async (
 	userId: number | string
 ): Promise<AuthResult> => {
 	try {
-		const response = await fetch(`${API_BASE_URL}/users/${userId}`);
-		// const response = await fetch(`${API_BASE_URL}/users/${userId}`);
+		const response = await fetch(`${API_BASE_URL}/users/users/${userId}`);
 		if (!response.ok) {
 			throw new Error('Failed to refresh user data');
 		}
