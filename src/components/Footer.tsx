@@ -14,19 +14,17 @@ export default function Footer(): JSX.Element {
 								<Zap className='w-6 h-6 text-white' />
 							</div>
 							<span className='text-xl font-bold text-[#1D2433]'>
-								FutureReady
+								ReadinessAi
 							</span>
 						</div>
-						<p className='text-sm text-[#4B5563]'>
-							Preparing you for the future of work.
-						</p>
+						<p className='text-sm text-[#4B5563]'>Test your skills .....</p>
 					</div>
 
 					{/* Product */}
 					<div>
 						<h4 className='font-semibold text-[#1C1C1C] mb-4'>Product</h4>
 						<ul className='space-y-2'>
-							<li>
+							{/* <li>
 								<a
 									href='#'
 									className='text-sm text-[#4B5563] hover:text-[#3A7AFE] transition-colors duration-200'>
@@ -37,16 +35,9 @@ export default function Footer(): JSX.Element {
 								<a
 									href='#'
 									className='text-sm text-[#4B5563] hover:text-[#3A7AFE] transition-colors duration-200'>
-									Pricing
-								</a>
-							</li>
-							<li>
-								<a
-									href='#'
-									className='text-sm text-[#4B5563] hover:text-[#3A7AFE] transition-colors duration-200'>
 									About
 								</a>
-							</li>
+							</li> */}
 						</ul>
 					</div>
 
@@ -54,7 +45,7 @@ export default function Footer(): JSX.Element {
 					<div>
 						<h4 className='font-semibold text-[#1C1C1C] mb-4'>Legal</h4>
 						<ul className='space-y-2'>
-							<li>
+							{/* <li>
 								<a
 									href='#'
 									className='text-sm text-[#4B5563] hover:text-[#3A7AFE] transition-colors duration-200'>
@@ -74,7 +65,7 @@ export default function Footer(): JSX.Element {
 									className='text-sm text-[#4B5563] hover:text-[#3A7AFE] transition-colors duration-200'>
 									Contact
 								</a>
-							</li>
+							</li> */}
 						</ul>
 					</div>
 
@@ -82,7 +73,7 @@ export default function Footer(): JSX.Element {
 					<div>
 						<h4 className='font-semibold text-[#1C1C1C] mb-4'>Support</h4>
 						<ul className='space-y-2'>
-							<li>
+							{/* <li>
 								<a
 									href='#'
 									className='text-sm text-[#4B5563] hover:text-[#3A7AFE] transition-colors duration-200'>
@@ -95,7 +86,7 @@ export default function Footer(): JSX.Element {
 									className='text-sm text-[#4B5563] hover:text-[#3A7AFE] transition-colors duration-200'>
 									Documentation
 								</a>
-							</li>
+							</li> */}
 						</ul>
 					</div>
 				</div>
@@ -103,11 +94,10 @@ export default function Footer(): JSX.Element {
 				{/* Copyright */}
 				<div className='mt-8 md:mt-12 pt-8 border-t border-gray-200'>
 					<p className='text-sm text-[#4B5563] text-center'>
-						© {currentYear} FutureReady. All rights reserved.
+						© {currentYear} ReadinessAi. All rights reserved.
 					</p>
 				</div>
 			</div>
 		</footer>
 	);
 }
-

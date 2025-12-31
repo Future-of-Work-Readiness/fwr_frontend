@@ -89,7 +89,7 @@ export default function OnboardingPage(): JSX.Element {
 								<Zap className='w-6 h-6 text-white' />
 							</div>
 							<span className='text-xl md:text-2xl font-bold text-[#1D2433]'>
-								FutureReady
+								ReadinessAi
 							</span>
 						</motion.div>
 
@@ -114,7 +114,7 @@ export default function OnboardingPage(): JSX.Element {
 						<motion.h1
 							className='text-4xl md:text-5xl lg:text-6xl font-bold text-[#1C1C1C] leading-tight'
 							variants={itemVariants}>
-							Welcome to <span className='text-[#3A7AFE]'>FutureReady</span>
+							Welcome to <span className='text-[#3A7AFE]'>ReadinessAi</span>
 							{currentUser?.name && (
 								<span className='block text-3xl md:text-4xl lg:text-5xl mt-2'>
 									{currentUser.name.split(' ')[0]}!
@@ -126,7 +126,7 @@ export default function OnboardingPage(): JSX.Element {
 							className='text-lg md:text-xl text-[#4B5563] leading-relaxed max-w-xl'
 							variants={itemVariants}>
 							You're about to embark on a journey to assess and improve your
-							readiness for the future of work. Let's get you set up and show
+							readiness. Let's get you set up and show
 							you how everything works.
 						</motion.p>
 
@@ -212,7 +212,7 @@ export default function OnboardingPage(): JSX.Element {
 						whileInView='visible'
 						viewport={{ once: true }}>
 						<h2 className='text-3xl md:text-4xl font-bold text-[#1C1C1C] mb-4'>
-							How FutureReady Works
+							How ReadinessAi Works
 						</h2>
 						<p className='text-base md:text-lg text-[#4B5563] max-w-2xl mx-auto'>
 							Our platform helps you assess, improve, and demonstrate your
@@ -230,14 +230,6 @@ export default function OnboardingPage(): JSX.Element {
 									'Complete industry-specific assessments that evaluate your technical knowledge and understanding of key concepts in your field.',
 								color: 'bg-[#3A7AFE]/10',
 								iconColor: 'text-[#3A7AFE]'
-							},
-							{
-								icon: Brain,
-								title: 'Try Real-World Simulations',
-								description:
-									'Engage with practical scenarios and simulations that test your ability to apply knowledge in real-world situations.',
-								color: 'bg-[#4CAF50]/10',
-								iconColor: 'text-[#4CAF50]'
 							},
 							{
 								icon: BarChart3,
@@ -262,14 +254,6 @@ export default function OnboardingPage(): JSX.Element {
 									'Benchmark your performance against others in your specialization and understand where you stand in the market.',
 								color: 'bg-[#3A7AFE]/10',
 								iconColor: 'text-[#3A7AFE]'
-							},
-							{
-								icon: Award,
-								title: 'Earn Badges & Microcredentials',
-								description:
-									'Collect digital badges and microcredentials that validate your skills and can be shared with employers.',
-								color: 'bg-[#EAB308]/10',
-								iconColor: 'text-[#EAB308]'
 							}
 						].map((feature, index) => (
 							<motion.div
@@ -310,7 +294,7 @@ export default function OnboardingPage(): JSX.Element {
 							Your Journey
 						</h2>
 						<p className='text-base md:text-lg text-[#4B5563] max-w-2xl mx-auto'>
-							Here's what to expect as you progress through FutureReady
+							Here's what to expect as you progress through ReadinessAi
 						</p>
 					</motion.div>
 
@@ -331,25 +315,11 @@ export default function OnboardingPage(): JSX.Element {
 								icon: FileText
 							},
 							{
-								step: 3,
-								title: 'Get Feedback',
-								description:
-									'Receive detailed feedback on your performance, including strengths, areas for improvement, and personalized recommendations.',
-								icon: BarChart3
-							},
-							{
 								step: 4,
 								title: 'Improve Skills',
 								description:
 									'Use insights from your results to set goals, track progress, and focus on developing the skills that matter most.',
 								icon: TrendingUp
-							},
-							{
-								step: 5,
-								title: 'Earn Badges',
-								description:
-									'Unlock badges and microcredentials as you achieve milestones and demonstrate mastery in key areas.',
-								icon: Award
 							}
 						].map((journeyStep, index) => (
 							<motion.div

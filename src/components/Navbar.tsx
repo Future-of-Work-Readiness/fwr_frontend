@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { Zap, LogOut } from 'lucide-react';
+import { Zap, LogOut, LayoutDashboard } from 'lucide-react';
 import { getCurrentUser, logoutUser } from '../../utils/auth';
 import { showToast } from '../lib/toastConfig';
 
@@ -37,16 +37,17 @@ export default function Navbar({
 							<Zap className='w-6 h-6 text-white' />
 						</div>
 						<span className='text-xl md:text-2xl font-bold text-[#1D2433]'>
-							FutureReady
+							ReadinessAi
 						</span>
 					</motion.div>
 
-					<div className='flex items-center space-x-3 md:space-x-4'>
+					<div className='flex items-center space-x-2 md:space-x-4'>
 						{showSkipToDashboard && (
 							<button
 								onClick={() => navigate('/dashboard')}
-								className='text-[#4B5563] hover:text-[#3A7AFE] font-medium px-3 md:px-4 py-2 transition-colors duration-200'>
-								My Dashboard
+								className='flex items-center space-x-2 px-2 md:px-3 lg:px-4 py-2 text-[#4B5563] hover:text-[#3A7AFE] hover:bg-[#F7F9FC] rounded-lg font-medium transition-colors duration-200'>
+								<LayoutDashboard className='w-4 h-4 md:w-5 md:h-5 flex-shrink-0' />
+								<span className='hidden md:inline'>My Dashboard</span>
 							</button>
 						)}
 						{currentUser && (

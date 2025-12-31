@@ -114,7 +114,7 @@ export default function AuthPage(): JSX.Element {
 							<Zap className='w-6 h-6 text-white' />
 						</div>
 						<span className='text-2xl font-bold text-[#1D2433]'>
-							FutureReady
+							ReadinessAi
 						</span>
 					</div>
 

@@ -75,7 +75,7 @@ export default function LandingPage() {
 								<Zap className='w-6 h-6 text-white' />
 							</div>
 							<span className='text-xl md:text-2xl font-bold text-[#1D2433]'>
-								FutureReady
+								ReadinessAi
 							</span>
 						</motion.div>
 
@@ -132,17 +132,6 @@ export default function LandingPage() {
 								className='text-[#3A7AFE] hover:text-[#2E6AE8] font-semibold px-8 md:px-10 py-4 md:py-5 transition-colors duration-200'>
 								Login
 							</button>
-						</motion.div>
-
-						<motion.div
-							className='flex items-center gap-6 pt-2'
-							variants={itemVariants}>
-							<div className='flex items-center space-x-2'>
-								<CheckCircle className='w-5 h-5 text-green-600' />
-								<span className='text-[#4B5563] text-sm md:text-base'>
-									No credit card required
-								</span>
-							</div>
 						</motion.div>
 					</motion.div>
 
@@ -213,11 +202,11 @@ export default function LandingPage() {
 						whileInView='visible'
 						viewport={{ once: true }}>
 						<h2 className='text-2xl md:text-3xl font-semibold text-[#1C1C1C] mb-4'>
-							Why Choose FutureReady?
+							Why Choose ReadinessAi?
 						</h2>
 						<p className='text-base md:text-lg text-[#4B5563] max-w-2xl mx-auto'>
 							Comprehensive assessments and personalized insights to help you
-							succeed in the future of work
+							succeed.
 						</p>
 					</motion.div>
 
@@ -227,19 +216,13 @@ export default function LandingPage() {
 								icon: BookOpen,
 								title: 'Comprehensive Learning',
 								description:
-									'Access industry-specific courses and assessments tailored to your career goals.'
+									'Access industry-specific assessments tailored to your career goals.'
 							},
 							{
 								icon: BarChart3,
 								title: 'Detailed Analytics',
 								description:
-									'Track your progress with detailed insights and personalized recommendations.'
-							},
-							{
-								icon: Award,
-								title: 'Career Readiness',
-								description:
-									"Get certified and demonstrate your readiness for tomorrow's job market."
+									'Track your progress with detailed insights.'
 							}
 						].map((feature, index) => (
 							<motion.div
