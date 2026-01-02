@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Poppins, Inter, Space_Mono, Lora } from "next/font/google";
+import { QueryProvider } from "@/providers/QueryProvider";
+import { Toaster } from "sonner";
 import "./globals.css";
 
 const poppins = Poppins({
@@ -27,8 +29,8 @@ const lora = Lora({
 });
 
 export const metadata: Metadata = {
-  title: "FWR - Future Work Ready",
-  description: "Prepare for the future of work",
+  title: "ReadinessAI",
+  description: "Prepare for the future of work with AI-powered career readiness assessments",
 };
 
 export default function RootLayout({
@@ -41,7 +43,10 @@ export default function RootLayout({
       <body
         className={`${poppins.variable} ${inter.variable} ${spaceMono.variable} ${lora.variable} font-sans antialiased`}
       >
-        {children}
+        <QueryProvider>
+          {children}
+          <Toaster richColors position="top-center" />
+        </QueryProvider>
       </body>
     </html>
   );
