@@ -52,8 +52,8 @@ const BenefitsSection = () => {
               {benefits.map((benefit, index) => (
                 <ScrollReveal key={benefit.title} delay={index * 0.1}>
                   <div className="flex gap-4 group">
-                    <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-gradient-to-br from-primary/10 to-cyan/10 flex items-center justify-center group-hover:from-accent/20 group-hover:to-cyan/20 transition-all">
-                      <benefit.icon className="w-5 h-5 text-primary group-hover:text-accent transition-colors" />
+                    <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-gradient-to-br from-primary/10 to-cyan/10 flex items-center justify-center transition-all">
+                      <benefit.icon className="w-5 h-5 text-primary  transition-colors" />
                     </div>
                     <div className="text-left">
                       <h3 className="font-display font-semibold text-foreground mb-1">

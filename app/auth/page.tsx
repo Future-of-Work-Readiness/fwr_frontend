@@ -177,8 +177,8 @@ function AuthContent() {
               <Image
                 src="/assets/RAI-Logo2-nobg.png"
                 alt="ReadinessAI Logo"
-                width={56}
-                height={56}
+                width={66}
+                height={66}
               />
             </div>
             <CardTitle className="text-2xl font-display">Welcome</CardTitle>
@@ -328,11 +328,6 @@ function AuthContent() {
                 LinkedIn
               </Button>
             </div>
-
-            {/* Development note */}
-            <p className="text-xs text-muted-foreground text-center mt-6">
-              Tip: Use email with &quot;complete&quot; to simulate completed onboarding.
-            </p>
           </CardContent>
         </Card>
       </div>

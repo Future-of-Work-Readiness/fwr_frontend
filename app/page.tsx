@@ -12,8 +12,8 @@ export default function Home() {
       <Navbar />
       <HeroSection />
       <BenefitsSection />
-      <FeaturesSection />
       <IndustriesSection />
+      <FeaturesSection />
       <CTASection />
       <Footer />
     </main>

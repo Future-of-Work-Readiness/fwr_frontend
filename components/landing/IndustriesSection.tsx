@@ -14,7 +14,7 @@ const industries = [
   {
     icon: Cpu,
     name: "Technology",
-    description: "AI, automation, cybersecurity, cloud computing, and software development readiness.",
+    description: "AI, DevOps, cybersecurity, cloud computing, and software development readiness.",
   },
   {
     icon: Briefcase,
@@ -53,7 +53,7 @@ const IndustriesSection = () => {
         <ScrollReveal className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8 mb-16">
           <div className="max-w-2xl">
             <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
-              <span className="text-accent">Career Domains</span>
+              <span className="text-accent">Industries</span>
             </h2>
           </div>
         </ScrollReveal>
