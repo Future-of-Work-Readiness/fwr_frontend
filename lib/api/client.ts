@@ -126,9 +126,8 @@ function normalizeError(error: AxiosError<ApiResponse>): ApiError {
       (route) => currentPath === route || currentPath.startsWith(`${route}/`)
     );
 
-    // Don't dispatch for /auth/me requests - those are expected to fail for guests
-    const isAuthMeRequest =
-      requestUrl.includes('/auth/me') || requestUrl.includes('/users/me');
+    // Don't dispatch for /users/me requests - those are expected to fail for guests
+    const isAuthMeRequest = requestUrl.includes('/users/me');
 
     // Only redirect when on a protected route and NOT for auth check requests
     if (isOnProtectedRoute && !isAuthMeRequest) {

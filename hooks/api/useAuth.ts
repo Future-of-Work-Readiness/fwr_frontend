@@ -18,8 +18,11 @@ import type {
   MessageResponse,
   ForgotPasswordData,
   ResetPasswordData,
+  BackendLoginResponse,
+  BackendRegisterResponse,
+  BackendCurrentUserResponse,
 } from '@/lib/api/types';
-import { ApiError } from '@/lib/api/types';
+import { ApiError, transformBackendUser, transformLoginResponse, transformRegisterResponse } from '@/lib/api/types';
 import { dispatchAuthEvent, subscribeToAuthEvents } from '@/lib/auth/events';
 
 // Storage key for auth tokens (matching existing Zustand store)
@@ -97,13 +100,21 @@ export function useCurrentUser(
     queryKey: queryKeys.auth.me(),
     queryFn: async (): Promise<SessionUser | null> => {
       try {
-        // Try to get user from API
-        const response = await api.get<{ user: SessionUser } | SessionUser>(
-          '/auth/me'
+        // Try to get user from API - using /users/me endpoint
+        const response = await api.get<BackendCurrentUserResponse>(
+          '/users/me'
         );
-        // Handle both { user: {...} } and direct user object responses
-        const user = 'user' in response ? response.user : response;
-        return user;
+        // Transform backend response to frontend format
+        // The /users/me endpoint already returns frontend-compatible format
+        return {
+          id: response.id,
+          email: response.email,
+          fullName: response.fullName,
+          avatarUrl: response.avatarUrl,
+          onboardingCompleted: response.onboardingCompleted,
+          createdAt: response.createdAt || new Date().toISOString(),
+          updatedAt: response.updatedAt || new Date().toISOString(),
+        };
       } catch (error) {
         // If 401, user is not logged in - return null instead of throwing
         if (error instanceof ApiError && error.isAuthError) {
@@ -178,13 +189,17 @@ export function useLogin() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (credentials: LoginCredentials) =>
-      api.post<LoginResponse>('/auth/login', credentials),
+    mutationFn: async (credentials: LoginCredentials): Promise<LoginResponse> => {
+      // Call backend login endpoint
+      const backendResponse = await api.post<BackendLoginResponse>('/users/login', credentials);
+      // Transform to frontend format
+      return transformLoginResponse(backendResponse);
+    },
 
     onSuccess: (data) => {
-      // Extract user from response
-      const user = 'user' in data ? data.user : (data as unknown as SessionUser);
-      const accessToken = 'accessToken' in data ? data.accessToken : '';
+      // Extract user from transformed response
+      const user = data.user;
+      const accessToken = data.accessToken;
 
       // Update cached user data immediately
       queryClient.setQueryData(queryKeys.auth.me(), user);
@@ -211,12 +226,22 @@ export function useRegister() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: RegisterData) =>
-      api.post<RegisterResponse>('/auth/register', data),
+    mutationFn: async (data: RegisterData): Promise<RegisterResponse> => {
+      // Transform frontend data to backend format
+      const backendPayload = {
+        email: data.email,
+        password: data.password,
+        fullName: data.fullName, // Backend now accepts fullName
+      };
+      // Call backend register endpoint
+      const backendResponse = await api.post<BackendRegisterResponse>('/users/register', backendPayload);
+      // Transform to frontend format
+      return transformRegisterResponse(backendResponse);
+    },
 
     onSuccess: (data) => {
-      const user = 'user' in data ? data.user : (data as unknown as SessionUser);
-      const accessToken = 'accessToken' in data ? data.accessToken : '';
+      const user = data.user;
+      const accessToken = data.accessToken;
 
       queryClient.setQueryData(queryKeys.auth.me(), user);
       saveAuthToStorage(user, accessToken);
@@ -260,7 +285,7 @@ export function useLogout() {
   return useMutation({
     mutationFn: async () => {
       try {
-        await api.post<MessageResponse>('/auth/logout');
+        await api.post<MessageResponse>('/users/logout');
       } catch {
         // Even if API call fails, we should still logout locally
       }
@@ -278,7 +303,7 @@ export function useLogout() {
 export function useForgotPassword() {
   return useMutation({
     mutationFn: (data: ForgotPasswordData) =>
-      api.post<MessageResponse>('/auth/forgot-password', data),
+      api.post<MessageResponse>('/users/forgot-password', data),
   });
 }
 
@@ -288,7 +313,7 @@ export function useForgotPassword() {
 export function useResetPassword() {
   return useMutation({
     mutationFn: (data: ResetPasswordData) =>
-      api.post<MessageResponse>('/auth/reset-password', data),
+      api.post<MessageResponse>('/users/reset-password', data),
   });
 }
 
