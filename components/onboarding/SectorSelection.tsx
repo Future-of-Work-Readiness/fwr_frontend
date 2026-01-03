@@ -42,6 +42,10 @@ const SectorSelection = ({ onSelect, onBack }: SectorSelectionProps) => {
               <div className="w-10 h-10 rounded-full bg-primary-foreground/20 text-primary-foreground/50 flex items-center justify-center font-bold">
                 2
               </div>
+              <div className="w-16 h-1 bg-primary-foreground/30 rounded" />
+              <div className="w-10 h-10 rounded-full bg-primary-foreground/20 text-primary-foreground/50 flex items-center justify-center font-bold">
+                3
+              </div>
             </div>
             <h1 className="text-3xl lg:text-4xl font-display font-bold text-primary-foreground mb-2">
               Choose Your Sector

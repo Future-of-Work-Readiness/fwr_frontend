@@ -63,7 +63,7 @@ const IndustriesSection = () => {
           {industries.map((industry, index) => (
             <ScrollReveal key={industry.name} delay={index * 0.08}>
               <div
-                className="group relative bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:bg-white/10 hover:border-accent/50 transition-all duration-500 cursor-pointer h-full"
+                className="group relative bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:bg-white/10 hover:border-accent/50 transition-all duration-500 h-full"
               >
                 {/* Corner accent */}
                 <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-accent/20 to-transparent rounded-bl-[100px] opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -78,7 +78,6 @@ const IndustriesSection = () => {
                   <h3 className="font-display text-lg font-bold text-white group-hover:text-accent transition-colors">
                     {industry.name}
                   </h3>
-                  <ArrowUpRight className="w-5 h-5 text-white/30 group-hover:text-accent group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
                 </div>
                 
                 <p className="text-white/50 text-sm leading-relaxed">

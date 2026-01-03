@@ -11,9 +11,9 @@ export default function Home() {
     <main className="min-h-screen overflow-x-hidden">
       <Navbar />
       <HeroSection />
+      <BenefitsSection />
       <FeaturesSection />
       <IndustriesSection />
-      <BenefitsSection />
       <CTASection />
       <Footer />
     </main>

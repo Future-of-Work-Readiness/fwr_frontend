@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useLoginMutation, useSignUpMutation } from "@/hooks/useAuthMutations";
 import { loginSchema, signUpSchema } from "@/lib/validations/auth";
@@ -172,6 +173,14 @@ function AuthContent() {
         
         <Card className="border-0 shadow-xl">
           <CardHeader className="text-center pb-2">
+            <div className="flex justify-center mb-4">
+              <Image
+                src="/assets/RAI-Logo2-nobg.png"
+                alt="ReadinessAI Logo"
+                width={56}
+                height={56}
+              />
+            </div>
             <CardTitle className="text-2xl font-display">Welcome</CardTitle>
           </CardHeader>
           <CardContent>

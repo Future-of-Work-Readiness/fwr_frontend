@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -49,9 +50,13 @@ export const DashboardNav = () => {
       <aside className="hidden lg:flex flex-col w-72 min-h-screen bg-card border-r border-border p-5">
         <div className="mb-8">
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shadow-md">
-              <span className="font-display font-bold text-lg text-white">R</span>
-            </div>
+            <Image
+              src="/assets/RAI-Logo2-nobg.png"
+              alt="ReadinessAI Logo"
+              width={32}
+              height={32}
+              className="rounded-lg"
+            />
             <span className="text-xl font-display font-bold text-primary">
               ReadinessAI
             </span>
@@ -100,9 +105,13 @@ export const DashboardNav = () => {
       <header className="lg:hidden fixed top-0 left-0 right-0 bg-card border-b border-border z-50">
         <div className="flex items-center justify-between p-4">
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center">
-              <span className="font-display font-bold text-base text-white">R</span>
-            </div>
+            <Image
+              src="/assets/RAI-Logo2-nobg.png"
+              alt="ReadinessAI Logo"
+              width={28}
+              height={28}
+              className="rounded-lg"
+            />
             <span className="text-lg font-display font-bold text-primary">
               ReadinessAI
             </span>

@@ -67,9 +67,9 @@ const FieldSelection = ({ onSelect, onBack }: FieldSelectionProps) => {
                 >
                   <CardContent className="p-6">
                     <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
+                      {/* <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
                         <IconComponent className="h-6 w-6 text-primary" />
-                      </div>
+                      </div> */}
                       <div>
                         <h3 className="font-semibold text-lg mb-2 group-hover:text-primary transition-colors">
                           {field.label}

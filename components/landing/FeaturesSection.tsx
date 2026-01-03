@@ -79,18 +79,13 @@ const FeaturesSection = () => {
 
                 {/* Content */}
                 <div className="relative">
-                  <h3 className="font-display text-xl font-bold text-foreground mb-3 group-hover:text-accent transition-colors">
+                  <h3 className="font-display text-xl font-bold text-foreground mb-3 transition-colors">
                     {feature.title}
                   </h3>
                   <p className="text-muted-foreground leading-relaxed mb-4">
                     {feature.description}
                   </p>
                   
-                  {/* Learn more link */}
-                  <div className="flex items-center gap-2 text-primary font-medium text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <span>Learn more</span>
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </div>
                 </div>
               </div>
             </ScrollReveal>
