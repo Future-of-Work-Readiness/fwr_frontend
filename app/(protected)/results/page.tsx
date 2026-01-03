@@ -3,22 +3,22 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useAuthStore } from "@/stores/useAuthStore";
+import { useAuth } from "@/components/providers";
 import { useCareerStore } from "@/stores/useCareerStore";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import ScrollReveal from "@/components/ui/scroll-reveal";
 import { Loader2, FileText, Calendar, ArrowRight, Clock, ArrowLeft, CheckCircle2, XCircle } from "lucide-react";
-import { useAllAssessmentResultsQuery, AssessmentResult } from "@/hooks";
+import { useAllAssessmentResults, type AssessmentResult } from "@/hooks";
 
 export default function ResultsPage() {
   const router = useRouter();
-  const { user, isLoading: authLoading } = useAuthStore();
+  const { user, isLoading: authLoading } = useAuth();
   const { currentCareer } = useCareerStore();
 
   // Fetch all assessment results for the user
-  const { data: assessmentHistory = [], isLoading: resultsLoading } = useAllAssessmentResultsQuery(user?.id);
+  const { data: assessmentHistory = [], isLoading: resultsLoading } = useAllAssessmentResults();
 
   // Auth redirect
   useEffect(() => {

@@ -5,7 +5,7 @@ import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { useAuthStore } from "@/stores/useAuthStore";
+import { useLogout } from "@/hooks";
 import {
   LayoutDashboard,
   BarChart3,
@@ -29,14 +29,14 @@ const navItems = [
 export const DashboardNav = () => {
   const pathname = usePathname();
   const router = useRouter();
-  const { logout } = useAuthStore();
+  const logoutMutation = useLogout();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Hide sidebar on Technical Skills and Soft Skills pages
   const hideSidebar = pathname === "/technical-skills" || pathname === "/soft-skills";
 
-  const handleSignOut = () => {
-    logout();
+  const handleSignOut = async () => {
+    await logoutMutation.mutateAsync();
     router.replace("/auth");
   };
 

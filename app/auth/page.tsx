@@ -4,8 +4,8 @@ import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { useAuthStore } from "@/stores/useAuthStore";
-import { useLoginMutation, useSignUpMutation } from "@/hooks/useAuthMutations";
+import { useAuth } from "@/components/providers";
+import { useLogin, useRegister } from "@/hooks";
 import { loginSchema, signUpSchema } from "@/lib/validations/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,11 +19,11 @@ import { z } from "zod";
 function AuthContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { isAuthenticated, user } = useAuthStore();
+  const { isAuthenticated, user } = useAuth();
   
   // Mutations
-  const loginMutation = useLoginMutation();
-  const signUpMutation = useSignUpMutation();
+  const loginMutation = useLogin();
+  const signUpMutation = useRegister();
   
   // Tab state from URL params
   const [activeTab, setActiveTab] = useState(() => {

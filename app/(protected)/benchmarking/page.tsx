@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useAuthStore } from "@/stores/useAuthStore";
+import { useAuth } from "@/components/providers";
 import { useCareerStore } from "@/stores/useCareerStore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -47,7 +47,7 @@ const MetricDisplay = ({ label, value, isPrimary }: MetricDisplayProps) => (
 
 export default function BenchmarkingPage() {
   const router = useRouter();
-  const { user, isLoading: authLoading } = useAuthStore();
+  const { user, isLoading: authLoading } = useAuth();
   const { careers, currentCareer } = useCareerStore();
   const [loading, setLoading] = useState(true);
   const [isPanelOpen, setIsPanelOpen] = useState(false);

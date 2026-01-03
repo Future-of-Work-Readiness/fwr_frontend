@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useAuthStore } from "@/stores/useAuthStore";
+import { useAuth } from "@/components/providers";
 import { useCareerStore } from "@/stores/useCareerStore";
 import { ReadinessGauge, QuickAccessCard } from "@/components/dashboard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,7 +14,7 @@ import { formatSpecialisation, SECTOR_LABELS } from "@/lib/constants";
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { user, isAuthenticated, isLoading: authLoading } = useAuthStore();
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const { currentCareer, careers, isLoading: careerLoading } = useCareerStore();
   const [isNewUser, setIsNewUser] = useState(false);
 

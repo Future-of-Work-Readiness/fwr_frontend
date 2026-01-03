@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuthStore } from "@/stores/useAuthStore";
+import { useAuth } from "@/components/providers";
 import { useCareerStore } from "@/stores/useCareerStore";
-import { useAddCareerMutation } from "@/hooks/useCareerMutations";
+import { useAddCareer } from "@/hooks";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { SectorType, TechnologyFieldType } from "@/lib/constants";
@@ -18,13 +18,13 @@ type AddCareerStep = "sector" | "field" | "specialisation";
 
 export default function AddCareerPage() {
   const router = useRouter();
-  const { user, isLoading: authLoading } = useAuthStore();
+  const { user, isLoading: authLoading } = useAuth();
   const { setCurrentCareer } = useCareerStore();
   const [step, setStep] = useState<AddCareerStep>("sector");
   const [sector, setSector] = useState<SectorType | null>(null);
   const [field, setField] = useState<TechnologyFieldType | null>(null);
 
-  const addCareerMutation = useAddCareerMutation();
+  const addCareerMutation = useAddCareer();
 
   const handleSectorSelect = (selectedSector: SectorType) => {
     setSector(selectedSector);
@@ -48,7 +48,6 @@ export default function AddCareerPage() {
 
     try {
       const result = await addCareerMutation.mutateAsync({
-        userId: user.id,
         sector,
         field: field || null,
         specialisation,
@@ -56,12 +55,15 @@ export default function AddCareerPage() {
       });
 
       // Set the new career as current
-      setCurrentCareer(result.career);
+      if (result.career) {
+        setCurrentCareer(result.career);
+      }
       toast.success("Career profile created successfully!");
       router.push("/dashboard");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error creating career:", error);
-      toast.error(`Failed to create career profile: ${error?.message || "Unknown error"}. Please try again.`);
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      toast.error(`Failed to create career profile: ${errorMessage}. Please try again.`);
     }
   };
 

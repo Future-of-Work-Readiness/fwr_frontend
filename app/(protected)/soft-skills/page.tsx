@@ -2,9 +2,9 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { useAuthStore } from "@/stores/useAuthStore";
+import { useAuth } from "@/components/providers";
 import { useCareerStore } from "@/stores/useCareerStore";
-import { useSubmitTestResultMutation } from "@/hooks";
+import { useSubmitTestResult } from "@/hooks";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -304,7 +304,7 @@ type TestState = "intro" | "testing" | "submitting";
 
 export default function SoftSkillsPage() {
   const router = useRouter();
-  const { user, isLoading: authLoading } = useAuthStore();
+  const { user, isLoading: authLoading } = useAuth();
   const { currentCareer } = useCareerStore();
   
   const [testState, setTestState] = useState<TestState>("intro");
@@ -313,7 +313,7 @@ export default function SoftSkillsPage() {
   const [timeRemaining, setTimeRemaining] = useState(20 * 60); // 20 minutes
   const [startTime, setStartTime] = useState<number | null>(null);
 
-  const submitTestMutation = useSubmitTestResultMutation();
+  const submitTestMutation = useSubmitTestResult();
 
   // Initialize test
   const startTest = () => {
@@ -349,7 +349,6 @@ export default function SoftSkillsPage() {
 
     try {
       await submitTestMutation.mutateAsync({
-        userId: user.id,
         careerId: currentCareer.id,
         specialisation: "soft-skills",
         level: "comprehensive",

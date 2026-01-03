@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { useAuthStore } from "@/stores/useAuthStore";
+import { useAuth } from "@/components/providers";
 import { useCareerStore } from "@/stores/useCareerStore";
-import { useSubmitTestResultMutation } from "@/hooks/useTestMutations";
+import { useSubmitTestResult } from "@/hooks";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -36,9 +36,9 @@ export default function TestResultsPage() {
   const specialisation = params.specialisation as string;
   const level = params.level as string;
   
-  const { user, isLoading: authLoading } = useAuthStore();
+  const { user, isLoading: authLoading } = useAuth();
   const { currentCareer, updateCareer } = useCareerStore();
-  const submitResultMutation = useSubmitTestResultMutation();
+  const submitResultMutation = useSubmitTestResult();
   
   const [loading, setLoading] = useState(true);
   const [testData, setTestData] = useState<TestResultsState | null>(null);
@@ -63,7 +63,6 @@ export default function TestResultsPage() {
           const passed = testData.score >= 70;
           
           await submitResultMutation.mutateAsync({
-            userId: user.id,
             careerId: currentCareer.id,
             specialisation: testData.specialisation,
             level: testData.level,

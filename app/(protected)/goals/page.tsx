@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAuthStore } from "@/stores/useAuthStore";
+import { useAuth } from "@/components/providers";
 import { useCareerStore } from "@/stores/useCareerStore";
 import { formatSpecialisation } from "@/lib/constants";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -15,19 +15,19 @@ import ScrollReveal from "@/components/ui/scroll-reveal";
 import { Loader2, Target, Plus, Edit2, Trash2, BookOpen, ArrowLeft, Save, X } from "lucide-react";
 import {
   useGoalsQuery,
-  useCreateGoalMutation,
-  useUpdateGoalMutation,
-  useDeleteGoalMutation,
+  useCreateGoal,
+  useUpdateGoal,
+  useDeleteGoal,
   useJournalEntriesQuery,
-  useCreateJournalEntryMutation,
+  useCreateJournalEntry,
   JOURNAL_PROMPTS,
-  Goal,
-  JournalEntry,
+  type GoalWithProgress,
 } from "@/hooks";
+import type { JournalEntry } from "@/types";
 
 export default function GoalsPage() {
   const router = useRouter();
-  const { user, isLoading: authLoading } = useAuthStore();
+  const { user, isLoading: authLoading } = useAuth();
   const { currentCareer } = useCareerStore();
 
   // Form state
@@ -41,14 +41,14 @@ export default function GoalsPage() {
   const [editProgress, setEditProgress] = useState(0);
 
   // Queries
-  const { data: goals = [], isLoading: goalsLoading } = useGoalsQuery(user?.id);
-  const { data: journalEntries = [], isLoading: journalLoading } = useJournalEntriesQuery(user?.id);
+  const { data: goals = [], isLoading: goalsLoading } = useGoalsQuery();
+  const { data: journalEntries = [], isLoading: journalLoading } = useJournalEntriesQuery();
 
   // Mutations
-  const createGoalMutation = useCreateGoalMutation();
-  const updateGoalMutation = useUpdateGoalMutation();
-  const deleteGoalMutation = useDeleteGoalMutation();
-  const createJournalMutation = useCreateJournalEntryMutation();
+  const createGoalMutation = useCreateGoal();
+  const updateGoalMutation = useUpdateGoal();
+  const deleteGoalMutation = useDeleteGoal();
+  const createJournalMutation = useCreateJournalEntry();
 
   // Auth redirect
   useEffect(() => {
@@ -63,7 +63,7 @@ export default function GoalsPage() {
       const entry = journalEntries.find((e) => e.id === selectedEntryId);
       if (entry) {
         setJournalContent(entry.content);
-        setCurrentPrompt(entry.prompt);
+        setCurrentPrompt(entry.prompt || JOURNAL_PROMPTS[0]);
       }
     }
   }, [selectedEntryId, journalEntries]);
@@ -72,7 +72,7 @@ export default function GoalsPage() {
     if (!newGoalTitle || !newGoalTarget || !user) return;
 
     createGoalMutation.mutate(
-      { userId: user.id, title: newGoalTitle, target: newGoalTarget },
+      { title: newGoalTitle, target: newGoalTarget },
       {
         onSuccess: () => {
           setNewGoalTitle("");
@@ -85,13 +85,13 @@ export default function GoalsPage() {
 
   const handleDeleteGoal = (goalId: string) => {
     if (!user) return;
-    deleteGoalMutation.mutate({ goalId, userId: user.id });
+    deleteGoalMutation.mutate(goalId);
   };
 
-  const handleUpdateProgress = (goal: Goal) => {
+  const handleUpdateProgress = (goal: GoalWithProgress) => {
     if (!user) return;
     updateGoalMutation.mutate(
-      { goalId: goal.id, userId: user.id, updates: { progress: editProgress } },
+      { goalId: goal.id, data: { progress: editProgress } },
       {
         onSuccess: () => {
           setEditingGoalId(null);
@@ -104,7 +104,7 @@ export default function GoalsPage() {
     if (!journalContent || !user) return;
 
     createJournalMutation.mutate(
-      { userId: user.id, content: journalContent, prompt: currentPrompt },
+      { content: journalContent, prompt: currentPrompt },
       {
         onSuccess: () => {
           setJournalContent("");
@@ -272,7 +272,7 @@ export default function GoalsPage() {
                                   className="h-8 w-8"
                                   onClick={() => {
                                     setEditingGoalId(goal.id);
-                                    setEditProgress(goal.progress);
+                                    setEditProgress(goal.progress ?? 0);
                                   }}
                                 >
                                   <Edit2 className="h-4 w-4" />

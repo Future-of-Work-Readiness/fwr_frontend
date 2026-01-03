@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useAuthStore } from "@/stores/useAuthStore";
+import { useAuth } from "@/components/providers";
 import { useCareerStore } from "@/stores/useCareerStore";
-import { useCareersQuery, useSetPrimaryCareerMutation } from "@/hooks/useCareerMutations";
+import { useCareersQuery, useSetPrimaryCareer } from "@/hooks";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -17,10 +17,10 @@ import type { CareerProfile } from "@/types";
 
 export default function CareersPage() {
   const router = useRouter();
-  const { user, isLoading: authLoading } = useAuthStore();
+  const { user, isLoading: authLoading } = useAuth();
   const { careers, isLoading: careersLoading, setCurrentCareer } = useCareerStore();
-  const { isLoading: queryLoading } = useCareersQuery(user?.id);
-  const setPrimaryMutation = useSetPrimaryCareerMutation();
+  const { isLoading: queryLoading } = useCareersQuery();
+  const setPrimaryMutation = useSetPrimaryCareer();
 
   const handleOpenDashboard = (career: CareerProfile) => {
     setCurrentCareer(career);

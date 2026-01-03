@@ -95,6 +95,7 @@ export interface JournalEntry {
   userId: string;
   title: string;
   content: string;
+  prompt?: string;
   mood: JournalMood | null;
   tags: string[];
   createdAt: string;

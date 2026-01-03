@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useAuthStore } from "@/stores/useAuthStore";
+import { useAuth } from "@/components/providers";
 import { useCareerStore } from "@/stores/useCareerStore";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,7 +12,7 @@ import { formatSpecialisation, SECTOR_TRACKS, SKILL_LEVELS, getLevelColor } from
 
 export default function TechnicalSkillsPage() {
   const router = useRouter();
-  const { isLoading: authLoading } = useAuthStore();
+  const { isLoading: authLoading } = useAuth();
   const { currentCareer, isLoading: careerLoading } = useCareerStore();
 
   // Group exercises by level
