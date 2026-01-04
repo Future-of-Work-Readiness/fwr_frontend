@@ -363,7 +363,7 @@ export default function TestPage() {
         </div>
 
         {/* Question Navigator */}
-        <div className="mt-8 p-4 bg-muted/50 rounded-lg">
+        {/* <div className="mt-8 p-4 bg-muted/50 rounded-lg">
           <p className="text-sm font-medium mb-3">Question Navigator</p>
           <div className="flex flex-wrap gap-2">
             {questions.map((q, index) => (
@@ -382,7 +382,7 @@ export default function TestPage() {
               </button>
             ))}
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

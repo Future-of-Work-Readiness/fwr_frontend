@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useAuth } from "@/components/providers";
 import { Button } from "@/components/ui/button";
@@ -27,17 +27,33 @@ export default function TestResultsPage() {
   
   const [loading, setLoading] = useState(true);
   const [quizResult, setQuizResult] = useState<StoredQuizResult | null>(null);
+  
+  // Use ref to prevent double-processing in React Strict Mode
+  const hasProcessedRef = useRef(false);
 
   useEffect(() => {
+    // Prevent double-processing due to React Strict Mode
+    if (hasProcessedRef.current) {
+      return;
+    }
+    
     const storedData = sessionStorage.getItem("quizResult");
     if (storedData) {
+      hasProcessedRef.current = true;
       const data = JSON.parse(storedData) as StoredQuizResult;
       setQuizResult(data);
       setLoading(false);
       // Clear session storage after reading
       sessionStorage.removeItem("quizResult");
-    } else {
-      router.push("/technical-skills");
+    } else if (!hasProcessedRef.current) {
+      // Only redirect if we haven't processed data and there's nothing in storage
+      // Use a small delay to ensure we're not in the middle of a Strict Mode remount
+      const timeoutId = setTimeout(() => {
+        if (!hasProcessedRef.current) {
+          router.push("/technical-skills");
+        }
+      }, 100);
+      return () => clearTimeout(timeoutId);
     }
   }, [router]);
 

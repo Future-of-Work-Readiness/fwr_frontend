@@ -53,7 +53,7 @@ const IndustriesSection = () => {
         <ScrollReveal className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8 mb-16">
           <div className="max-w-2xl">
             <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
-              <span className="text-accent">Industries</span>
+              <span className="text-accent">Sectors</span>
             </h2>
           </div>
         </ScrollReveal>

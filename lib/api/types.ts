@@ -189,7 +189,6 @@ export interface BackendUserData {
   readiness_score?: number;
   technical_score?: number;
   soft_skills_score?: number;
-  leadership_score?: number;
   created_at: string;
 }
 
@@ -231,7 +230,7 @@ export interface BackendCurrentUserResponse {
   readinessScore?: number;
   technicalScore?: number;
   softSkillsScore?: number;
-  leadershipScore?: number;
+  // leadershipScore?: number;
 }
 
 // ============================================================

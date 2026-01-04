@@ -99,7 +99,7 @@ export function usePeerBenchmarkQuery(
  */
 export function getPeerAverageFromBenchmark(
   benchmark: PeerBenchmarkData | null | undefined,
-  category: 'Overall Readiness' | 'Technical Skills' | 'Soft Skills' | 'Leadership'
+  category: 'Overall Readiness' | 'Technical Skills' | 'Soft Skills'
 ): number {
   if (!benchmark?.comparisons) return 0;
   
@@ -112,7 +112,7 @@ export function getPeerAverageFromBenchmark(
  */
 export function getPercentileFromBenchmark(
   benchmark: PeerBenchmarkData | null | undefined,
-  category: 'Overall Readiness' | 'Technical Skills' | 'Soft Skills' | 'Leadership'
+  category: 'Overall Readiness' | 'Technical Skills' | 'Soft Skills'
 ): number {
   if (!benchmark?.comparisons) return 50;
   

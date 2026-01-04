@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import ScrollReveal from "@/components/ui/scroll-reveal";
 import { Loader2, Code, ChevronRight, ArrowLeft } from "lucide-react";
-import { formatSpecialisation, SECTOR_TRACKS, SKILL_LEVELS, getLevelColor } from "@/lib/constants";
+import { formatSpecialisation, SKILL_LEVELS, getLevelColor } from "@/lib/constants";
 
 export default function TechnicalSkillsPage() {
   const router = useRouter();

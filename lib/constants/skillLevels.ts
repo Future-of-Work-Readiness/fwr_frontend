@@ -32,68 +32,68 @@ export const getLevelColor = (level: string) => {
 };
 
 // Soft skills categories
-export const SOFT_SKILLS = [
-  {
-    id: "communication",
-    name: "Communication",
-    description: "Develop your ability to convey ideas clearly, listen actively, and engage effectively with others",
-    color: "blue",
-  },
-  {
-    id: "teamwork",
-    name: "Teamwork",
-    description: "Learn to collaborate effectively, build trust, and contribute to shared goals",
-    color: "green",
-  },
-  {
-    id: "problem_solving",
-    name: "Problem Solving",
-    description: "Master analytical thinking, creative solutions, and systematic approaches to challenges",
-    color: "orange",
-  },
-  {
-    id: "time_management",
-    name: "Time Management",
-    description: "Enhance your ability to prioritise tasks, manage deadlines, and maximise productivity",
-    color: "purple",
-  },
-  {
-    id: "adaptability",
-    name: "Adaptability",
-    description: "Build resilience and flexibility to thrive in changing environments",
-    color: "cyan",
-  },
-  {
-    id: "leadership",
-    name: "Leadership",
-    description: "Develop skills to inspire, guide, and empower teams towards success",
-    color: "indigo",
-  },
-  {
-    id: "handling_feedback",
-    name: "Handling Feedback",
-    description: "Learn to receive, process, and act on constructive feedback effectively",
-    color: "yellow",
-  },
-  {
-    id: "dealing_with_conflict",
-    name: "Dealing with Conflict",
-    description: "Master conflict resolution strategies and maintain positive relationships",
-    color: "red",
-  },
-  {
-    id: "professionalism",
-    name: "Professionalism",
-    description: "Cultivate workplace etiquette, integrity, and a strong professional presence",
-    color: "slate",
-  },
-  {
-    id: "ethical_judgment",
-    name: "Ethical Judgment",
-    description: "Develop sound ethical reasoning and decision-making in complex situations",
-    color: "teal",
-  },
-] as const;
+// export const SOFT_SKILLS = [
+//   {
+//     id: "communication",
+//     name: "Communication",
+//     description: "Develop your ability to convey ideas clearly, listen actively, and engage effectively with others",
+//     color: "blue",
+//   },
+//   {
+//     id: "teamwork",
+//     name: "Teamwork",
+//     description: "Learn to collaborate effectively, build trust, and contribute to shared goals",
+//     color: "green",
+//   },
+//   {
+//     id: "problem_solving",
+//     name: "Problem Solving",
+//     description: "Master analytical thinking, creative solutions, and systematic approaches to challenges",
+//     color: "orange",
+//   },
+//   {
+//     id: "time_management",
+//     name: "Time Management",
+//     description: "Enhance your ability to prioritise tasks, manage deadlines, and maximise productivity",
+//     color: "purple",
+//   },
+//   {
+//     id: "adaptability",
+//     name: "Adaptability",
+//     description: "Build resilience and flexibility to thrive in changing environments",
+//     color: "cyan",
+//   },
+//   {
+//     id: "leadership",
+//     name: "Leadership",
+//     description: "Develop skills to inspire, guide, and empower teams towards success",
+//     color: "indigo",
+//   },
+//   {
+//     id: "handling_feedback",
+//     name: "Handling Feedback",
+//     description: "Learn to receive, process, and act on constructive feedback effectively",
+//     color: "yellow",
+//   },
+//   {
+//     id: "dealing_with_conflict",
+//     name: "Dealing with Conflict",
+//     description: "Master conflict resolution strategies and maintain positive relationships",
+//     color: "red",
+//   },
+//   {
+//     id: "professionalism",
+//     name: "Professionalism",
+//     description: "Cultivate workplace etiquette, integrity, and a strong professional presence",
+//     color: "slate",
+//   },
+//   {
+//     id: "ethical_judgment",
+//     name: "Ethical Judgment",
+//     description: "Develop sound ethical reasoning and decision-making in complex situations",
+//     color: "teal",
+//   },
+// ] as const;
 
-export type SoftSkillId = typeof SOFT_SKILLS[number]["id"];
+// export type SoftSkillId = typeof SOFT_SKILLS[number]["id"];
 

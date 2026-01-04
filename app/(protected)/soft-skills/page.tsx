@@ -286,14 +286,14 @@ export default function SoftSkillsPage() {
                       </div>
                     </div>
 
-                    <div>
+                    {/* <div>
                       <p className="font-medium mb-3">Areas Covered:</p>
                       <div className="flex flex-wrap gap-2">
                         {skillsAreas.map((skill) => (
                           <Badge key={skill} variant="secondary">{skill}</Badge>
                         ))}
                       </div>
-                    </div>
+                    </div> */}
 
                     <div className="pt-4 border-t">
                       <Button 
@@ -418,7 +418,7 @@ export default function SoftSkillsPage() {
         </div>
 
         {/* Question Navigator */}
-        <div className="mt-8 p-4 bg-muted/50 rounded-lg">
+        {/* <div className="mt-8 p-4 bg-muted/50 rounded-lg">
           <p className="text-sm font-medium mb-3">Question Navigator</p>
           <div className="flex flex-wrap gap-2">
             {questions.map((q, index) => (
@@ -437,7 +437,7 @@ export default function SoftSkillsPage() {
               </button>
             ))}
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

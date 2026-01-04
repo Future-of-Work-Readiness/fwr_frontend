@@ -323,7 +323,7 @@ export interface CareerScores {
   readinessScore: number;
   technicalScore: number;
   softSkillScore: number;
-  leadershipScore: number;
+  // leadershipScore: number;
 }
 
 export interface CareerDashboard {

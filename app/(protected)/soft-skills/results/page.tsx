@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -23,17 +23,33 @@ export default function SoftSkillsResultsPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [quizResult, setQuizResult] = useState<StoredQuizResult | null>(null);
+  
+  // Use ref to prevent double-processing in React Strict Mode
+  const hasProcessedRef = useRef(false);
 
   useEffect(() => {
+    // Prevent double-processing due to React Strict Mode
+    if (hasProcessedRef.current) {
+      return;
+    }
+    
     const storedData = sessionStorage.getItem("quizResult");
     if (storedData) {
+      hasProcessedRef.current = true;
       const data = JSON.parse(storedData) as StoredQuizResult;
       setQuizResult(data);
       setLoading(false);
       // Clear session storage after reading
       sessionStorage.removeItem("quizResult");
-    } else {
-      router.push("/soft-skills");
+    } else if (!hasProcessedRef.current) {
+      // Only redirect if we haven't processed data and there's nothing in storage
+      // Use a small delay to ensure we're not in the middle of a Strict Mode remount
+      const timeoutId = setTimeout(() => {
+        if (!hasProcessedRef.current) {
+          router.push("/soft-skills");
+        }
+      }, 100);
+      return () => clearTimeout(timeoutId);
     }
   }, [router]);
 
@@ -193,12 +209,12 @@ export default function SoftSkillsResultsPage() {
                   <Progress value={readiness.overall} className="h-2" />
                 </div>
                 <div>
-                  <div className="flex justify-between items-center mb-1">
+                    <div className="flex justify-between items-center mb-1">
                     <span className="text-sm font-medium">Technical</span>
                     <span className={`text-sm font-bold ${getScoreColor(readiness.technical)}`}>
                       {Math.round(readiness.technical)}%
-                    </span>
-                  </div>
+                      </span>
+                    </div>
                   <Progress value={readiness.technical} className="h-2" />
                 </div>
                 <div>
@@ -243,11 +259,11 @@ export default function SoftSkillsResultsPage() {
                   <ul className="space-y-2">
                     {getRecommendations().map((rec, index) => (
                       <li key={index} className="flex items-start gap-2 text-muted-foreground">
-                        <span className="text-primary">•</span>
+                      <span className="text-primary">•</span>
                         <span>{rec}</span>
-                      </li>
+                    </li>
                     ))}
-                  </ul>
+              </ul>
                 </div>
               </div>
             </CardContent>
