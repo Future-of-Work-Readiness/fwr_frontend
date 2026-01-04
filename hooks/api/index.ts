@@ -135,6 +135,26 @@ export {
   type PeerBenchmarkResponse,
 } from './useBenchmarks';
 
+// ============ SECTOR HOOKS ============
+export {
+  useSectorsQuery,
+  useSectorsHierarchyQuery,
+  useSectorQuery,
+  useBranchesQuery,
+  useSectorHierarchyQuery,
+  useSpecializationsQuery,
+  formatSpecializationName,
+  formatName,
+  getSectorIcon,
+  SECTOR_ICONS,
+  type Sector,
+  type Branch,
+  type Specialization,
+  type SpecializationInHierarchy,
+  type BranchInHierarchy,
+  type SectorHierarchy,
+} from './useSectors';
+
 // ============ LEGACY ASSESSMENT HOOKS (DEPRECATED) ============
 // These are re-exported for backward compatibility but should be migrated to useQuizzes
 export {

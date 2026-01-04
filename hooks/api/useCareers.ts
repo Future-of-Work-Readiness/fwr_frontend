@@ -31,9 +31,12 @@ export interface UpdateCareerPayload {
 }
 
 export interface CompleteOnboardingPayload {
-  sector: SectorType;
-  field: string | null;
-  specialisation: string;
+  // Preferred: use the specialization UUID directly
+  specialization_id?: string;
+  // Alternative: use string identifiers (for backward compatibility)
+  sector?: string;
+  field?: string | null;
+  specialisation?: string;
 }
 
 // ============ QUERIES ============

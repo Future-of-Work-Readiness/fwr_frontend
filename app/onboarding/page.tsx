@@ -3,10 +3,9 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/providers';
-import { useCompleteOnboarding } from '@/hooks';
+import { useCompleteOnboarding, type Sector, type Branch, type Specialization } from '@/hooks/api';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { SectorType, TechnologyFieldType } from '@/lib/constants';
 import {
 	OnboardingIntro,
 	SectorSelection,
@@ -18,12 +17,12 @@ type OnboardingStep = 'intro' | 'sector' | 'field' | 'specialisation';
 
 export default function OnboardingPage() {
 	const router = useRouter();
-	const { isAuthenticated, user, isLoading: authLoading } = useAuth();
+	const { isAuthenticated, user, isLoading: authLoading, isFetching: authFetching } = useAuth();
 	const completeOnboardingMutation = useCompleteOnboarding();
 
 	const [step, setStep] = useState<OnboardingStep>('intro');
-	const [sector, setSector] = useState<SectorType | null>(null);
-	const [field, setField] = useState<TechnologyFieldType | null>(null);
+	const [selectedSector, setSelectedSector] = useState<Sector | null>(null);
+	const [selectedBranch, setSelectedBranch] = useState<Branch | null>(null);
 
 	// Redirect if not authenticated
 	useEffect(() => {
@@ -58,46 +57,41 @@ export default function OnboardingPage() {
 		router
 	]);
 
-	const handleSectorSelect = (selectedSector: SectorType) => {
-		setSector(selectedSector);
-		// For technology, go to field selection; for others, go directly to specialisation
-		if (selectedSector === 'technology') {
-			setStep('field');
-		} else {
-			setStep('specialisation');
-		}
+	const handleSectorSelect = (sector: Sector) => {
+		setSelectedSector(sector);
+		// All sectors have branches, so go to field selection
+		setStep('field');
 	};
 
-	const handleFieldSelect = (selectedField: TechnologyFieldType) => {
-		setField(selectedField);
+	const handleFieldSelect = (branch: Branch) => {
+		setSelectedBranch(branch);
 		setStep('specialisation');
 	};
 
-	const handleSpecialisationSelect = async (specialisation: string) => {
-		if (!user || !sector) return;
+	const handleSpecialisationSelect = async (specialization: Specialization) => {
+		if (!user || !selectedSector) return;
 
+		// Use the specialization_id directly for the backend
 		completeOnboardingMutation.mutate({
-			sector,
-			field: field || null,
-			specialisation
+			specialization_id: specialization.specialization_id,
+			sector: selectedSector.name,
+			field: selectedBranch?.name || null,
+			specialisation: specialization.name
 		});
 	};
 
 	const handleBackFromField = () => {
-		setField(null);
+		setSelectedBranch(null);
 		setStep('sector');
 	};
 
 	const handleBackFromSpecialisation = () => {
-		if (sector === 'technology') {
-			setStep('field');
-		} else {
-			setStep('sector');
-		}
+		setSelectedBranch(null);
+		setStep('field');
 	};
 
-	// Show loading state while checking auth
-	if (authLoading) {
+	// Show loading state while checking auth (wait for fresh data, not just cached)
+	if (authLoading || authFetching) {
 		return (
 			<div className='min-h-screen gradient-hero flex items-center justify-center'>
 				<Loader2 className='h-8 w-8 animate-spin text-primary-foreground' />
@@ -117,6 +111,18 @@ export default function OnboardingPage() {
 		);
 	}
 
+	// Don't render if onboarding is already complete (redirect in progress)
+	if (user?.onboardingCompleted) {
+		return (
+			<div className='min-h-screen gradient-hero flex items-center justify-center'>
+				<div className='flex flex-col items-center gap-4'>
+					<Loader2 className='h-8 w-8 animate-spin text-primary-foreground' />
+					<p className='text-primary-foreground/70'>Redirecting to dashboard...</p>
+				</div>
+			</div>
+		);
+	}
+
 	// Render current step
 	switch (step) {
 		case 'intro':
@@ -129,17 +135,19 @@ export default function OnboardingPage() {
 				/>
 			);
 		case 'field':
-			return (
+			return selectedSector ? (
 				<FieldSelection
+					sectorId={selectedSector.sector_id}
+					sectorName={selectedSector.name}
 					onSelect={handleFieldSelect}
 					onBack={handleBackFromField}
 				/>
-			);
+			) : null;
 		case 'specialisation':
-			return sector ? (
+			return selectedBranch ? (
 				<SpecialisationSelection
-					sector={sector}
-					field={field || undefined}
+					branchId={selectedBranch.branch_id}
+					branchName={selectedBranch.name}
 					onSelect={handleSpecialisationSelect}
 					onBack={handleBackFromSpecialisation}
 					isLoading={completeOnboardingMutation.isPending}

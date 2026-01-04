@@ -60,7 +60,7 @@ export const ReadinessGauge = ({ score }: ReadinessGaugeProps) => {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.5, duration: 0.5 }}
           >
-            {score}%
+            {score}
           </motion.span>
           {score >= 40 && (
             <span className="text-sm text-muted-foreground mt-1">

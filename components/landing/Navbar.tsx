@@ -4,17 +4,29 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, LogOut, LayoutDashboard } from 'lucide-react';
+import { useAuth } from '@/components/providers';
+import { useLogout } from '@/hooks/api';
 
 const Navbar = () => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [scrolled, setScrolled] = useState(false);
+	const { isAuthenticated, user, isLoading, isFetching } = useAuth();
+	const logoutMutation = useLogout();
 
 	useEffect(() => {
 		const handleScroll = () => setScrolled(window.scrollY > 50);
 		window.addEventListener('scroll', handleScroll);
 		return () => window.removeEventListener('scroll', handleScroll);
 	}, []);
+
+	const handleLogout = () => {
+		logoutMutation.mutate();
+		setIsOpen(false);
+	};
+
+	// Determine if user is fully logged in (not just cached data)
+	const isLoggedIn = isAuthenticated && !isLoading && !isFetching && !!user;
 
 	const navLinks = [
 		{ name: 'About', href: '#about' },
@@ -62,16 +74,42 @@ const Navbar = () => {
 
 					{/* CTA Buttons */}
 					<div className='hidden md:flex items-center gap-3'>
-						<Button
-							asChild
-							variant='hero'
-							size='sm'
-							className='bg-white text-black hover:bg-white/90 shadow-glow'>
-							<Link href='/auth?tab=login'>Login</Link>
-						</Button>
-						<Button asChild variant='hero' size='sm' className='shadow-glow'>
-							<Link href='/auth?tab=signup'>Sign Up</Link>
-						</Button>
+						{isLoggedIn ? (
+							<>
+								<Button
+									asChild
+									variant='hero'
+									size='sm'
+									className='shadow-glow'>
+									<Link href='/dashboard'>
+										<LayoutDashboard className='w-4 h-4 mr-2' />
+										Dashboard
+									</Link>
+								</Button>
+								<Button
+									variant='hero'
+									size='sm'
+									onClick={handleLogout}
+									disabled={logoutMutation.isPending}
+									className='bg-white/10 hover:bg-white/20 border border-white/20'>
+									<LogOut className='w-4 h-4 mr-2' />
+									{logoutMutation.isPending ? 'Logging out...' : 'Logout'}
+								</Button>
+							</>
+						) : (
+							<>
+								<Button
+									asChild
+									variant='hero'
+									size='sm'
+									className='bg-white text-black hover:bg-white/90 shadow-glow'>
+									<Link href='/auth?tab=login'>Login</Link>
+								</Button>
+								<Button asChild variant='hero' size='sm' className='shadow-glow'>
+									<Link href='/auth?tab=signup'>Sign Up</Link>
+								</Button>
+							</>
+						)}
 					</div>
 
 					{/* Mobile Menu Button */}
@@ -109,12 +147,33 @@ const Navbar = () => {
 							</a>
 						))}
 						<div className='flex flex-col gap-2 mt-4 px-4'>
-							<Button asChild variant='hero' className='w-full'>
-								<Link href='/auth?tab=login'>Login</Link>
-							</Button>
-							<Button asChild variant='hero' className='w-full'>
-								<Link href='/auth?tab=signup'>Sign Up</Link>
-							</Button>
+							{isLoggedIn ? (
+								<>
+									<Button asChild variant='hero' className='w-full'>
+										<Link href='/dashboard' onClick={() => setIsOpen(false)}>
+											<LayoutDashboard className='w-4 h-4 mr-2' />
+											Go to Dashboard
+										</Link>
+									</Button>
+									<Button 
+										variant='hero' 
+										className='w-full bg-white/10 hover:bg-white/20 border border-white/20'
+										onClick={handleLogout}
+										disabled={logoutMutation.isPending}>
+										<LogOut className='w-4 h-4 mr-2' />
+										{logoutMutation.isPending ? 'Logging out...' : 'Logout'}
+									</Button>
+								</>
+							) : (
+								<>
+									<Button asChild variant='hero' className='w-full'>
+										<Link href='/auth?tab=login'>Login</Link>
+									</Button>
+									<Button asChild variant='hero' className='w-full'>
+										<Link href='/auth?tab=signup'>Sign Up</Link>
+									</Button>
+								</>
+							)}
 						</div>
 					</div>
 				</div>

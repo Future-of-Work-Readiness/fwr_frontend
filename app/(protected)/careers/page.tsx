@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useAuth } from "@/components/providers";
 import { useCareerStore } from "@/stores/useCareerStore";
 import { useCareersQuery, useSetPrimaryCareer } from "@/hooks";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import ScrollReveal from "@/components/ui/scroll-reveal";
@@ -111,7 +111,7 @@ export default function CareersPage() {
                       : "Career Profile"
                     }
                   </CardTitle>
-                  <CardDescription className="text-sm space-y-1">
+                  <div className="text-sm text-muted-foreground space-y-1">
                     {career.sector && (
                       <div>
                         <span className="font-medium">Sector:</span> {SECTOR_LABELS[career.sector] || career.sector}
@@ -122,7 +122,7 @@ export default function CareersPage() {
                         <span className="font-medium">Field:</span> {career.field.replace(/_/g, " ")}
                       </div>
                     )}
-                  </CardDescription>
+                  </div>
                 </CardHeader>
                 <CardContent className="pt-0">
                   <div className="mb-4">

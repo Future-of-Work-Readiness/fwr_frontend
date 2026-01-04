@@ -2,24 +2,54 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { SECTORS, SectorType } from "@/lib/constants";
-import { Laptop, Heart, PoundSterling, GraduationCap, HardHat, ArrowLeft } from "lucide-react";
+import { useSectorsQuery, getSectorIcon, formatName, type Sector } from "@/hooks/api";
+import { Laptop, Heart, PoundSterling, GraduationCap, HardHat, ArrowLeft, Loader2, Briefcase } from "lucide-react";
 import ScrollReveal from "@/components/ui/scroll-reveal";
 
-const iconMap = {
+const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Laptop,
   Heart,
   PoundSterling,
   GraduationCap,
   HardHat,
+  Briefcase,
 };
 
 interface SectorSelectionProps {
-  onSelect: (sector: SectorType) => void;
+  onSelect: (sector: Sector) => void;
   onBack: () => void;
 }
 
 const SectorSelection = ({ onSelect, onBack }: SectorSelectionProps) => {
+  const { data: sectors, isLoading, error } = useSectorsQuery();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen gradient-hero flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="h-8 w-8 animate-spin text-primary-foreground" />
+          <p className="text-primary-foreground/70">Loading sectors...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen gradient-hero flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4 text-center">
+          <p className="text-primary-foreground">Failed to load sectors. Please try again.</p>
+          <Button variant="secondary" onClick={() => window.location.reload()}>
+            Retry
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // Filter out cross_functional sector from onboarding display
+  const displaySectors = sectors?.filter(s => s.name !== 'cross_functional') || [];
+
   return (
     <div className="min-h-screen gradient-hero p-4 py-12">
       <div className="max-w-4xl mx-auto">
@@ -54,15 +84,15 @@ const SectorSelection = ({ onSelect, onBack }: SectorSelectionProps) => {
         </ScrollReveal>
 
         <div className="space-y-4">
-          {(Object.keys(SECTORS) as SectorType[]).map((sectorKey, index) => {
-            const sector = SECTORS[sectorKey];
-            const IconComponent = iconMap[sector.icon as keyof typeof iconMap] || Laptop;
+          {displaySectors.map((sector, index) => {
+            const iconName = getSectorIcon(sector.name);
+            const IconComponent = iconMap[iconName] || Briefcase;
 
             return (
-              <ScrollReveal key={sectorKey} delay={index * 0.05}>
+              <ScrollReveal key={sector.sector_id} delay={index * 0.05}>
                 <Card
                   className="cursor-pointer border-2 border-transparent hover:border-primary transition-all duration-300 hover:shadow-lg group h-full"
-                  onClick={() => onSelect(sectorKey)}
+                  onClick={() => onSelect(sector)}
                 >
                   <CardContent className="p-6">
                     <div className="flex items-start gap-4">
@@ -71,10 +101,10 @@ const SectorSelection = ({ onSelect, onBack }: SectorSelectionProps) => {
                       </div>
                       <div>
                         <h3 className="font-semibold text-lg mb-2 group-hover:text-primary transition-colors">
-                          {sector.label}
+                          {formatName(sector.name)}
                         </h3>
                         <p className="text-sm text-muted-foreground leading-relaxed">
-                          {sector.description}
+                          {sector.description || `Explore careers in ${formatName(sector.name)}.`}
                         </p>
                       </div>
                     </div>
@@ -90,4 +120,3 @@ const SectorSelection = ({ onSelect, onBack }: SectorSelectionProps) => {
 };
 
 export default SectorSelection;
-

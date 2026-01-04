@@ -93,6 +93,39 @@ export const queryKeys = {
     data: (userId: string) =>
       [...queryKeys.benchmarking.all, 'data', userId] as const,
   },
+
+  // ========== SECTORS ==========
+  sectors: {
+    all: ['sectors'] as const,
+    list: () => [...queryKeys.sectors.all, 'list'] as const,
+    hierarchy: () => [...queryKeys.sectors.all, 'hierarchy'] as const,
+    detail: (id: string) => [...queryKeys.sectors.all, 'detail', id] as const,
+    branches: (sectorId: string) => [...queryKeys.sectors.all, 'branches', sectorId] as const,
+    sectorHierarchy: (sectorId: string) => [...queryKeys.sectors.all, 'sector-hierarchy', sectorId] as const,
+    specializations: (branchId: string) => [...queryKeys.sectors.all, 'specializations', branchId] as const,
+  },
+
+  // ========== QUIZZES ==========
+  quizzes: {
+    all: ['quizzes'] as const,
+    list: () => [...queryKeys.quizzes.all, 'list'] as const,
+    bySpecialization: (specId: string) => [...queryKeys.quizzes.all, 'by-spec', specId] as const,
+    detail: (id: string) => [...queryKeys.quizzes.all, 'detail', id] as const,
+    find: (specName: string, level: number) => [...queryKeys.quizzes.all, 'find', specName, level] as const,
+    history: (userId: string, filters?: Record<string, unknown>) => 
+      [...queryKeys.quizzes.all, 'history', userId, filters] as const,
+    progress: (attemptId: string) => [...queryKeys.quizzes.all, 'progress', attemptId] as const,
+  },
+
+  // ========== ACTIVITY ==========
+  activity: {
+    all: ['activity'] as const,
+    feed: (userId: string, filters?: Record<string, unknown>) => 
+      [...queryKeys.activity.all, 'feed', userId, filters] as const,
+    recent: (userId: string, limit?: number) => 
+      [...queryKeys.activity.all, 'recent', userId, limit] as const,
+    stats: (userId: string) => [...queryKeys.activity.all, 'stats', userId] as const,
+  },
 } as const;
 
 export type QueryKeys = typeof queryKeys;

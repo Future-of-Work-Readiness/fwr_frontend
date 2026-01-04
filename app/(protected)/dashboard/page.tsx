@@ -16,7 +16,7 @@ import type { SectorType } from "@/types";
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
+  const { user, isAuthenticated, isLoading: authLoading, isFetching: authFetching } = useAuth();
   const { currentCareer, careers, isLoading: careerLoading } = useCareerStore();
   const { data: dashboardData, isLoading: dashboardLoading } = useCareerDashboardQuery({
     enabled: !!user?.onboardingCompleted,
@@ -43,17 +43,18 @@ export default function DashboardPage() {
   }, [user]);
 
   // Redirect to onboarding if not completed
+  // Wait for fresh data (not just cached) before redirecting
   useEffect(() => {
-    if (!authLoading && isAuthenticated && user && !user.onboardingCompleted) {
+    if (!authLoading && !authFetching && isAuthenticated && user && !user.onboardingCompleted) {
       router.replace("/onboarding");
     }
-  }, [authLoading, isAuthenticated, user, router]);
+  }, [authLoading, authFetching, isAuthenticated, user, router]);
 
   const firstName = user?.fullName?.split(" ")[0] || "there";
-  const welcomeMessage = isNewUser ? `Welcome ${firstName}` : `Welcome Back ${firstName}`;
+  const welcomeMessage = isNewUser ? `Welcome, ${firstName}` : `Welcome Back, ${firstName}`;
 
-  // Show loading state
-  if (authLoading || careerLoading) {
+  // Show loading state (include authFetching to wait for fresh data)
+  if (authLoading || authFetching || careerLoading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -119,28 +120,6 @@ export default function DashboardPage() {
 
       {/* Key Metrics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <ScrollReveal delay={0.2}>
-          <Card className="border-2 border-primary/20 bg-white shadow-lg hover:shadow-xl transition-shadow">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground mb-1">Readiness Score</p>
-                  <p className="text-3xl font-bold text-primary">
-                    {dashboardLoading ? (
-                      <Loader2 className="h-6 w-6 animate-spin inline" />
-                    ) : (
-                      readinessScore
-                    )}
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-1">out of 100</p>
-                </div>
-                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
-                  <Award className="h-7 w-7 text-primary" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </ScrollReveal>
         
         <ScrollReveal delay={0.25}>
           <Card className="border-2 border-primary/20 bg-white shadow-lg hover:shadow-xl transition-shadow">

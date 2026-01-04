@@ -1,11 +1,14 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, LayoutDashboard } from "lucide-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { useAuth } from "@/components/providers";
 
 const HeroSection = () => {
+  const { isAuthenticated, user, isLoading, isFetching } = useAuth();
+  const isLoggedIn = isAuthenticated && !isLoading && !isFetching && !!user;
   return (
     <section 
       className="relative min-h-screen flex items-center overflow-hidden pt-20"
@@ -62,12 +65,22 @@ const HeroSection = () => {
               transition={{ duration: 0.6, delay: 0.4, ease: [0.25, 0.4, 0.25, 1] }}
               className="flex flex-col sm:flex-row items-start gap-4"
             >
-              <Button asChild variant="hero" size="xl" className="group">
-                <Link href="/auth?tab=signup">
-                  Get Started
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </Link>
-              </Button>
+              {isLoggedIn ? (
+                <Button asChild variant="hero" size="xl" className="group">
+                  <Link href="/dashboard">
+                    <LayoutDashboard className="w-5 h-5 mr-2" />
+                    Go to Dashboard
+                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform ml-2" />
+                  </Link>
+                </Button>
+              ) : (
+                <Button asChild variant="hero" size="xl" className="group">
+                  <Link href="/auth?tab=signup">
+                    Get Started
+                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </Link>
+                </Button>
+              )}
             </motion.div>
           </div>
 

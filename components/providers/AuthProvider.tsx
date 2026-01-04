@@ -9,6 +9,7 @@ interface AuthContextValue {
   user: SessionUser | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  isFetching: boolean;
   isError: boolean;
   refetch: () => void;
 }
@@ -17,6 +18,7 @@ const AuthContext = createContext<AuthContextValue>({
   user: null,
   isAuthenticated: false,
   isLoading: true,
+  isFetching: false,
   isError: false,
   refetch: () => {},
 });
@@ -33,6 +35,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const {
     data: user,
     isLoading,
+    isFetching,
     isError,
     isAuthenticated,
     refetch,
@@ -47,6 +50,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         user: user ?? null,
         isAuthenticated,
         isLoading,
+        isFetching,
         isError,
         refetch,
       }}
