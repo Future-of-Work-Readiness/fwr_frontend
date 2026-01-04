@@ -48,14 +48,17 @@ export {
   useUpdateGoal,
   useDeleteGoal,
   useCompleteGoal,
+  useUpdateGoalProgress,
   useJournalEntriesQuery,
   useJournalEntryQuery,
   useCreateJournalEntry,
+  useUpdateJournalEntry,
   useDeleteJournalEntry,
   JOURNAL_PROMPTS,
   type CreateGoalPayload,
   type UpdateGoalPayload,
   type CreateJournalEntryPayload,
+  type UpdateJournalEntryPayload,
   type GoalWithProgress,
 } from './useGoals';
 
@@ -67,9 +70,12 @@ export {
   useQuizDetailQuery,
   useFindQuizQuery,
   useQuizHistoryQuery,
+  useQuizHistoryAttemptsQuery,
+  useQuizProgressQuery,
   // Mutation hooks
   useStartQuiz,
   useSubmitQuiz,
+  useSaveQuizProgress,
   // Query keys
   quizQueryKeys,
   // Types
@@ -87,7 +93,12 @@ export {
   type UpdatedGoal,
   type QuizSubmitResponse,
   type QuizAttemptHistory,
+  type QuizAttemptHistoryBackend,
   type QuizHistoryResponse,
+  type QuizHistoryResponseBackend,
+  type QuizHistoryFilters,
+  type QuizProgress,
+  type QuizProgressSave,
   // Legacy compatibility exports
   useAssessmentResults,
   useTestResults,
@@ -95,6 +106,21 @@ export {
   type AssessmentResult,
   type TestResult,
 } from './useQuizzes';
+
+// ============ ACTIVITY FEED HOOKS ============
+export {
+  useActivityFeedQuery,
+  useRecentActivitiesQuery,
+  useActivityStatsQuery,
+  activityQueryKeys,
+  getActivityIcon,
+  getActivityColor,
+  type Activity,
+  type ActivityType,
+  type ActivityListResponse,
+  type ActivityStats,
+  type ActivityFilters,
+} from './useActivity';
 
 // ============ BENCHMARK HOOKS ============
 export {

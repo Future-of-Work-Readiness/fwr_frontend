@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/components/providers";
@@ -8,17 +8,60 @@ import { useCareerStore } from "@/stores/useCareerStore";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import ScrollReveal from "@/components/ui/scroll-reveal";
-import { Loader2, FileText, Calendar, ArrowRight, Clock, ArrowLeft, CheckCircle2, XCircle } from "lucide-react";
-import { useAllAssessmentResults, type AssessmentResult } from "@/hooks";
+import { 
+  Loader2, FileText, Calendar, ArrowRight, Clock, ArrowLeft, 
+  CheckCircle2, XCircle, Filter, ChevronLeft, ChevronRight 
+} from "lucide-react";
+import { 
+  useQuizHistoryQuery, 
+  type QuizAttemptHistory,
+  type QuizHistoryFilters 
+} from "@/hooks";
+
+const ITEMS_PER_PAGE = 10;
 
 export default function ResultsPage() {
   const router = useRouter();
   const { user, isLoading: authLoading } = useAuth();
   const { currentCareer } = useCareerStore();
 
-  // Fetch all assessment results for the user
-  const { data: assessmentHistory = [], isLoading: resultsLoading } = useAllAssessmentResults();
+  // Filter state
+  const [passedFilter, setPassedFilter] = useState<string>("all");
+  const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // Build filters object
+  const filters: QuizHistoryFilters = {
+    limit: ITEMS_PER_PAGE,
+    offset: (currentPage - 1) * ITEMS_PER_PAGE,
+    ...(passedFilter !== "all" && { passed: passedFilter === "passed" }),
+    ...(categoryFilter !== "all" && { category: categoryFilter as "technical" | "soft_skill" }),
+  };
+
+  // Fetch assessment history with filters
+  const { 
+    data: historyData, 
+    isLoading: resultsLoading,
+    isFetching 
+  } = useQuizHistoryQuery(filters);
+
+  const assessmentHistory = historyData?.attempts || [];
+  const totalItems = historyData?.total || 0;
+  const hasMore = historyData?.hasMore || false;
+  const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [passedFilter, categoryFilter]);
 
   // Auth redirect
   useEffect(() => {
@@ -28,18 +71,45 @@ export default function ResultsPage() {
   }, [user, authLoading, router]);
 
   const formatTime = (seconds: number) => {
+    if (!seconds || seconds === 0) return "--";
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}m ${secs}s`;
   };
 
-  if (authLoading || resultsLoading) {
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (hasMore || currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const clearFilters = () => {
+    setPassedFilter("all");
+    setCategoryFilter("all");
+    setCurrentPage(1);
+  };
+
+  const hasActiveFilters = passedFilter !== "all" || categoryFilter !== "all";
+
+  if (authLoading || (resultsLoading && !historyData)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
+
+  // Calculate stats from current page data (or use API total for accurate counts)
+  const passedCount = assessmentHistory.filter((a) => a.passed).length;
+  const avgScore = assessmentHistory.length > 0
+    ? Math.round(assessmentHistory.reduce((acc, a) => acc + a.score, 0) / assessmentHistory.length)
+    : 0;
 
   return (
     <div className="min-h-screen bg-background">
@@ -66,74 +136,135 @@ export default function ResultsPage() {
             </ScrollReveal>
 
             {/* Stats Summary */}
-            {assessmentHistory.length > 0 && (
-              <ScrollReveal>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <Card>
-                    <CardContent className="p-4 text-center">
-                      <p className="text-2xl font-bold text-primary">{assessmentHistory.length}</p>
-                      <p className="text-sm text-muted-foreground">Total Tests</p>
-                    </CardContent>
-                  </Card>
-                  <Card>
-                    <CardContent className="p-4 text-center">
-                      <p className="text-2xl font-bold text-primary">
-                        {assessmentHistory.filter((a) => a.passed).length}
-                      </p>
-                      <p className="text-sm text-muted-foreground">Passed</p>
-                    </CardContent>
-                  </Card>
-                  <Card>
-                    <CardContent className="p-4 text-center">
-                      <p className="text-2xl font-bold text-orange">
-                        {Math.round(
-                          assessmentHistory.reduce((acc, a) => acc + a.score, 0) /
-                            assessmentHistory.length
-                        )}
-                        %
-                      </p>
-                      <p className="text-sm text-muted-foreground">Avg Score</p>
-                    </CardContent>
-                  </Card>
-                  <Card>
-                    <CardContent className="p-4 text-center">
-                      <p className="text-2xl font-bold text-cyan">
-                        {Math.round(
-                          (assessmentHistory.filter((a) => a.passed).length /
-                            assessmentHistory.length) *
-                            100
-                        )}
-                        %
-                      </p>
-                      <p className="text-sm text-muted-foreground">Pass Rate</p>
-                    </CardContent>
-                  </Card>
-                </div>
-              </ScrollReveal>
-            )}
+            <ScrollReveal>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <Card>
+                  <CardContent className="p-4 text-center">
+                    <p className="text-2xl font-bold text-primary">{totalItems}</p>
+                    <p className="text-sm text-muted-foreground">Total Tests</p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="p-4 text-center">
+                    <p className="text-2xl font-bold text-primary">
+                      {passedCount}
+                    </p>
+                    <p className="text-sm text-muted-foreground">Passed (This Page)</p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="p-4 text-center">
+                    <p className="text-2xl font-bold text-orange">
+                      {avgScore}%
+                    </p>
+                    <p className="text-sm text-muted-foreground">Avg Score (This Page)</p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="p-4 text-center">
+                    <p className="text-2xl font-bold text-cyan">
+                      {assessmentHistory.length > 0 
+                        ? Math.round((passedCount / assessmentHistory.length) * 100) 
+                        : 0}%
+                    </p>
+                    <p className="text-sm text-muted-foreground">Pass Rate (This Page)</p>
+                  </CardContent>
+                </Card>
+              </div>
+            </ScrollReveal>
+
+            {/* Filters */}
+            <ScrollReveal delay={0.05}>
+              <Card>
+                <CardHeader className="pb-4">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <Filter className="h-4 w-4" />
+                      Filters
+                    </CardTitle>
+                    {hasActiveFilters && (
+                      <Button variant="ghost" size="sm" onClick={clearFilters}>
+                        Clear Filters
+                      </Button>
+                    )}
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <div className="flex flex-wrap gap-4">
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-sm text-muted-foreground">Status</label>
+                      <Select value={passedFilter} onValueChange={setPassedFilter}>
+                        <SelectTrigger className="w-[140px]">
+                          <SelectValue placeholder="All" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All</SelectItem>
+                          <SelectItem value="passed">Passed</SelectItem>
+                          <SelectItem value="failed">Failed</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-sm text-muted-foreground">Category</label>
+                      <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                        <SelectTrigger className="w-[160px]">
+                          <SelectValue placeholder="All Categories" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Categories</SelectItem>
+                          <SelectItem value="technical">Technical</SelectItem>
+                          <SelectItem value="soft_skill">Soft Skills</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </ScrollReveal>
 
             {/* Assessment History */}
             <ScrollReveal delay={0.1}>
               <Card>
                 <CardHeader>
-                  <CardTitle>Assessment History</CardTitle>
-                  <CardDescription>
-                    All your completed assessments and their results
-                  </CardDescription>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle>Assessment History</CardTitle>
+                      <CardDescription>
+                        {totalItems > 0 
+                          ? `Showing ${(currentPage - 1) * ITEMS_PER_PAGE + 1}-${Math.min(currentPage * ITEMS_PER_PAGE, totalItems)} of ${totalItems} assessments`
+                          : "All your completed assessments and their results"
+                        }
+                      </CardDescription>
+                    </div>
+                    {isFetching && (
+                      <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                    )}
+                  </div>
                 </CardHeader>
                 <CardContent>
                   {assessmentHistory.length === 0 ? (
                     <div className="text-center py-12">
                       <FileText className="h-16 w-16 mx-auto mb-4 text-muted-foreground/30" />
-                      <h3 className="font-semibold mb-2">No assessments yet</h3>
+                      <h3 className="font-semibold mb-2">
+                        {hasActiveFilters ? "No matching assessments" : "No assessments yet"}
+                      </h3>
                       <p className="text-muted-foreground mb-6">
-                        Complete your first assessment to see your results here
+                        {hasActiveFilters 
+                          ? "Try adjusting your filters to see more results"
+                          : "Complete your first assessment to see your results here"
+                        }
                       </p>
-                      <Button asChild>
-                        <Link href="/technical-skills">
-                          Browse Tests <ArrowRight className="h-4 w-4 ml-2" />
-                        </Link>
-                      </Button>
+                      {hasActiveFilters ? (
+                        <Button variant="outline" onClick={clearFilters}>
+                          Clear Filters
+                        </Button>
+                      ) : (
+                        <Button asChild>
+                          <Link href="/technical-skills">
+                            Browse Tests <ArrowRight className="h-4 w-4 ml-2" />
+                          </Link>
+                        </Button>
+                      )}
                     </div>
                   ) : (
                     <div className="space-y-3">
@@ -185,7 +316,7 @@ export default function ResultsPage() {
                                     : "text-destructive"
                                 }`}
                               >
-                                {assessment.score}%
+                                {Math.round(assessment.score)}%
                               </div>
                               <Badge
                                 variant={assessment.passed ? "default" : "destructive"}
@@ -197,6 +328,35 @@ export default function ResultsPage() {
                           </div>
                         );
                       })}
+                    </div>
+                  )}
+
+                  {/* Pagination */}
+                  {totalItems > ITEMS_PER_PAGE && (
+                    <div className="flex items-center justify-between mt-6 pt-4 border-t">
+                      <p className="text-sm text-muted-foreground">
+                        Page {currentPage} of {totalPages}
+                      </p>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={handlePreviousPage}
+                          disabled={currentPage === 1 || isFetching}
+                        >
+                          <ChevronLeft className="h-4 w-4 mr-1" />
+                          Previous
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={handleNextPage}
+                          disabled={currentPage >= totalPages || isFetching}
+                        >
+                          Next
+                          <ChevronRight className="h-4 w-4 ml-1" />
+                        </Button>
+                      </div>
                     </div>
                   )}
                 </CardContent>
@@ -243,4 +403,3 @@ export default function ResultsPage() {
     </div>
   );
 }
-
