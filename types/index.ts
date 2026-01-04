@@ -11,12 +11,15 @@ export type SectorType =
   | "construction";
 
 // User Types
+export type UserRole = "user" | "admin";
+
 export interface User {
   id: string;
   email: string;
   fullName: string | null;
   avatarUrl: string | null;
   onboardingCompleted: boolean;
+  role: UserRole;
   createdAt: string;
   updatedAt: string;
 }

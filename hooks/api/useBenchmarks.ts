@@ -93,13 +93,18 @@ export function usePeerBenchmarkQuery(
 }
 
 /**
+ * Valid benchmark categories (Leadership removed in backend update)
+ */
+export type BenchmarkCategory = 'Overall Readiness' | 'Technical Skills' | 'Soft Skills';
+
+/**
  * Get peer average for a specific score category
  * 
  * This is a utility function to extract peer average from benchmark data
  */
 export function getPeerAverageFromBenchmark(
   benchmark: PeerBenchmarkData | null | undefined,
-  category: 'Overall Readiness' | 'Technical Skills' | 'Soft Skills'
+  category: BenchmarkCategory
 ): number {
   if (!benchmark?.comparisons) return 0;
   
@@ -112,7 +117,7 @@ export function getPeerAverageFromBenchmark(
  */
 export function getPercentileFromBenchmark(
   benchmark: PeerBenchmarkData | null | undefined,
-  category: 'Overall Readiness' | 'Technical Skills' | 'Soft Skills'
+  category: BenchmarkCategory
 ): number {
   if (!benchmark?.comparisons) return 50;
   

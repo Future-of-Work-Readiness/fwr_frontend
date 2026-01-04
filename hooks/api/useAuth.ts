@@ -75,7 +75,14 @@ function getUserFromStorage(): SessionUser | null {
 		const authStorage = localStorage.getItem(AUTH_STORAGE_KEY);
 		if (authStorage) {
 			const { state } = JSON.parse(authStorage);
-			return state?.user || null;
+			if (state?.user) {
+				// Ensure role field exists for backwards compatibility
+				return {
+					...state.user,
+					role: state.user.role || 'user',
+				};
+			}
+			return null;
 		}
 	} catch {
 		return null;
@@ -115,6 +122,7 @@ export function useCurrentUser(
 					fullName: response.fullName,
 					avatarUrl: response.avatarUrl,
 					onboardingCompleted: response.onboardingCompleted,
+					role: (response.role as 'user' | 'admin') || 'user',
 					createdAt: response.createdAt || new Date().toISOString(),
 					updatedAt: response.updatedAt || new Date().toISOString()
 				};

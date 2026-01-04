@@ -79,6 +79,11 @@ export class ApiError extends Error {
 }
 
 /**
+ * User role type
+ */
+export type UserRole = "user" | "admin";
+
+/**
  * Session user type (frontend format)
  * Used throughout the frontend application
  */
@@ -88,6 +93,7 @@ export interface SessionUser {
   fullName: string | null;
   avatarUrl: string | null;
   onboardingCompleted: boolean;
+  role: UserRole;
   createdAt: string;
   updatedAt: string;
 }
@@ -249,6 +255,7 @@ export function transformBackendUser(backendUser: BackendUserData): SessionUser 
     onboardingCompleted: backendUser.onboarding_completed ?? 
       (backendUser.preferred_specialization_id !== null && 
        backendUser.preferred_specialization_id !== undefined),
+    role: (backendUser.role as UserRole) || "user",
     createdAt: backendUser.created_at,
     updatedAt: backendUser.created_at, // Use created_at as fallback
   };
