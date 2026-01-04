@@ -23,6 +23,7 @@ export {
   useCareersQuery,
   useCareerQuery,
   usePrimaryCareerQuery,
+  useSyncCareers,
   useCreateCareer,
   useAddCareer,
   useUpdateCareer,
@@ -30,9 +31,13 @@ export {
   useDeleteCareer,
   useCompleteOnboarding,
   usePrefetchCareer,
+  useCareerDashboardQuery,
+  useSpecificCareerDashboardQuery,
   type CreateCareerPayload,
   type UpdateCareerPayload,
   type CompleteOnboardingPayload,
+  type CareerDashboard,
+  type CareerScores,
 } from './useCareers';
 
 // ============ GOALS & JOURNAL HOOKS ============

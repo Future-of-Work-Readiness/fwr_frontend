@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import {
   useQuery,
   useMutation,
@@ -11,6 +12,7 @@ import { queryKeys } from '@/lib/query/keys';
 import { ApiError } from '@/lib/api/types';
 import type { CareerProfile, SectorType } from '@/types';
 import { useAuth } from '@/components/providers';
+import { useCareerStore } from '@/stores/useCareerStore';
 
 // ============ TYPES ============
 
@@ -18,14 +20,14 @@ export interface CreateCareerPayload {
   sector: SectorType;
   field: string | null;
   specialisation: string;
-  isPrimary?: boolean;
+  is_primary?: boolean;  // snake_case for backend
 }
 
 export interface UpdateCareerPayload {
   sector?: SectorType;
   field?: string | null;
   specialisation?: string;
-  isPrimary?: boolean;
+  is_primary?: boolean;  // snake_case for backend
 }
 
 export interface CompleteOnboardingPayload {
@@ -50,10 +52,10 @@ export function useCareersQuery(
   return useQuery({
     queryKey: queryKeys.careers.list(user?.id || ''),
     queryFn: async () => {
-      const response = await api.get<{ careers: CareerProfile[] } | CareerProfile[]>(
+      const response = await api.get<{ careers: CareerProfile[]; total: number }>(
         '/careers'
       );
-      return Array.isArray(response) ? response : response.careers;
+      return response.careers;
     },
     enabled: !!user?.id,
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -108,6 +110,42 @@ export function usePrimaryCareerQuery(
     staleTime: 5 * 60 * 1000,
     ...options,
   });
+}
+
+// ============ SYNC HOOK ============
+
+/**
+ * Sync careers from TanStack Query to Zustand store.
+ * 
+ * This hook bridges server state (TanStack Query) with client state (Zustand).
+ * - Fetches careers from API via useCareersQuery
+ * - Syncs data to Zustand store on success
+ * - Zustand provides: localStorage persistence, currentCareer context, instant access
+ * 
+ * Call this hook once in your app layout or a provider component.
+ */
+export function useSyncCareers() {
+  const { data: careers, isLoading, isError, error } = useCareersQuery();
+  const { setCareers, setLoading } = useCareerStore();
+
+  // Sync loading state
+  useEffect(() => {
+    setLoading(isLoading);
+  }, [isLoading, setLoading]);
+
+  // Sync careers data to Zustand when it arrives
+  useEffect(() => {
+    if (careers && careers.length > 0) {
+      setCareers(careers);
+    }
+  }, [careers, setCareers]);
+
+  return {
+    isLoading,
+    isError,
+    error,
+    careersCount: careers?.length ?? 0,
+  };
 }
 
 // ============ MUTATIONS ============
@@ -250,8 +288,8 @@ export function useCompleteOnboarding() {
 
   return useMutation({
     mutationFn: (payload: CompleteOnboardingPayload) =>
-      api.post<{ career: CareerProfile; success: boolean }>(
-        '/auth/complete-onboarding',
+      api.post<{ career: CareerProfile; success: boolean; user: unknown }>(
+        '/users/complete-onboarding',
         payload
       ),
 
@@ -270,6 +308,78 @@ export function useCompleteOnboarding() {
       // Update user to reflect onboarding completion
       queryClient.invalidateQueries({ queryKey: queryKeys.auth.me() });
     },
+  });
+}
+
+// ============ DASHBOARD ============
+
+/**
+ * Career dashboard response type
+ */
+export interface CareerScores {
+  readinessScore: number;
+  technicalScore: number;
+  softSkillScore: number;
+  leadershipScore: number;
+}
+
+export interface CareerDashboard {
+  careerId: string;
+  sector: string | null;
+  field: string | null;
+  specialisation: string | null;
+  isPrimary: boolean;
+  scores: CareerScores;
+  goalsCount: number;
+  completedGoalsCount: number;
+  testsCompletedCount: number;
+  totalCareers: number;
+}
+
+/**
+ * Fetch dashboard data for the primary career
+ */
+export function useCareerDashboardQuery(
+  options?: Omit<
+    UseQueryOptions<CareerDashboard, ApiError>,
+    'queryKey' | 'queryFn'
+  >
+) {
+  const { user } = useAuth();
+
+  return useQuery({
+    queryKey: queryKeys.careers.dashboard(),
+    queryFn: async () => {
+      const response = await api.get<CareerDashboard>('/careers/dashboard');
+      return response;
+    },
+    enabled: !!user?.id,
+    staleTime: 2 * 60 * 1000, // 2 minutes - dashboard data changes more frequently
+    ...options,
+  });
+}
+
+/**
+ * Fetch dashboard data for a specific career
+ */
+export function useSpecificCareerDashboardQuery(
+  careerId: string,
+  options?: Omit<
+    UseQueryOptions<CareerDashboard, ApiError>,
+    'queryKey' | 'queryFn'
+  >
+) {
+  return useQuery({
+    queryKey: queryKeys.careers.dashboard(careerId),
+    queryFn: async () => {
+      const response = await api.get<CareerDashboard>(
+        `/careers/${careerId}/dashboard`
+      );
+      return response;
+    },
+    enabled: !!careerId,
+    staleTime: 2 * 60 * 1000,
+    ...options,
   });
 }
 

@@ -51,7 +51,7 @@ export default function AddCareerPage() {
         sector,
         field: field || null,
         specialisation,
-        isPrimary: false, // New careers are not primary by default
+        is_primary: false, // New careers are not primary by default
       });
 
       // Set the new career as current

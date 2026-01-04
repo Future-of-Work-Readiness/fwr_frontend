@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Poppins, Inter, Space_Mono, Lora } from 'next/font/google';
 import { QueryProvider } from '@/lib/query';
-import { AuthProvider } from '@/components/providers';
+import { AuthProvider, CareerProvider } from '@/components/providers';
 import { Toaster } from 'sonner';
 import './globals.css';
 
@@ -51,8 +51,10 @@ export default function RootLayout({
 				className={`${poppins.variable} ${inter.variable} ${spaceMono.variable} ${lora.variable} font-sans antialiased`}>
 				<QueryProvider>
 					<AuthProvider>
-						{children}
-						<Toaster richColors position='top-center' />
+						<CareerProvider>
+							{children}
+							<Toaster richColors position='top-center' />
+						</CareerProvider>
 					</AuthProvider>
 				</QueryProvider>
 			</body>

@@ -30,6 +30,8 @@ export const queryKeys = {
     detail: (id: string) => [...queryKeys.careers.details(), id] as const,
     primary: (userId: string) =>
       [...queryKeys.careers.all, 'primary', userId] as const,
+    dashboard: (careerId?: string) =>
+      [...queryKeys.careers.all, 'dashboard', careerId || 'primary'] as const,
   },
 
   // ========== ASSESSMENTS ==========

@@ -5,18 +5,33 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/components/providers";
 import { useCareerStore } from "@/stores/useCareerStore";
+import { useCareerDashboardQuery } from "@/hooks";
 import { ReadinessGauge, QuickAccessCard } from "@/components/dashboard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import ScrollReveal from "@/components/ui/scroll-reveal";
 import { Loader2, Cpu, Users, TrendingUp, Award, Target } from "lucide-react";
 import { formatSpecialisation, SECTOR_LABELS } from "@/lib/constants";
+import type { SectorType } from "@/types";
 
 export default function DashboardPage() {
   const router = useRouter();
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const { currentCareer, careers, isLoading: careerLoading } = useCareerStore();
+  const { data: dashboardData, isLoading: dashboardLoading } = useCareerDashboardQuery({
+    enabled: !!user?.onboardingCompleted,
+  });
   const [isNewUser, setIsNewUser] = useState(false);
+
+  // Use dashboard data if available, fallback to career store
+  const goalsCount = dashboardData?.goalsCount ?? 0;
+  const readinessScore = dashboardData?.scores.readinessScore ?? currentCareer?.readinessScore ?? 0;
+  const totalCareers = dashboardData?.totalCareers ?? careers.length;
+  
+  // Career info from dashboard or store
+  const sector = dashboardData?.sector ?? currentCareer?.sector;
+  const field = dashboardData?.field ?? currentCareer?.field;
+  const specialisation = dashboardData?.specialisation ?? currentCareer?.specialisation;
 
   // Check if user is new (created within last 5 minutes)
   useEffect(() => {
@@ -47,7 +62,7 @@ export default function DashboardPage() {
   }
 
   // If no career exists after loading, show prompt to add career
-  if (!careerLoading && !currentCareer) {
+  if (!careerLoading && !currentCareer && !dashboardData) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
@@ -69,14 +84,14 @@ export default function DashboardPage() {
           <h1 className="text-3xl lg:text-4xl font-display font-bold mb-2 bg-gradient-to-r from-primary to-orange bg-clip-text text-transparent">
             {welcomeMessage}
           </h1>
-          {currentCareer?.sector && currentCareer?.specialisation && (
+          {sector && specialisation && (
             <div className="flex items-center gap-2 mt-2 flex-wrap">
               <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary/10 text-primary border border-primary/20">
-                {SECTOR_LABELS[currentCareer.sector] || currentCareer.sector}
+                {SECTOR_LABELS[sector as SectorType] || sector}
               </span>
               <span className="text-muted-foreground">•</span>
               <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-orange/10 text-orange border border-orange/20">
-                {formatSpecialisation(currentCareer.specialisation)}
+                {formatSpecialisation(specialisation)}
               </span>
             </div>
           )}
@@ -110,7 +125,13 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-muted-foreground mb-1">Readiness Score</p>
-                  <p className="text-3xl font-bold text-primary">{currentCareer?.readinessScore || 0}</p>
+                  <p className="text-3xl font-bold text-primary">
+                    {dashboardLoading ? (
+                      <Loader2 className="h-6 w-6 animate-spin inline" />
+                    ) : (
+                      readinessScore
+                    )}
+                  </p>
                   <p className="text-xs text-muted-foreground mt-1">out of 100</p>
                 </div>
                 <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
@@ -127,7 +148,13 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-muted-foreground mb-1">Goals Set</p>
-                  <p className="text-3xl font-bold text-primary">0</p>
+                  <p className="text-3xl font-bold text-primary">
+                    {dashboardLoading ? (
+                      <Loader2 className="h-6 w-6 animate-spin inline" />
+                    ) : (
+                      goalsCount
+                    )}
+                  </p>
                   <p className="text-xs text-muted-foreground mt-1">Track your progress</p>
                 </div>
                 <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
@@ -150,7 +177,7 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="flex justify-center py-6">
-              <ReadinessGauge score={currentCareer?.readinessScore || 0} />
+              <ReadinessGauge score={readinessScore} />
             </div>
           </CardContent>
         </Card>
@@ -166,19 +193,19 @@ export default function DashboardPage() {
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="p-4 rounded-lg bg-muted/30">
                 <p className="text-sm text-muted-foreground mb-1">Sector</p>
-                <p className="font-semibold capitalize">{currentCareer?.sector?.replace(/_/g, " ") || "N/A"}</p>
+                <p className="font-semibold capitalize">{sector?.replace(/_/g, " ") || "N/A"}</p>
               </div>
               <div className="p-4 rounded-lg bg-muted/30">
                 <p className="text-sm text-muted-foreground mb-1">Field</p>
-                <p className="font-semibold capitalize">{currentCareer?.field?.replace(/_/g, " ") || "N/A"}</p>
+                <p className="font-semibold capitalize">{field?.replace(/_/g, " ") || "N/A"}</p>
               </div>
               <div className="p-4 rounded-lg bg-muted/30">
                 <p className="text-sm text-muted-foreground mb-1">Specialisation</p>
-                <p className="font-semibold">{currentCareer?.specialisation ? formatSpecialisation(currentCareer.specialisation) : "N/A"}</p>
+                <p className="font-semibold">{specialisation ? formatSpecialisation(specialisation) : "N/A"}</p>
               </div>
               <div className="p-4 rounded-lg bg-muted/30">
                 <p className="text-sm text-muted-foreground mb-1">Career Profiles</p>
-                <p className="font-semibold">{careers.length}</p>
+                <p className="font-semibold">{totalCareers}</p>
               </div>
             </div>
           </CardContent>

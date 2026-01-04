@@ -28,22 +28,22 @@ export const careerProfileSchema = z.object({
 
 export type CareerProfileSchema = z.infer<typeof careerProfileSchema>;
 
-// Create Career Profile Schema
+// Create Career Profile Schema (snake_case for API request)
 export const createCareerProfileSchema = z.object({
   sector: sectorTypeSchema,
   field: z.string().min(1, "Field is required"),
   specialisation: z.string().optional(),
-  isPrimary: z.boolean().default(false),
+  is_primary: z.boolean().default(false),  // snake_case for backend
 });
 
 export type CreateCareerProfileSchema = z.infer<typeof createCareerProfileSchema>;
 
-// Update Career Profile Schema
+// Update Career Profile Schema (snake_case for API request)
 export const updateCareerProfileSchema = z.object({
   sector: sectorTypeSchema.optional(),
   field: z.string().min(1).optional(),
   specialisation: z.string().optional(),
-  isPrimary: z.boolean().optional(),
+  is_primary: z.boolean().optional(),  // snake_case for backend
 });
 
 export type UpdateCareerProfileSchema = z.infer<typeof updateCareerProfileSchema>;
