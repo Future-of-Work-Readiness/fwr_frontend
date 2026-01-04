@@ -59,18 +59,64 @@ export {
   type GoalWithProgress,
 } from './useGoals';
 
-// ============ ASSESSMENT HOOKS ============
+// ============ QUIZ HOOKS (NEW) ============
 export {
+  // Query hooks
+  useQuizzesQuery,
+  useQuizzesBySpecializationQuery,
+  useQuizDetailQuery,
+  useFindQuizQuery,
+  useQuizHistoryQuery,
+  // Mutation hooks
+  useStartQuiz,
+  useSubmitQuiz,
+  // Query keys
+  quizQueryKeys,
+  // Types
+  type QuizOption,
+  type QuizOptionWithAnswer,
+  type QuizQuestion,
+  type QuizSummary,
+  type QuizDetail,
+  type QuizStartResponse,
+  type QuizAnswer,
+  type QuestionResult,
+  type ReadinessSnapshot,
+  type QuizFeedback,
+  type ScoreImpact,
+  type UpdatedGoal,
+  type QuizSubmitResponse,
+  type QuizAttemptHistory,
+  type QuizHistoryResponse,
+  // Legacy compatibility exports
   useAssessmentResults,
-  useAllAssessmentResults,
-  useAssessmentResultsByCareer,
   useTestResults,
+  useAllAssessmentResults,
+  type AssessmentResult,
+  type TestResult,
+} from './useQuizzes';
+
+// ============ BENCHMARK HOOKS ============
+export {
+  usePeerBenchmarkQuery,
+  getPeerAverageFromBenchmark,
+  getPercentileFromBenchmark,
+  benchmarkQueryKeys,
+  type PeerComparison,
+  type CommonStrength,
+  type CommonGap,
+  type PeerBenchmarkData,
+  type PeerBenchmarkResponse,
+} from './useBenchmarks';
+
+// ============ LEGACY ASSESSMENT HOOKS (DEPRECATED) ============
+// These are re-exported for backward compatibility but should be migrated to useQuizzes
+export {
+  useAssessmentResultsByCareer,
   useAssessmentQuestions,
   useStartAssessment,
   useSubmitTestResult,
   useSubmitAssessmentAnswers,
-  type AssessmentResult,
   type SubmitTestResultPayload,
   type StartAssessmentPayload,
-  type TestResult,
 } from './useAssessments';

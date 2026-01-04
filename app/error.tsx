@@ -1,64 +1,71 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { AlertTriangle, RefreshCw, Home } from "lucide-react";
-import Link from "next/link";
+import { useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 
-export default function Error({
-  error,
-  reset,
-}: {
+interface ErrorProps {
   error: Error & { digest?: string };
   reset: () => void;
-}) {
+}
+
+/**
+ * Global error page for Next.js App Router.
+ * This catches errors in the app and displays a friendly error page.
+ */
+export default function Error({ error, reset }: ErrorProps) {
   useEffect(() => {
-    // Log the error to an error reporting service
-    console.error("Application error:", error);
+    // Log the error to console (in production, send to error tracking)
+    console.error('Application error:', error);
   }, [error]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-destructive/5 to-orange/5 flex items-center justify-center p-4">
-      <div className="max-w-md w-full text-center space-y-8">
-        {/* Error Icon */}
-        <div className="flex justify-center">
-          <div className="w-24 h-24 rounded-full bg-destructive/10 flex items-center justify-center">
-            <AlertTriangle className="w-12 h-12 text-destructive" />
+    <div className="min-h-screen flex items-center justify-center p-4 bg-background">
+      <Card className="max-w-md w-full">
+        <CardHeader className="text-center">
+          <div className="mx-auto mb-4 w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center">
+            <AlertTriangle className="h-8 w-8 text-destructive" />
           </div>
-        </div>
-
-        {/* Content */}
-        <div className="space-y-4">
-          <h1 className="text-2xl sm:text-3xl font-display font-bold text-foreground">
-            Something went wrong
-          </h1>
-          <p className="text-muted-foreground text-base max-w-sm mx-auto">
-            We encountered an unexpected error. Please try again or return to the home page.
+          <CardTitle className="text-2xl">Something went wrong</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <p className="text-muted-foreground text-center">
+            We encountered an unexpected error. Please try again or return to the dashboard.
           </p>
-          {process.env.NODE_ENV === "development" && error.message && (
-            <div className="mt-4 p-4 bg-destructive/10 rounded-lg text-left">
+          
+          {process.env.NODE_ENV === 'development' && (
+            <div className="p-4 bg-muted rounded-lg">
               <p className="text-xs font-mono text-destructive break-all">
                 {error.message}
               </p>
+              {error.digest && (
+                <p className="text-xs font-mono text-muted-foreground mt-2">
+                  Digest: {error.digest}
+                </p>
+              )}
             </div>
           )}
-        </div>
-
-        {/* Actions */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-          <Button size="lg" onClick={reset} className="w-full sm:w-auto">
-            <RefreshCw className="w-4 h-4 mr-2" />
-            Try Again
-          </Button>
-          <Button variant="outline" size="lg" asChild className="w-full sm:w-auto">
-            <Link href="/">
-              <Home className="w-4 h-4 mr-2" />
-              Go to Home
-            </Link>
-          </Button>
-        </div>
-      </div>
+          
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Button
+              variant="outline"
+              onClick={reset}
+              className="flex-1"
+            >
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Try Again
+            </Button>
+            <Button
+              onClick={() => window.location.href = '/dashboard'}
+              className="flex-1"
+            >
+              <Home className="h-4 w-4 mr-2" />
+              Go to Dashboard
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
-

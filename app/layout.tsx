@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Poppins, Inter, Space_Mono, Lora } from 'next/font/google';
 import { QueryProvider } from '@/lib/query';
 import { AuthProvider, CareerProvider } from '@/components/providers';
+import { ErrorBoundary } from '@/components/ui/error-boundary';
 import { Toaster } from 'sonner';
 import './globals.css';
 
@@ -49,14 +50,16 @@ export default function RootLayout({
 		<html lang='en'>
 			<body
 				className={`${poppins.variable} ${inter.variable} ${spaceMono.variable} ${lora.variable} font-sans antialiased`}>
-				<QueryProvider>
-					<AuthProvider>
-						<CareerProvider>
-							{children}
-							<Toaster richColors position='top-center' />
-						</CareerProvider>
-					</AuthProvider>
-				</QueryProvider>
+				<ErrorBoundary>
+					<QueryProvider>
+						<AuthProvider>
+							<CareerProvider>
+								{children}
+								<Toaster richColors position='top-center' />
+							</CareerProvider>
+						</AuthProvider>
+					</QueryProvider>
+				</ErrorBoundary>
 			</body>
 		</html>
 	);

@@ -1,6 +1,7 @@
 "use client";
 
-import { useSearchParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -8,16 +9,56 @@ import { Progress } from "@/components/ui/progress";
 import ScrollReveal from "@/components/ui/scroll-reveal";
 import { 
   CheckCircle2, XCircle, ArrowLeft, Home, RefreshCcw, 
-  Trophy, Target, Clock, BarChart3 
+  Trophy, Target, Clock, BarChart3, BookOpen, TrendingUp, Loader2
 } from "lucide-react";
+import type { QuizSubmitResponse, QuestionResult } from "@/hooks";
+
+interface StoredQuizResult extends QuizSubmitResponse {
+  level: string;
+  specialisation: string;
+  timeTaken: number;
+}
 
 export default function SoftSkillsResultsPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
+  const [loading, setLoading] = useState(true);
+  const [quizResult, setQuizResult] = useState<StoredQuizResult | null>(null);
 
-  const score = parseInt(searchParams.get("score") || "0");
-  const timeTaken = parseInt(searchParams.get("timeTaken") || "0");
-  const passed = searchParams.get("passed") === "true";
+  useEffect(() => {
+    const storedData = sessionStorage.getItem("quizResult");
+    if (storedData) {
+      const data = JSON.parse(storedData) as StoredQuizResult;
+      setQuizResult(data);
+      setLoading(false);
+      // Clear session storage after reading
+      sessionStorage.removeItem("quizResult");
+    } else {
+      router.push("/soft-skills");
+    }
+  }, [router]);
+
+  if (loading || !quizResult) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  const { 
+    percentage, 
+    passed, 
+    correct_count, 
+    total_count, 
+    question_results,
+    readiness,
+    feedback,
+    quiz_title,
+    passing_score,
+    timeTaken,
+  } = quizResult;
+
+  const score = Math.round(percentage);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -40,13 +81,33 @@ export default function SoftSkillsResultsPage() {
     return "More work needed. Review the skills and try again.";
   };
 
-  const skillBreakdown = [
-    { name: "Communication", score: Math.min(100, score + Math.floor(Math.random() * 15) - 5) },
-    { name: "Teamwork", score: Math.min(100, score + Math.floor(Math.random() * 15) - 5) },
-    { name: "Problem Solving", score: Math.min(100, score + Math.floor(Math.random() * 15) - 5) },
-    { name: "Time Management", score: Math.min(100, score + Math.floor(Math.random() * 15) - 5) },
-    { name: "Leadership", score: Math.min(100, score + Math.floor(Math.random() * 15) - 5) },
-  ];
+  const getRecommendations = () => {
+    // Use backend feedback if available
+    if (feedback?.recommendations && feedback.recommendations.length > 0) {
+      return feedback.recommendations;
+    }
+    
+    // Fallback recommendations based on score
+    if (score < 70) {
+      return [
+        "Review communication and active listening techniques",
+        "Practice conflict resolution scenarios",
+        "Focus on team collaboration exercises",
+      ];
+    } else if (score < 85) {
+      return [
+        "Continue developing your leadership capabilities",
+        "Explore advanced time management techniques",
+        "Practice giving and receiving constructive feedback",
+      ];
+    } else {
+      return [
+        "Consider mentoring others in soft skills development",
+        "Focus on advanced leadership and strategic thinking",
+        "Share your expertise with team members",
+      ];
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -66,7 +127,7 @@ export default function SoftSkillsResultsPage() {
               {passed ? "Congratulations!" : "Keep Practicing!"}
             </h1>
             <p className="text-muted-foreground text-lg">
-              {getScoreMessage(score)}
+              {feedback?.overall || getScoreMessage(score)}
             </p>
           </div>
         </ScrollReveal>
@@ -99,96 +160,199 @@ export default function SoftSkillsResultsPage() {
                   <p className="text-sm text-muted-foreground mb-2">Questions</p>
                   <div className="flex items-center justify-center gap-2">
                     <Target className="h-6 w-6 text-primary" />
-                    <p className="text-3xl font-bold">20</p>
+                    <p className="text-3xl font-bold">{correct_count}/{total_count}</p>
                   </div>
+                  <p className="text-xs text-muted-foreground mt-1">correct</p>
                 </div>
               </div>
             </CardContent>
           </Card>
         </ScrollReveal>
 
-        <ScrollReveal delay={0.2}>
+        {/* Readiness Scores */}
+        <ScrollReveal delay={0.15}>
           <Card className="mb-6">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <BarChart3 className="h-5 w-5 text-primary" />
-                Skills Breakdown
+                Readiness Scores
               </CardTitle>
               <CardDescription>
-                Your performance across different soft skill areas
+                Your updated overall readiness after this assessment
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {skillBreakdown.map((skill) => (
-                  <div key={skill.name}>
-                    <div className="flex justify-between items-center mb-1">
-                      <span className="text-sm font-medium">{skill.name}</span>
-                      <span className={`text-sm font-bold ${getScoreColor(skill.score)}`}>
-                        {skill.score}%
-                      </span>
-                    </div>
-                    <Progress value={skill.score} className="h-2" />
+              <div className="grid md:grid-cols-3 gap-4">
+                <div>
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="text-sm font-medium">Overall</span>
+                    <span className={`text-sm font-bold ${getScoreColor(readiness.overall)}`}>
+                      {Math.round(readiness.overall)}%
+                    </span>
                   </div>
-                ))}
+                  <Progress value={readiness.overall} className="h-2" />
+                </div>
+                <div>
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="text-sm font-medium">Technical</span>
+                    <span className={`text-sm font-bold ${getScoreColor(readiness.technical)}`}>
+                      {Math.round(readiness.technical)}%
+                    </span>
+                  </div>
+                  <Progress value={readiness.technical} className="h-2" />
+                </div>
+                <div>
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="text-sm font-medium">Soft Skills</span>
+                    <span className={`text-sm font-bold ${getScoreColor(readiness.soft)}`}>
+                      {Math.round(readiness.soft)}%
+                    </span>
+                  </div>
+                  <Progress value={readiness.soft} className="h-2" />
+                </div>
               </div>
             </CardContent>
           </Card>
         </ScrollReveal>
 
-        <ScrollReveal delay={0.3}>
-          <Card className="mb-8">
+        {/* Feedback Section */}
+        <ScrollReveal delay={0.2}>
+          <Card className="mb-6">
             <CardHeader>
-              <CardTitle>Recommendations</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5 text-primary" />
+                Personalized Feedback
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <ul className="space-y-3">
-                {score < 70 && (
-                  <>
-                    <li className="flex items-start gap-2">
-                      <span className="text-primary">•</span>
-                      <span>Review communication and active listening techniques</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-primary">•</span>
-                      <span>Practice conflict resolution scenarios</span>
-                    </li>
-                  </>
+              <div className="space-y-4">
+                {feedback?.strengths && (
+                  <div>
+                    <h3 className="font-semibold mb-2">Strengths</h3>
+                    <p className="text-muted-foreground">{feedback.strengths}</p>
+                  </div>
                 )}
-                {score >= 70 && score < 85 && (
-                  <>
-                    <li className="flex items-start gap-2">
-                      <span className="text-primary">•</span>
-                      <span>Continue developing your leadership capabilities</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-primary">•</span>
-                      <span>Explore advanced time management techniques</span>
-                    </li>
-                  </>
+                {feedback?.weaknesses && (
+                  <div>
+                    <h3 className="font-semibold mb-2">Areas for Improvement</h3>
+                    <p className="text-muted-foreground">{feedback.weaknesses}</p>
+                  </div>
                 )}
-                {score >= 85 && (
-                  <>
-                    <li className="flex items-start gap-2">
-                      <span className="text-primary">•</span>
-                      <span>Consider mentoring others in soft skills development</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-primary">•</span>
-                      <span>Focus on advanced leadership and strategic thinking</span>
-                    </li>
-                  </>
-                )}
-                <li className="flex items-start gap-2">
-                  <span className="text-primary">•</span>
-                  <span>Apply these skills in real-world professional scenarios</span>
-                </li>
-              </ul>
+                <div>
+                  <h3 className="font-semibold mb-2">Recommendations</h3>
+                  <ul className="space-y-2">
+                    {getRecommendations().map((rec, index) => (
+                      <li key={index} className="flex items-start gap-2 text-muted-foreground">
+                        <span className="text-primary">•</span>
+                        <span>{rec}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </ScrollReveal>
 
-        <ScrollReveal delay={0.4}>
+        {/* Question Review */}
+        {question_results && question_results.length > 0 && (
+          <ScrollReveal delay={0.25}>
+            <Card className="mb-6">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <BookOpen className="h-5 w-5 text-primary" />
+                  Question Review
+                </CardTitle>
+                <CardDescription>
+                  Review each question, your answer, and the correct answer
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-6">
+                  {question_results.map((result: QuestionResult, index: number) => (
+                    <div key={result.question_id} className="border-b pb-6 last:border-0">
+                      <div className="flex items-start justify-between mb-3">
+                        <h3 className="font-semibold text-lg">
+                          Question {index + 1}
+                        </h3>
+                        {result.is_correct ? (
+                          <Badge className="bg-primary/10 text-primary border-primary/20">
+                            <CheckCircle2 className="h-3 w-3 mr-1" />
+                            Correct
+                          </Badge>
+                        ) : (
+                          <Badge className="bg-destructive/10 text-destructive border-destructive/20">
+                            <XCircle className="h-3 w-3 mr-1" />
+                            Incorrect
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="mb-4">{result.question_text}</p>
+                      <div className="space-y-2 mb-4">
+                        {result.options.map((option) => {
+                          const isUserAnswer = option.key === result.user_answer;
+                          const isCorrectAnswer = option.is_correct;
+                          return (
+                            <div
+                              key={option.key}
+                              className={`p-3 rounded-lg border-2 ${
+                                isCorrectAnswer
+                                  ? "border-primary bg-primary/10"
+                                  : isUserAnswer
+                                  ? "border-destructive bg-destructive/10"
+                                  : "border-border"
+                              }`}
+                            >
+                              <div className="flex items-center gap-2">
+                                {isCorrectAnswer && (
+                                  <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />
+                                )}
+                                {isUserAnswer && !isCorrectAnswer && (
+                                  <XCircle className="h-4 w-4 text-destructive shrink-0" />
+                                )}
+                                <span className="font-medium mr-2">{option.key}.</span>
+                                <span
+                                  className={
+                                    isCorrectAnswer
+                                      ? "font-semibold text-primary"
+                                      : isUserAnswer
+                                      ? "font-semibold text-destructive"
+                                      : ""
+                                  }
+                                >
+                                  {option.text}
+                                </span>
+                                {isCorrectAnswer && (
+                                  <Badge className="ml-auto bg-primary text-primary-foreground shrink-0">
+                                    Correct
+                                  </Badge>
+                                )}
+                                {isUserAnswer && !isCorrectAnswer && (
+                                  <Badge className="ml-auto bg-destructive text-destructive-foreground shrink-0">
+                                    Your Answer
+                                  </Badge>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                      {result.explanation && (
+                        <div className="bg-primary/10 p-3 rounded-lg">
+                          <p className="text-sm text-foreground">
+                            <strong>Explanation:</strong> {result.explanation}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </ScrollReveal>
+        )}
+
+        <ScrollReveal delay={0.3}>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button
               variant="outline"
@@ -211,4 +375,3 @@ export default function SoftSkillsResultsPage() {
     </div>
   );
 }
-

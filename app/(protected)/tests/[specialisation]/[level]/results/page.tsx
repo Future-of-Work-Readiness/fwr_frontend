@@ -3,31 +3,18 @@
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useAuth } from "@/components/providers";
-import { useCareerStore } from "@/stores/useCareerStore";
-import { useSubmitTestResult } from "@/hooks";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Loader2, ArrowLeft, CheckCircle2, XCircle, Clock, Target, TrendingUp, BookOpen } from "lucide-react";
 import { formatSpecialisation, SKILL_LEVELS } from "@/lib/constants";
-import { toast } from "sonner";
+import type { QuizSubmitResponse, QuestionResult, ReadinessSnapshot } from "@/hooks";
 
-interface Question {
-  id: string;
-  text: string;
-  options: string[];
-  correctAnswer: number;
-  explanation: string;
-}
-
-interface TestResultsState {
-  questions: Question[];
-  answers: number[];
-  score: number;
-  timeTaken: number;
+interface StoredQuizResult extends QuizSubmitResponse {
   level: string;
   specialisation: string;
+  timeTaken: number;
 }
 
 export default function TestResultsPage() {
@@ -36,68 +23,25 @@ export default function TestResultsPage() {
   const specialisation = params.specialisation as string;
   const level = params.level as string;
   
-  const { user, isLoading: authLoading } = useAuth();
-  const { currentCareer, updateCareer } = useCareerStore();
-  const submitResultMutation = useSubmitTestResult();
+  const { isLoading: authLoading } = useAuth();
   
   const [loading, setLoading] = useState(true);
-  const [testData, setTestData] = useState<TestResultsState | null>(null);
-  const [resultsSaved, setResultsSaved] = useState(false);
+  const [quizResult, setQuizResult] = useState<StoredQuizResult | null>(null);
 
   useEffect(() => {
-    const storedData = sessionStorage.getItem("testResults");
+    const storedData = sessionStorage.getItem("quizResult");
     if (storedData) {
-      const data = JSON.parse(storedData) as TestResultsState;
-      setTestData(data);
+      const data = JSON.parse(storedData) as StoredQuizResult;
+      setQuizResult(data);
       setLoading(false);
+      // Clear session storage after reading
+      sessionStorage.removeItem("quizResult");
     } else {
       router.push("/technical-skills");
     }
   }, [router]);
 
-  // Save results when test data is loaded
-  useEffect(() => {
-    const saveResults = async () => {
-      if (testData && user && currentCareer && !resultsSaved) {
-        try {
-          const passed = testData.score >= 70;
-          
-          await submitResultMutation.mutateAsync({
-            careerId: currentCareer.id,
-            specialisation: testData.specialisation,
-            level: testData.level,
-            score: testData.score,
-            passed,
-            timeTaken: testData.timeTaken,
-            questionsCount: testData.questions.length,
-          });
-
-          // Update career scores on pass
-          if (passed && currentCareer) {
-            const newTechnicalScore = Math.max(currentCareer.technicalScore, testData.score);
-            const newReadinessScore = Math.round((newTechnicalScore + currentCareer.softSkillScore) / 2);
-            
-            updateCareer(currentCareer.id, {
-              technicalScore: newTechnicalScore,
-              readinessScore: newReadinessScore,
-            });
-            
-            toast.success("Your career scores have been updated!");
-          }
-
-          setResultsSaved(true);
-          // Clear session storage
-          sessionStorage.removeItem("testResults");
-        } catch (error) {
-          console.error("Failed to save results:", error);
-        }
-      }
-    };
-
-    saveResults();
-  }, [testData, user, currentCareer, resultsSaved, submitResultMutation, updateCareer]);
-
-  if (authLoading || loading || !testData) {
+  if (authLoading || loading || !quizResult) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -105,8 +49,22 @@ export default function TestResultsPage() {
     );
   }
 
-  const { questions, answers, score, timeTaken, level: testLevel, specialisation: testSpec } = testData;
-  const passed = score >= 70;
+  const { 
+    percentage, 
+    passed, 
+    correct_count, 
+    total_count, 
+    question_results,
+    readiness,
+    feedback,
+    quiz_title,
+    passing_score,
+    timeTaken,
+    level: testLevel,
+    specialisation: testSpec,
+  } = quizResult;
+
+  const score = Math.round(percentage);
   const levelDisplay = testLevel.charAt(0).toUpperCase() + testLevel.slice(1);
 
   const formatTime = (seconds: number) => {
@@ -116,6 +74,12 @@ export default function TestResultsPage() {
   };
 
   const getRecommendations = () => {
+    // Use backend feedback if available
+    if (feedback?.recommendations && feedback.recommendations.length > 0) {
+      return feedback.recommendations;
+    }
+    
+    // Fallback recommendations
     if (score >= 90) {
       return [
         "Excellent performance! Consider moving to the next level.",
@@ -163,7 +127,7 @@ export default function TestResultsPage() {
             Test Results
           </h1>
           <p className="text-muted-foreground text-lg">
-            {formatSpecialisation(testSpec)} – {levelDisplay}
+            {quiz_title || `${formatSpecialisation(testSpec)} – ${levelDisplay}`}
           </p>
         </div>
 
@@ -182,7 +146,7 @@ export default function TestResultsPage() {
                     {passed ? "Passed" : "Not Passed"}
                   </h2>
                   <p className="text-muted-foreground">
-                    Score: {score}% (Minimum: 70%)
+                    Score: {score}% (Minimum: {passing_score}%)
                   </p>
                 </div>
               </div>
@@ -198,11 +162,11 @@ export default function TestResultsPage() {
         <div className="grid md:grid-cols-3 gap-4 mb-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-sm font-medium">Overall</CardTitle>
+              <CardTitle className="text-sm font-medium">Overall Readiness</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold mb-2">{score}%</div>
-              <Progress value={score} />
+              <div className="text-3xl font-bold mb-2">{Math.round(readiness.overall)}%</div>
+              <Progress value={readiness.overall} />
             </CardContent>
           </Card>
           <Card>
@@ -210,8 +174,8 @@ export default function TestResultsPage() {
               <CardTitle className="text-sm font-medium">Technical</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold mb-2">{score}%</div>
-              <Progress value={score} />
+              <div className="text-3xl font-bold mb-2">{Math.round(readiness.technical)}%</div>
+              <Progress value={readiness.technical} />
             </CardContent>
           </Card>
           <Card>
@@ -219,8 +183,10 @@ export default function TestResultsPage() {
               <CardTitle className="text-sm font-medium">Soft Skills</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold mb-2">--</div>
-              <Progress value={0} />
+              <div className="text-3xl font-bold mb-2">
+                {readiness.soft > 0 ? `${Math.round(readiness.soft)}%` : "--"}
+              </div>
+              <Progress value={readiness.soft} />
             </CardContent>
           </Card>
         </div>
@@ -234,10 +200,10 @@ export default function TestResultsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid md:grid-cols-3 gap-4">
+            <div className="grid md:grid-cols-4 gap-4">
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Questions Answered</p>
-                <p className="text-lg font-semibold">{questions.length}</p>
+                <p className="text-sm text-muted-foreground mb-1">Questions</p>
+                <p className="text-lg font-semibold">{correct_count} / {total_count} correct</p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Time Taken</p>
@@ -249,6 +215,12 @@ export default function TestResultsPage() {
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Difficulty Level</p>
                 <Badge>{levelDisplay}</Badge>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">Status</p>
+                <Badge variant={passed ? "default" : "destructive"}>
+                  {passed ? "Passed" : "Failed"}
+                </Badge>
               </div>
             </div>
           </CardContent>
@@ -264,14 +236,24 @@ export default function TestResultsPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div>
-                <h3 className="font-semibold mb-2">Improvement Advice</h3>
-                <p className="text-muted-foreground">
-                  {score >= 70
-                    ? "You've demonstrated a solid understanding of the concepts. Continue building on this foundation and explore more advanced topics."
-                    : "Focus on reviewing the fundamental concepts. Take your time to understand each topic thoroughly before moving forward."}
-                </p>
-              </div>
+              {feedback?.overall && (
+                <div>
+                  <h3 className="font-semibold mb-2">Summary</h3>
+                  <p className="text-muted-foreground">{feedback.overall}</p>
+                </div>
+              )}
+              {feedback?.strengths && (
+                <div>
+                  <h3 className="font-semibold mb-2">Strengths</h3>
+                  <p className="text-muted-foreground">{feedback.strengths}</p>
+                </div>
+              )}
+              {feedback?.weaknesses && (
+                <div>
+                  <h3 className="font-semibold mb-2">Areas for Improvement</h3>
+                  <p className="text-muted-foreground">{feedback.weaknesses}</p>
+                </div>
+              )}
               <div>
                 <h3 className="font-semibold mb-2">Recommendations</h3>
                 <ul className="list-disc list-inside space-y-1 text-muted-foreground">
@@ -285,31 +267,29 @@ export default function TestResultsPage() {
         </Card>
 
         {/* Question Review */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <BookOpen className="h-5 w-5" />
-              Question Review
-            </CardTitle>
-            <CardDescription>
-              Review each question, your answer, and the correct answer
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-6">
-              {questions.map((question, index) => {
-                const userAnswer = answers[index];
-                const isCorrect = userAnswer === question.correctAnswer;
-                return (
-                  <div key={question.id} className="border-b pb-6 last:border-0">
+        {question_results && question_results.length > 0 && (
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BookOpen className="h-5 w-5" />
+                Question Review
+              </CardTitle>
+              <CardDescription>
+                Review each question, your answer, and the correct answer
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                {question_results.map((result: QuestionResult, index: number) => (
+                  <div key={result.question_id} className="border-b pb-6 last:border-0">
                     <div className="flex items-start justify-between mb-3">
                       <h3 className="font-semibold text-lg">
                         Question {index + 1}
                       </h3>
-                      {isCorrect ? (
+                      {result.is_correct ? (
                         <Badge className="bg-primary/10 text-primary border-primary/20">
                           <CheckCircle2 className="h-3 w-3 mr-1" />
-                          Correct
+                          Correct (+{result.earned_points} pts)
                         </Badge>
                       ) : (
                         <Badge className="bg-destructive/10 text-destructive border-destructive/20">
@@ -318,14 +298,14 @@ export default function TestResultsPage() {
                         </Badge>
                       )}
                     </div>
-                    <p className="mb-4">{question.text}</p>
+                    <p className="mb-4">{result.question_text}</p>
                     <div className="space-y-2 mb-4">
-                      {question.options.map((option, optIndex) => {
-                        const isUserAnswer = userAnswer === optIndex;
-                        const isCorrectAnswer = optIndex === question.correctAnswer;
+                      {result.options.map((option) => {
+                        const isUserAnswer = option.key === result.user_answer;
+                        const isCorrectAnswer = option.is_correct;
                         return (
                           <div
-                            key={optIndex}
+                            key={option.key}
                             className={`p-3 rounded-lg border-2 ${
                               isCorrectAnswer
                                 ? "border-primary bg-primary/10"
@@ -341,6 +321,7 @@ export default function TestResultsPage() {
                               {isUserAnswer && !isCorrectAnswer && (
                                 <XCircle className="h-4 w-4 text-destructive shrink-0" />
                               )}
+                              <span className="font-medium mr-2">{option.key}.</span>
                               <span
                                 className={
                                   isCorrectAnswer
@@ -350,34 +331,45 @@ export default function TestResultsPage() {
                                     : ""
                                 }
                               >
-                                {option}
+                                {option.text}
                               </span>
                               {isCorrectAnswer && (
-                                <Badge className="ml-auto bg-primary text-primary-foreground shrink-0">Correct Answer</Badge>
+                                <Badge className="ml-auto bg-primary text-primary-foreground shrink-0">
+                                  Correct Answer
+                                </Badge>
                               )}
                               {isUserAnswer && !isCorrectAnswer && (
-                                <Badge className="ml-auto bg-destructive text-destructive-foreground shrink-0">Your Answer</Badge>
+                                <Badge className="ml-auto bg-destructive text-destructive-foreground shrink-0">
+                                  Your Answer
+                                </Badge>
                               )}
                             </div>
+                            {option.rationale && isCorrectAnswer && (
+                              <p className="text-sm text-muted-foreground mt-2 ml-6">
+                                {option.rationale}
+                              </p>
+                            )}
                           </div>
                         );
                       })}
                     </div>
-                    <div className="bg-primary/10 p-3 rounded-lg">
-                      <p className="text-sm text-foreground">
-                        <strong>Explanation:</strong> {question.explanation}
-                      </p>
-                    </div>
+                    {result.explanation && (
+                      <div className="bg-primary/10 p-3 rounded-lg">
+                        <p className="text-sm text-foreground">
+                          <strong>Explanation:</strong> {result.explanation}
+                        </p>
+                      </div>
+                    )}
                   </div>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-4">
-          {getNextLevel() && (
+          {passed && getNextLevel() && (
             <Button
               onClick={() => router.push(`/tests/${testSpec}/${getNextLevel()}`)}
               className="flex-1 bg-primary hover:bg-primary/90"
@@ -404,4 +396,3 @@ export default function TestResultsPage() {
     </div>
   );
 }
-
