@@ -14,8 +14,20 @@ import { dispatchAuthEvent } from '@/lib/auth/events';
  */
 
 // Your external backend URL
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+const getApiBaseUrl = (): string => {
+  const url = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+  
+  // Force HTTPS in production (except for localhost)
+  if (typeof window !== 'undefined' && 
+      window.location.protocol === 'https:' && 
+      !url.includes('localhost')) {
+    return url.replace(/^http:/, 'https:');
+  }
+  
+  return url;
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 // Storage key for auth tokens (matching existing Zustand store)
 const AUTH_STORAGE_KEY = 'fwr-auth-storage';
