@@ -138,7 +138,7 @@ export default function BenchmarkingPage() {
         <main className="flex-1 p-4 lg:p-8 pt-8">
           <div className="max-w-6xl mx-auto space-y-8">
             <ScrollReveal>
-              <div className="mb-8">
+              <div className="mb-6 sm:mb-8">
                 <Button
                   variant="ghost"
                   onClick={() => router.push("/dashboard")}
@@ -147,10 +147,10 @@ export default function BenchmarkingPage() {
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Back to Dashboard
                 </Button>
-                <h1 className="text-2xl lg:text-3xl font-display font-bold mb-2">
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-display font-bold mb-2">
                   Peer Benchmarking
                 </h1>
-                <p className="text-muted-foreground">
+                <p className="text-muted-foreground text-sm sm:text-base">
                   Compare your performance with peers in your specialization
                 </p>
               </div>
@@ -210,31 +210,31 @@ export default function BenchmarkingPage() {
                 {/* Summary Card */}
                 <ScrollReveal>
                   <Card className="bg-white border-0 shadow-md">
-                    <CardHeader>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <Trophy className="h-5 w-5 text-primary" />
+                    <CardHeader className="pb-2 sm:pb-4">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <div className="flex items-center gap-2 sm:gap-3">
+                          <Trophy className="h-4 w-4 sm:h-5 sm:w-5 text-primary shrink-0" />
                           <div>
-                            <CardTitle className="text-lg">Your Standing</CardTitle>
-                            <CardDescription>
+                            <CardTitle className="text-base sm:text-lg">Your Standing</CardTitle>
+                            <CardDescription className="text-xs sm:text-sm">
                               {peerBenchmark.specialization_name || "Your Specialization"}
                             </CardDescription>
                           </div>
                         </div>
-                        <Badge variant="secondary" className="flex items-center gap-1">
+                        <Badge variant="secondary" className="flex items-center gap-1 w-fit text-xs">
                           <Users className="h-3 w-3" />
                           {peerBenchmark.total_peers} peers
                         </Badge>
                       </div>
                     </CardHeader>
                     <CardContent>
-                      <div className="text-center mb-6">
-                        <p className="text-sm text-muted-foreground mb-2">Overall Percentile</p>
-                        <p className="text-5xl font-bold text-primary">
+                      <div className="text-center mb-4 sm:mb-6">
+                        <p className="text-xs sm:text-sm text-muted-foreground mb-2">Overall Percentile</p>
+                        <p className="text-4xl sm:text-5xl font-bold text-primary">
                           {peerBenchmark.overall_percentile}
-                          <span className="text-2xl">%</span>
+                          <span className="text-xl sm:text-2xl">%</span>
                         </p>
-                        <p className="text-sm text-muted-foreground mt-1">
+                        <p className="text-xs sm:text-sm text-muted-foreground mt-1">
                           Better than {peerBenchmark.overall_percentile}% of peers
                         </p>
                       </div>
@@ -245,26 +245,26 @@ export default function BenchmarkingPage() {
                 {/* Detailed Comparisons */}
                 <ScrollReveal delay={0.1}>
                   <Card className="bg-white border-0 shadow-md">
-                    <CardHeader>
-                      <div className="flex items-center gap-3">
-                        <BarChart3 className="h-5 w-5 text-primary" />
-                        <CardTitle className="text-lg">Score Comparison</CardTitle>
+                    <CardHeader className="pb-2 sm:pb-4">
+                      <div className="flex items-center gap-2 sm:gap-3">
+                        <BarChart3 className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+                        <CardTitle className="text-base sm:text-lg">Score Comparison</CardTitle>
                       </div>
                     </CardHeader>
                     <CardContent>
-                      <div className="space-y-6">
+                      <div className="space-y-5 sm:space-y-6">
                         {peerBenchmark.comparisons.map((comparison) => (
                           <div key={comparison.category} className="space-y-2">
-                            <div className="flex items-center justify-between">
-                              <span className="font-medium">{comparison.category}</span>
-                              <Badge className={getStatusColor(comparison.status)}>
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-2">
+                              <span className="text-sm sm:text-base font-medium">{comparison.category}</span>
+                              <Badge className={`${getStatusColor(comparison.status)} text-xs w-fit`}>
                                 {comparison.status === "above" ? "Above Average" : 
                                  comparison.status === "below" ? "Below Average" : "Average"}
                               </Badge>
                             </div>
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-2 gap-3 sm:gap-4">
                               <div>
-                                <div className="flex justify-between text-sm mb-1">
+                                <div className="flex justify-between text-xs sm:text-sm mb-1">
                                   <span className="text-muted-foreground">Your Score</span>
                                   <span className="font-semibold text-primary">
                                     {comparison.your_score}%
@@ -273,8 +273,8 @@ export default function BenchmarkingPage() {
                                 <Progress value={comparison.your_score} className="h-2" />
                               </div>
                               <div>
-                                <div className="flex justify-between text-sm mb-1">
-                                  <span className="text-muted-foreground">Peer Average</span>
+                                <div className="flex justify-between text-xs sm:text-sm mb-1">
+                                  <span className="text-muted-foreground">Peer Avg</span>
                                   <span className="font-semibold text-orange">
                                     {comparison.peer_average}%
                                   </span>
@@ -285,8 +285,8 @@ export default function BenchmarkingPage() {
                                 />
                               </div>
                             </div>
-                            <p className="text-xs text-muted-foreground">
-                              Percentile: Top {100 - comparison.percentile}% (Better than {comparison.percentile}% of peers)
+                            <p className="text-[10px] sm:text-xs text-muted-foreground">
+                              Better than {comparison.percentile}% of peers
                             </p>
                           </div>
                         ))}
@@ -462,14 +462,14 @@ export default function BenchmarkingPage() {
             {/* Take More Tests CTA */}
             <ScrollReveal delay={0.25}>
               <Card className="border-primary/30 bg-gradient-to-br from-primary/10 to-transparent">
-                <CardContent className="p-6 text-center">
-                  <h3 className="font-semibold mb-2">Improve Your Ranking</h3>
-                  <p className="text-sm text-muted-foreground mb-4">
+                <CardContent className="p-4 sm:p-6 text-center">
+                  <h3 className="text-sm sm:text-base font-semibold mb-2">Improve Your Ranking</h3>
+                  <p className="text-xs sm:text-sm text-muted-foreground mb-4">
                     Complete additional assessments to improve your scores and climb the rankings
                   </p>
-                  <Button variant="outline" asChild>
+                  <Button variant="outline" asChild size="sm" className="text-xs sm:text-sm">
                     <Link href="/technical-skills">
-                      Go to Tests <ArrowRight className="h-4 w-4 ml-2" />
+                      Go to Tests <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 ml-2" />
                     </Link>
                   </Button>
                 </CardContent>
@@ -479,14 +479,14 @@ export default function BenchmarkingPage() {
             {/* Goals CTA */}
             <ScrollReveal delay={0.3}>
               <Card className="border-orange/30 bg-gradient-to-br from-orange/10 to-transparent">
-                <CardContent className="p-6 text-center">
-                  <h3 className="font-semibold mb-2">Ready to set your goals?</h3>
-                  <p className="text-sm text-muted-foreground mb-4">
+                <CardContent className="p-4 sm:p-6 text-center">
+                  <h3 className="text-sm sm:text-base font-semibold mb-2">Ready to set your goals?</h3>
+                  <p className="text-xs sm:text-sm text-muted-foreground mb-4">
                     Use these insights to define your personal development objectives
                   </p>
-                  <Button asChild>
+                  <Button asChild size="sm" className="text-xs sm:text-sm">
                     <Link href="/goals">
-                      Set Goals <ArrowRight className="h-4 w-4 ml-2" />
+                      Set Goals <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 ml-2" />
                     </Link>
                   </Button>
                 </CardContent>

@@ -144,24 +144,24 @@ export default function SoftSkillsResultsPage() {
 	};
 
 	return (
-		<div className='min-h-screen bg-background'>
-			<div className='max-w-4xl mx-auto p-4 lg:p-8 pt-8'>
+		<div className='min-h-screen bg-background overflow-x-hidden'>
+			<div className='max-w-4xl mx-auto px-3 sm:px-4 lg:px-8 py-4 lg:py-8'>
 				<ScrollReveal>
-					<div className='text-center mb-8'>
+					<div className='text-center mb-6 sm:mb-8'>
 						<div
-							className={`inline-flex items-center justify-center w-20 h-20 rounded-full mb-4 ${
+							className={`inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full mb-4 ${
 								passed ? 'bg-green-100' : 'bg-destructive/10'
 							}`}>
 							{passed ? (
-								<CheckCircle2 className='h-10 w-10 text-green-600' />
+								<CheckCircle2 className='h-8 w-8 sm:h-10 sm:w-10 text-green-600' />
 							) : (
-								<XCircle className='h-10 w-10 text-destructive' />
+								<XCircle className='h-8 w-8 sm:h-10 sm:w-10 text-destructive' />
 							)}
 						</div>
-						<h1 className='text-3xl lg:text-4xl font-display font-bold mb-2'>
+						<h1 className='text-2xl sm:text-3xl lg:text-4xl font-display font-bold mb-2'>
 							{passed ? 'Congratulations!' : 'Keep Practicing!'}
 						</h1>
-						<p className='text-muted-foreground text-lg'>
+						<p className='text-muted-foreground text-sm sm:text-lg px-2'>
 							{feedback?.overall || getScoreMessage(score)}
 						</p>
 					</div>
@@ -169,45 +169,45 @@ export default function SoftSkillsResultsPage() {
 
 				<ScrollReveal delay={0.1}>
 					<Card className='mb-6'>
-						<CardHeader>
-							<CardTitle className='flex items-center gap-2'>
-								<Trophy className='h-5 w-5 text-primary' />
+						<CardHeader className='px-3 sm:px-6'>
+							<CardTitle className='flex items-center gap-2 text-base sm:text-lg'>
+								<Trophy className='h-5 w-5 text-primary shrink-0' />
 								Your Results
 							</CardTitle>
 						</CardHeader>
-						<CardContent>
-							<div className='grid md:grid-cols-3 gap-6'>
-								<div className='text-center p-6 bg-muted/50 rounded-xl'>
-									<p className='text-sm text-muted-foreground mb-2'>
+						<CardContent className='px-3 sm:px-6'>
+							<div className='grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6'>
+								<div className='text-center p-4 sm:p-6 bg-muted/50 rounded-xl'>
+									<p className='text-xs sm:text-sm text-muted-foreground mb-2'>
 										Overall Score
 									</p>
-									<p className={`text-5xl font-bold ${getScoreColor(score)}`}>
+									<p className={`text-4xl sm:text-5xl font-bold ${getScoreColor(score)}`}>
 										{score}%
 									</p>
 									<Badge
 										variant={passed ? 'default' : 'destructive'}
-										className='mt-2'>
+										className='mt-2 text-xs'>
 										{passed ? 'PASSED' : 'NOT PASSED'}
 									</Badge>
 								</div>
-								<div className='text-center p-6 bg-muted/50 rounded-xl'>
-									<p className='text-sm text-muted-foreground mb-2'>
+								<div className='text-center p-4 sm:p-6 bg-muted/50 rounded-xl'>
+									<p className='text-xs sm:text-sm text-muted-foreground mb-2'>
 										Time Taken
 									</p>
 									<div className='flex items-center justify-center gap-2'>
-										<Clock className='h-6 w-6 text-primary' />
-										<p className='text-3xl font-bold'>
+										<Clock className='h-5 w-5 sm:h-6 sm:w-6 text-primary shrink-0' />
+										<p className='text-2xl sm:text-3xl font-bold'>
 											{formatTime(timeTaken)}
 										</p>
 									</div>
 								</div>
-								<div className='text-center p-6 bg-muted/50 rounded-xl'>
-									<p className='text-sm text-muted-foreground mb-2'>
+								<div className='text-center p-4 sm:p-6 bg-muted/50 rounded-xl'>
+									<p className='text-xs sm:text-sm text-muted-foreground mb-2'>
 										Questions
 									</p>
 									<div className='flex items-center justify-center gap-2'>
-										<Target className='h-6 w-6 text-primary' />
-										<p className='text-3xl font-bold'>
+										<Target className='h-5 w-5 sm:h-6 sm:w-6 text-primary shrink-0' />
+										<p className='text-2xl sm:text-3xl font-bold'>
 											{correct_count}/{total_count}
 										</p>
 									</div>
@@ -221,22 +221,22 @@ export default function SoftSkillsResultsPage() {
 				{/* Readiness Scores */}
 				<ScrollReveal delay={0.15}>
 					<Card className='mb-6'>
-						<CardHeader>
-							<CardTitle className='flex items-center gap-2'>
-								<BarChart3 className='h-5 w-5 text-primary' />
+						<CardHeader className='px-3 sm:px-6'>
+							<CardTitle className='flex items-center gap-2 text-base sm:text-lg'>
+								<BarChart3 className='h-5 w-5 text-primary shrink-0' />
 								Readiness Scores
 							</CardTitle>
-							<CardDescription>
+							<CardDescription className='text-xs sm:text-sm'>
 								Your updated overall readiness after this assessment
 							</CardDescription>
 						</CardHeader>
-						<CardContent>
-							<div className='grid md:grid-cols-3 gap-4'>
+						<CardContent className='px-3 sm:px-6'>
+							<div className='grid grid-cols-1 sm:grid-cols-3 gap-4'>
 								<div>
 									<div className='flex justify-between items-center mb-1'>
-										<span className='text-sm font-medium'>Overall</span>
+										<span className='text-xs sm:text-sm font-medium'>Overall</span>
 										<span
-											className={`text-sm font-bold ${getScoreColor(
+											className={`text-xs sm:text-sm font-bold ${getScoreColor(
 												readiness.overall
 											)}`}>
 											{Math.round(readiness.overall)}%
@@ -246,9 +246,9 @@ export default function SoftSkillsResultsPage() {
 								</div>
 								<div>
 									<div className='flex justify-between items-center mb-1'>
-										<span className='text-sm font-medium'>Technical</span>
+										<span className='text-xs sm:text-sm font-medium'>Technical</span>
 										<span
-											className={`text-sm font-bold ${getScoreColor(
+											className={`text-xs sm:text-sm font-bold ${getScoreColor(
 												readiness.technical
 											)}`}>
 											{Math.round(readiness.technical)}%
@@ -258,9 +258,9 @@ export default function SoftSkillsResultsPage() {
 								</div>
 								<div>
 									<div className='flex justify-between items-center mb-1'>
-										<span className='text-sm font-medium'>Soft Skills</span>
+										<span className='text-xs sm:text-sm font-medium'>Soft Skills</span>
 										<span
-											className={`text-sm font-bold ${getScoreColor(
+											className={`text-xs sm:text-sm font-bold ${getScoreColor(
 												readiness.soft
 											)}`}>
 											{Math.round(readiness.soft)}%
@@ -315,40 +315,40 @@ export default function SoftSkillsResultsPage() {
 				{/* Question Review */}
 				{question_results && question_results.length > 0 && (
 					<ScrollReveal delay={0.25}>
-						<Card className='mb-6'>
-							<CardHeader>
-								<CardTitle className='flex items-center gap-2'>
-									<BookOpen className='h-5 w-5 text-primary' />
+						<Card className='mb-6 overflow-hidden'>
+							<CardHeader className='px-3 sm:px-6'>
+								<CardTitle className='flex items-center gap-2 text-base sm:text-lg'>
+									<BookOpen className='h-5 w-5 text-primary shrink-0' />
 									Question Review
 								</CardTitle>
-								<CardDescription>
+								<CardDescription className='text-xs sm:text-sm'>
 									Review each question, your answer, and the correct answer
 								</CardDescription>
 							</CardHeader>
-							<CardContent>
+							<CardContent className='px-3 sm:px-6'>
 								<div className='space-y-6'>
 									{question_results.map(
 										(result: QuestionResult, index: number) => (
 											<div
 												key={result.question_id}
 												className='border-b pb-6 last:border-0'>
-												<div className='flex items-start justify-between mb-3'>
-													<h3 className='font-semibold text-lg'>
+												<div className='flex flex-col sm:flex-row sm:items-start justify-between gap-2 mb-3'>
+													<h3 className='font-semibold text-base sm:text-lg'>
 														Question {index + 1}
 													</h3>
 													{result.is_correct ? (
-														<Badge className='bg-primary/10 text-primary border-primary/20'>
+														<Badge className='bg-primary/10 text-primary border-primary/20 w-fit text-xs'>
 															<CheckCircle2 className='h-3 w-3 mr-1' />
 															Correct
 														</Badge>
 													) : (
-														<Badge className='bg-destructive/10 text-destructive border-destructive/20'>
+														<Badge className='bg-destructive/10 text-destructive border-destructive/20 w-fit text-xs'>
 															<XCircle className='h-3 w-3 mr-1' />
 															Incorrect
 														</Badge>
 													)}
 												</div>
-												<p className='mb-4'>{result.question_text}</p>
+												<p className='mb-4 text-sm sm:text-base break-words'>{result.question_text}</p>
 												<div className='space-y-2 mb-4'>
 													{result.options.map((option) => {
 														const isUserAnswer =
@@ -357,51 +357,59 @@ export default function SoftSkillsResultsPage() {
 														return (
 															<div
 																key={option.key}
-																className={`p-3 rounded-lg border-2 ${
+																className={`p-2 sm:p-3 rounded-lg border-2 ${
 																	isCorrectAnswer
 																		? 'border-primary bg-primary/10'
 																		: isUserAnswer
 																		? 'border-destructive bg-destructive/10'
 																		: 'border-border'
 																}`}>
-																<div className='flex items-center gap-2'>
-																	{isCorrectAnswer && (
-																		<CheckCircle2 className='h-4 w-4 text-primary shrink-0' />
-																	)}
-																	{isUserAnswer && !isCorrectAnswer && (
-																		<XCircle className='h-4 w-4 text-destructive shrink-0' />
-																	)}
-																	<span className='font-medium mr-2'>
-																		{option.key}.
-																	</span>
-																	<span
-																		className={
-																			isCorrectAnswer
-																				? 'font-semibold text-primary'
-																				: isUserAnswer
-																				? 'font-semibold text-destructive'
-																				: ''
-																		}>
-																		{option.text}
-																	</span>
-																	{isCorrectAnswer && (
-																		<Badge className='ml-auto bg-primary text-primary-foreground shrink-0'>
-																			Correct
-																		</Badge>
-																	)}
-																	{isUserAnswer && !isCorrectAnswer && (
-																		<Badge className='ml-auto bg-destructive text-destructive-foreground shrink-0'>
-																			Your Answer
-																		</Badge>
-																	)}
+																<div className='flex items-start gap-2'>
+																	<div className='flex items-center gap-1 shrink-0 pt-0.5'>
+																		{isCorrectAnswer && (
+																			<CheckCircle2 className='h-4 w-4 text-primary' />
+																		)}
+																		{isUserAnswer && !isCorrectAnswer && (
+																			<XCircle className='h-4 w-4 text-destructive' />
+																		)}
+																		<span className='font-medium text-sm'>
+																			{option.key}.
+																		</span>
+																	</div>
+																	<div className='flex-1 min-w-0'>
+																		<span
+																			className={`text-sm sm:text-base break-words ${
+																				isCorrectAnswer
+																					? 'font-semibold text-primary'
+																					: isUserAnswer
+																					? 'font-semibold text-destructive'
+																					: ''
+																			}`}>
+																			{option.text}
+																		</span>
+																		{(isCorrectAnswer || (isUserAnswer && !isCorrectAnswer)) && (
+																			<div className='mt-1'>
+																				{isCorrectAnswer && (
+																					<Badge className='bg-primary text-primary-foreground text-[10px] sm:text-xs'>
+																						Correct
+																					</Badge>
+																				)}
+																				{isUserAnswer && !isCorrectAnswer && (
+																					<Badge className='bg-destructive text-destructive-foreground text-[10px] sm:text-xs'>
+																						Your Answer
+																					</Badge>
+																				)}
+																			</div>
+																		)}
+																	</div>
 																</div>
 															</div>
 														);
 													})}
 												</div>
 												{result.explanation && (
-													<div className='bg-primary/10 p-3 rounded-lg'>
-														<p className='text-sm text-foreground'>
+													<div className='bg-primary/10 p-2 sm:p-3 rounded-lg'>
+														<p className='text-xs sm:text-sm text-foreground break-words'>
 															<strong>Explanation:</strong> {result.explanation}
 														</p>
 													</div>

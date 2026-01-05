@@ -129,7 +129,7 @@ export default function GoalsPage() {
         <main className="flex-1 p-4 lg:p-8 pt-8">
           <div className="max-w-6xl mx-auto space-y-8">
             <ScrollReveal>
-              <div className="mb-8">
+              <div className="mb-6 sm:mb-8">
                 <Button
                   variant="ghost"
                   onClick={() => router.push("/dashboard")}
@@ -138,10 +138,10 @@ export default function GoalsPage() {
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Back to Dashboard
                 </Button>
-                <h1 className="text-2xl lg:text-3xl font-display font-bold mb-2">
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-display font-bold mb-2">
                   Self-Reflection & Goal Setting
                 </h1>
-                <p className="text-muted-foreground">
+                <p className="text-muted-foreground text-sm sm:text-base">
                   Set meaningful goals and track your progress towards career readiness
                 </p>
               </div>
@@ -152,38 +152,38 @@ export default function GoalsPage() {
               {/* Where I Am Now */}
               <ScrollReveal>
                 <Card className="h-full">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Target className="h-5 w-5 text-primary" />
+                  <CardHeader className="pb-2 sm:pb-4">
+                    <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                      <Target className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                       Where I Am Now
                     </CardTitle>
-                    <CardDescription>
+                    <CardDescription className="text-xs sm:text-sm">
                       Key insights from your readiness assessment
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div className="p-4 rounded-lg bg-primary/10 border border-primary/20">
+                    <div className="p-3 sm:p-4 rounded-lg bg-primary/10 border border-primary/20">
                       <div className="flex justify-between items-center mb-2">
-                        <span className="text-sm font-medium">
+                        <span className="text-xs sm:text-sm font-medium">
                           {currentCareer?.specialisation
                             ? `${formatSpecialisation(currentCareer.specialisation)} Readiness`
                             : "Overall Readiness"}
                         </span>
-                        <span className="text-sm font-bold text-primary">
+                        <span className="text-xs sm:text-sm font-bold text-primary">
                           {currentCareer?.readinessScore || 0}%
                         </span>
                       </div>
                       <Progress value={currentCareer?.readinessScore || 0} className="h-2" />
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="p-3 rounded-lg bg-muted/50">
+                    <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                      <div className="p-2 sm:p-3 rounded-lg bg-muted/50">
                         <p className="text-xs text-muted-foreground mb-1">Technical Score</p>
-                        <p className="text-lg font-bold">{currentCareer?.technicalScore || 0}%</p>
+                        <p className="text-base sm:text-lg font-bold">{currentCareer?.technicalScore || 0}%</p>
                       </div>
-                      <div className="p-3 rounded-lg bg-muted/50">
+                      <div className="p-2 sm:p-3 rounded-lg bg-muted/50">
                         <p className="text-xs text-muted-foreground mb-1">Soft Skills Score</p>
-                        <p className="text-lg font-bold">{currentCareer?.softSkillScore || 0}%</p>
+                        <p className="text-base sm:text-lg font-bold">{currentCareer?.softSkillScore || 0}%</p>
                       </div>
                     </div>
                   </CardContent>
@@ -193,22 +193,23 @@ export default function GoalsPage() {
               {/* Where I Want To Be */}
               <ScrollReveal delay={0.1}>
                 <Card className="h-full">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2 justify-between">
+                  <CardHeader className="pb-2 sm:pb-4">
+                    <CardTitle className="flex items-center gap-2 justify-between text-base sm:text-lg">
                       <span className="flex items-center gap-2">
-                        <Target className="h-5 w-5 text-orange" />
-                        Where I Want To Be
+                        <Target className="h-4 w-4 sm:h-5 sm:w-5 text-orange" />
+                        <span className="text-sm sm:text-base">Where I Want To Be</span>
                       </span>
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => setShowAddGoal(!showAddGoal)}
+                        className="text-xs sm:text-sm"
                       >
-                        <Plus className="h-4 w-4 mr-1" />
+                        <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                         Add Goal
                       </Button>
                     </CardTitle>
-                    <CardDescription>
+                    <CardDescription className="text-xs sm:text-sm">
                       Define your objectives and track progress
                     </CardDescription>
                   </CardHeader>
@@ -340,12 +341,12 @@ export default function GoalsPage() {
             {/* Self-Reflection Journal */}
             <ScrollReveal delay={0.2}>
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <BookOpen className="h-5 w-5 text-primary" />
+                <CardHeader className="pb-2 sm:pb-4">
+                  <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                    <BookOpen className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                     Self-Reflection Journal
                   </CardTitle>
-                  <CardDescription>
+                  <CardDescription className="text-xs sm:text-sm">
                     Take a moment to reflect on your learning journey
                   </CardDescription>
                 </CardHeader>

@@ -259,8 +259,8 @@ export default function TestPage() {
 
   // Quiz taking screen
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-4xl mx-auto p-4 lg:p-8 pt-8">
+    <div className="min-h-screen bg-background overflow-x-hidden">
+      <div className="max-w-4xl mx-auto px-3 sm:px-4 lg:px-8 py-4 lg:py-8">
         <Button
           variant="ghost"
           onClick={() => {
@@ -298,26 +298,28 @@ export default function TestPage() {
         </div>
 
         {/* Question Card */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="text-lg sm:text-xl">
+        <Card className="mb-6 overflow-hidden">
+          <CardHeader className="px-3 sm:px-6">
+            <CardTitle className="text-base sm:text-lg md:text-xl leading-relaxed break-words">
               {currentQuestion?.question_text}
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="px-3 sm:px-6">
             <div className="space-y-3">
               {currentQuestion?.options.map((option) => (
                 <button
                   key={option.key}
                   onClick={() => handleAnswerSelect(option.key)}
-                  className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
+                  className={`w-full text-left p-3 sm:p-4 rounded-lg border-2 transition-all ${
                     selectedAnswers.get(currentQuestion.question_id) === option.key
                       ? "border-primary bg-primary/10"
                       : "border-border hover:border-primary/50"
                   }`}
                 >
-                  <span className="font-medium mr-3">{option.key}.</span>
-                  {option.text}
+                  <div className="flex items-start gap-2 sm:gap-3">
+                    <span className="font-medium text-primary shrink-0">{option.key}.</span>
+                    <span className="break-words text-sm sm:text-base">{option.text}</span>
+                  </div>
                 </button>
               ))}
             </div>
