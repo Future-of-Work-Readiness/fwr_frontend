@@ -13,6 +13,7 @@ interface SpecialisationSelectionProps {
   onSelect: (specialization: Specialization) => void;
   onBack: () => void;
   isLoading: boolean;
+  excludedSpecialisations?: string[];
 }
 
 const SpecialisationSelection = ({ 
@@ -20,10 +21,16 @@ const SpecialisationSelection = ({
   branchName,
   onSelect, 
   onBack, 
-  isLoading: isSubmitting
+  isLoading: isSubmitting,
+  excludedSpecialisations = []
 }: SpecialisationSelectionProps) => {
   const [selected, setSelected] = useState<string | null>(null);
   const { data: specializations, isLoading, error } = useSpecializationsQuery(branchId);
+  
+  // Filter out already-selected specializations
+  const availableSpecializations = specializations?.filter(
+    spec => !excludedSpecialisations.includes(spec.name.toUpperCase())
+  );
 
   const handleSelect = (spec: Specialization) => {
     setSelected(spec.specialization_id);
@@ -94,40 +101,55 @@ const SpecialisationSelection = ({
         </ScrollReveal>
 
         <div className="space-y-4">
-          {specializations?.map((spec, index) => {
-            const isSelected = selected === spec.specialization_id;
+          {availableSpecializations && availableSpecializations.length > 0 ? (
+            availableSpecializations.map((spec, index) => {
+              const isSelected = selected === spec.specialization_id;
 
-            return (
-              <ScrollReveal key={spec.specialization_id} delay={index * 0.03}>
-                <Card
-                  className={`cursor-pointer border-2 transition-all duration-300 hover:shadow-lg group h-full ${
-                    isSelected 
-                      ? "border-orange bg-orange/5" 
-                      : "border-transparent hover:border-primary"
-                  } ${isSubmitting && isSelected ? "opacity-70" : ""}`}
-                  onClick={() => !isSubmitting && handleSelect(spec)}
-                >
-                  <CardContent className="p-6">
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1">
-                        <h3 className={`font-semibold text-lg mb-2 transition-colors ${
-                          isSelected ? "text-orange" : "group-hover:text-primary"
-                        }`}>
-                          {formatSpecializationName(spec.name)}
-                        </h3>
-                        <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
-                          {spec.description || `Specialise in ${formatSpecializationName(spec.name)}.`}
-                        </p>
+              return (
+                <ScrollReveal key={spec.specialization_id} delay={index * 0.03}>
+                  <Card
+                    className={`cursor-pointer border-2 transition-all duration-300 hover:shadow-lg group h-full ${
+                      isSelected 
+                        ? "border-orange bg-orange/5" 
+                        : "border-transparent hover:border-primary"
+                    } ${isSubmitting && isSelected ? "opacity-70" : ""}`}
+                    onClick={() => !isSubmitting && handleSelect(spec)}
+                  >
+                    <CardContent className="p-6">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1">
+                          <h3 className={`font-semibold text-lg mb-2 transition-colors ${
+                            isSelected ? "text-orange" : "group-hover:text-primary"
+                          }`}>
+                            {formatSpecializationName(spec.name)}
+                          </h3>
+                          <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
+                            {spec.description || `Specialise in ${formatSpecializationName(spec.name)}.`}
+                          </p>
+                        </div>
+                        {isSubmitting && isSelected && (
+                          <Loader2 className="h-5 w-5 animate-spin text-orange shrink-0" />
+                        )}
                       </div>
-                      {isSubmitting && isSelected && (
-                        <Loader2 className="h-5 w-5 animate-spin text-orange shrink-0" />
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              </ScrollReveal>
-            );
-          })}
+                    </CardContent>
+                  </Card>
+                </ScrollReveal>
+              );
+            })
+          ) : (
+            <div className="text-center py-8">
+              <p className="text-primary-foreground/70">
+                You already have all available careers in this field.
+              </p>
+              <Button 
+                variant="secondary" 
+                onClick={onBack} 
+                className="mt-4"
+              >
+                Choose a Different Field
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </div>

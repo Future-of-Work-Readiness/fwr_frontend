@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/components/providers";
 import { useCareerStore } from "@/stores/useCareerStore";
-import { useCareerDashboardQuery } from "@/hooks";
+import { useCareerDashboardQuery, useSpecificCareerDashboardQuery } from "@/hooks";
 import { ReadinessGauge, QuickAccessCard } from "@/components/dashboard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -18,9 +18,31 @@ export default function DashboardPage() {
   const router = useRouter();
   const { user, isAuthenticated, isLoading: authLoading, isFetching: authFetching } = useAuth();
   const { currentCareer, careers, isLoading: careerLoading } = useCareerStore();
-  const { data: dashboardData, isLoading: dashboardLoading } = useCareerDashboardQuery({
-    enabled: !!user?.onboardingCompleted,
+  
+  // Determine if we should fetch a specific career's dashboard
+  // If currentCareer is set and is NOT the primary, fetch its specific dashboard
+  const shouldFetchSpecific = currentCareer && !currentCareer.isPrimary;
+  
+  // Fetch primary career dashboard (used when no specific career is selected or for primary)
+  const { 
+    data: primaryDashboardData, 
+    isLoading: primaryDashboardLoading 
+  } = useCareerDashboardQuery({
+    enabled: !!user?.onboardingCompleted && !shouldFetchSpecific,
   });
+  
+  // Fetch specific career dashboard (used when a non-primary career is selected)
+  const { 
+    data: specificDashboardData, 
+    isLoading: specificDashboardLoading 
+  } = useSpecificCareerDashboardQuery(currentCareer?.id || '', {
+    enabled: !!user?.onboardingCompleted && !!shouldFetchSpecific,
+  });
+  
+  // Use the appropriate dashboard data
+  const dashboardData = shouldFetchSpecific ? specificDashboardData : primaryDashboardData;
+  const dashboardLoading = shouldFetchSpecific ? specificDashboardLoading : primaryDashboardLoading;
+  
   const [isNewUser, setIsNewUser] = useState(false);
 
   // Use dashboard data if available, fallback to career store

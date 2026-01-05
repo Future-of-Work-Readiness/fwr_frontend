@@ -45,6 +45,9 @@ export function AuthGuard({ children }: AuthGuardProps) {
   // Handle logout
   const handleLogout = useCallback(
     (detail: { reason?: 'user' | 'expired' | 'error' }) => {
+      // Dismiss any session-expired toast since this is an intentional logout
+      toast.dismiss('session-expired');
+      
       if (detail.reason === 'user') {
         toast.success('You have been logged out successfully.', {
           id: 'logout-success',

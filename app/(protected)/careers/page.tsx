@@ -137,7 +137,7 @@ export default function CareersPage() {
 												Readiness Score
 											</span>
 											<span className='text-2xl font-bold text-primary'>
-												{career.readinessScore || 0}
+												{career.readinessScore || 0}%
 											</span>
 										</div>
 									</div>

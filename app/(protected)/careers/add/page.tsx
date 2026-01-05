@@ -4,10 +4,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/providers";
 import { useCareerStore } from "@/stores/useCareerStore";
-import { useAddCareer } from "@/hooks";
+import { useAddCareer, useCareersQuery, type Sector, type Branch, type Specialization } from "@/hooks/api";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
-import { SectorType, TechnologyFieldType } from "@/lib/constants";
 import {
   SectorSelection,
   FieldSelection,
@@ -21,36 +20,43 @@ export default function AddCareerPage() {
   const { user, isLoading: authLoading } = useAuth();
   const { setCurrentCareer } = useCareerStore();
   const [step, setStep] = useState<AddCareerStep>("sector");
-  const [sector, setSector] = useState<SectorType | null>(null);
-  const [field, setField] = useState<TechnologyFieldType | null>(null);
+  const [selectedSector, setSelectedSector] = useState<Sector | null>(null);
+  const [selectedBranch, setSelectedBranch] = useState<Branch | null>(null);
 
   const addCareerMutation = useAddCareer();
+  
+  // Get existing careers to prevent duplicates
+  const { data: existingCareers } = useCareersQuery();
+  const existingSpecialisations = existingCareers?.map(c => c.specialisation?.toUpperCase()) || [];
 
-  const handleSectorSelect = (selectedSector: SectorType) => {
-    setSector(selectedSector);
-    if (selectedSector === "technology") {
-      setStep("field");
-    } else {
-      setStep("specialisation");
-    }
+  const handleSectorSelect = (sector: Sector) => {
+    setSelectedSector(sector);
+    // All sectors go to field selection (step 2) to pick a branch
+    setStep("field");
   };
 
-  const handleFieldSelect = (selectedField: TechnologyFieldType) => {
-    setField(selectedField);
+  const handleBranchSelect = (branch: Branch) => {
+    setSelectedBranch(branch);
     setStep("specialisation");
   };
 
-  const handleSpecialisationSelect = async (specialisation: string) => {
-    if (!user || !sector) {
+  const handleSpecialisationSelect = async (specialization: Specialization) => {
+    if (!user || !selectedSector) {
       toast.error("Missing user or sector information.");
+      return;
+    }
+
+    // Check if this career already exists
+    if (existingSpecialisations.includes(specialization.name.toUpperCase())) {
+      toast.error("You already have this career profile. Please select a different specialization.");
       return;
     }
 
     try {
       const result = await addCareerMutation.mutateAsync({
-        sector,
-        field: field || null,
-        specialisation,
+        sector: selectedSector.name as "technology" | "finance" | "health_social_care" | "education" | "construction",
+        field: selectedBranch?.name || null,
+        specialisation: specialization.name,
         is_primary: false, // New careers are not primary by default
       });
 
@@ -59,7 +65,7 @@ export default function AddCareerPage() {
         setCurrentCareer(result.career);
       }
       toast.success("Career profile created successfully!");
-      router.push("/dashboard");
+      router.push("/careers");
     } catch (error: unknown) {
       console.error("Error creating career:", error);
       const errorMessage = error instanceof Error ? error.message : "Unknown error";
@@ -68,16 +74,12 @@ export default function AddCareerPage() {
   };
 
   const handleBackFromField = () => {
-    setField(null);
+    setSelectedBranch(null);
     setStep("sector");
   };
 
   const handleBackFromSpecialisation = () => {
-    if (sector === "technology") {
-      setStep("field");
-    } else {
-      setStep("sector");
-    }
+    setStep("field");
   };
 
   const handleBackFromSector = () => {
@@ -96,19 +98,26 @@ export default function AddCareerPage() {
     case "sector":
       return <SectorSelection onSelect={handleSectorSelect} onBack={handleBackFromSector} />;
     case "field":
-      return <FieldSelection onSelect={handleFieldSelect} onBack={handleBackFromField} />;
+      return selectedSector ? (
+        <FieldSelection 
+          sectorId={selectedSector.sector_id} 
+          sectorName={selectedSector.name}
+          onSelect={handleBranchSelect} 
+          onBack={handleBackFromField} 
+        />
+      ) : null;
     case "specialisation":
-      return sector ? (
+      return selectedBranch ? (
         <SpecialisationSelection
-          sector={sector}
-          field={field || undefined}
+          branchId={selectedBranch.branch_id}
+          branchName={selectedBranch.name}
           onSelect={handleSpecialisationSelect}
           onBack={handleBackFromSpecialisation}
           isLoading={addCareerMutation.isPending}
+          excludedSpecialisations={existingSpecialisations}
         />
       ) : null;
     default:
       return null;
   }
 }
-

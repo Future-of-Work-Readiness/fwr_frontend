@@ -69,7 +69,8 @@ export const DashboardNav = () => {
           </p>
           <nav className="space-y-1">
             {navItems.map((item) => {
-              const isActive = pathname === item.href;
+              // Use startsWith for nested routes (e.g., /careers/add should highlight Careers)
+              const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
               return (
                 <Link
                   key={item.href}
@@ -124,7 +125,8 @@ export const DashboardNav = () => {
         {mobileMenuOpen && (
           <nav className="p-4 border-t border-border space-y-1 bg-card">
             {navItems.map((item) => {
-              const isActive = pathname === item.href;
+              // Use startsWith for nested routes (e.g., /careers/add should highlight Careers)
+              const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
               return (
                 <Link
                   key={item.href}

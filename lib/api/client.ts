@@ -126,11 +126,12 @@ function normalizeError(error: AxiosError<ApiResponse>): ApiError {
       (route) => currentPath === route || currentPath.startsWith(`${route}/`)
     );
 
-    // Don't dispatch for /users/me requests - those are expected to fail for guests
+    // Don't dispatch for auth-related requests that are expected to return 401
     const isAuthMeRequest = requestUrl.includes('/users/me');
+    const isLogoutRequest = requestUrl.includes('/users/logout');
 
-    // Only redirect when on a protected route and NOT for auth check requests
-    if (isOnProtectedRoute && !isAuthMeRequest) {
+    // Only redirect when on a protected route and NOT for expected 401 responses
+    if (isOnProtectedRoute && !isAuthMeRequest && !isLogoutRequest) {
       clearAuthStorage();
       dispatchAuthEvent('auth:session-expired', { returnUrl: currentPath });
     }
