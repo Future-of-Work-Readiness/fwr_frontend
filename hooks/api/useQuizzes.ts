@@ -128,10 +128,20 @@ export interface QuizFeedback {
  * Score impact information
  */
 export interface ScoreImpact {
+  // Required fields
   category: string;
   old_score: number;
   new_score: number;
   increase: number;
+  
+  // Optional metadata fields (for debugging/analytics/future use)
+  quiz_percentage?: number;
+  scoring_method?: string;
+  quiz_points?: number;
+  difficulty_level?: number;
+  level_multiplier?: number;
+  career_id?: string;
+  career_name?: string;
 }
 
 /**
@@ -747,5 +757,106 @@ export function useAllAssessmentResults(
   >
 ) {
   return useQuizHistoryAttemptsQuery(undefined, options);
+}
+
+
+// ============ QUIZ ATTEMPT SUMMARY ============
+
+/**
+ * Summary of attempts for a specific difficulty level
+ */
+export interface LevelAttemptSummary {
+  attempted: boolean;
+  passed?: boolean;
+  bestScore?: number;
+  attemptCount?: number;
+  lastAttemptAt?: string;
+}
+
+/**
+ * Backend response format for level attempt summary
+ */
+interface LevelAttemptSummaryBackend {
+  attempted: boolean;
+  passed?: boolean;
+  best_score?: number;
+  attempt_count?: number;
+  last_attempt_at?: string;
+}
+
+/**
+ * Response from GET /quizzes/attempts/summary
+ */
+export interface QuizAttemptSummaryResponse {
+  specializationName: string;
+  levels: Record<string, LevelAttemptSummary>;
+}
+
+/**
+ * Backend response format
+ */
+interface QuizAttemptSummaryResponseBackend {
+  specialization_name: string;
+  levels: Record<string, LevelAttemptSummaryBackend>;
+}
+
+/**
+ * Transform backend summary response to frontend format
+ */
+function transformAttemptSummary(
+  response: QuizAttemptSummaryResponseBackend
+): QuizAttemptSummaryResponse {
+  const levels: Record<string, LevelAttemptSummary> = {};
+  
+  for (const [level, data] of Object.entries(response.levels)) {
+    levels[level] = {
+      attempted: data.attempted,
+      passed: data.passed,
+      bestScore: data.best_score,
+      attemptCount: data.attempt_count,
+      lastAttemptAt: data.last_attempt_at,
+    };
+  }
+  
+  return {
+    specializationName: response.specialization_name,
+    levels,
+  };
+}
+
+/**
+ * Hook to fetch quiz attempt summary for a specialization.
+ * 
+ * Returns attempt status for each difficulty level (1-5):
+ * - attempted: Whether the user has attempted this level
+ * - passed: Whether the user passed (best attempt)
+ * - bestScore: Best percentage score achieved
+ * - attemptCount: Number of attempts at this level
+ * - lastAttemptAt: ISO timestamp of last attempt
+ * 
+ * @param specializationName - The specialization name (e.g., "FRONTEND_DEVELOPER")
+ * @param options - Additional query options
+ */
+export function useQuizAttemptSummary(
+  specializationName: string | undefined,
+  options?: Omit<
+    UseQueryOptions<QuizAttemptSummaryResponse, ApiError>,
+    'queryKey' | 'queryFn'
+  >
+) {
+  const { isAuthenticated } = useAuth();
+  
+  return useQuery<QuizAttemptSummaryResponse, ApiError>({
+    queryKey: [...quizQueryKeys.all, 'attempt-summary', specializationName],
+    queryFn: async () => {
+      const response = await api.get<QuizAttemptSummaryResponseBackend>(
+        `/quizzes/attempts/summary?specialization_name=${encodeURIComponent(specializationName!)}`
+      );
+      return transformAttemptSummary(response);
+    },
+    enabled: !!specializationName && isAuthenticated,
+    staleTime: 60 * 1000, // Cache for 1 minute
+    ...options,
+  });
 }
 

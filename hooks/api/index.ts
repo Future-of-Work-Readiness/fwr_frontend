@@ -72,6 +72,7 @@ export {
   useQuizHistoryQuery,
   useQuizHistoryAttemptsQuery,
   useQuizProgressQuery,
+  useQuizAttemptSummary,
   // Mutation hooks
   useStartQuiz,
   useSubmitQuiz,
@@ -99,6 +100,8 @@ export {
   type QuizHistoryFilters,
   type QuizProgress,
   type QuizProgressSave,
+  type LevelAttemptSummary,
+  type QuizAttemptSummaryResponse,
   // Legacy compatibility exports
   useAssessmentResults,
   useTestResults,

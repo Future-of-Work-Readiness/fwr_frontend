@@ -243,7 +243,7 @@ export default function TestResultsPage() {
         </Card>
 
         {/* Personalized Feedback */}
-        <Card className="mb-6">
+        {/* <Card className="mb-6">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <TrendingUp className="h-5 w-5" />
@@ -280,7 +280,7 @@ export default function TestResultsPage() {
               </div>
             </div>
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/* Question Review */}
         {question_results && question_results.length > 0 && (
