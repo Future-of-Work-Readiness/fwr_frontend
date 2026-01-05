@@ -104,7 +104,7 @@ export default function TechnicalSkillsPage() {
         <main className="flex-1 p-4 lg:p-8 pt-8">
           <div className="max-w-7xl mx-auto space-y-8">
             <ScrollReveal>
-              <div className="mb-8">
+              <div className="mb-6 sm:mb-8">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4 mb-4">
                   <Button
                     variant="ghost"
@@ -115,10 +115,10 @@ export default function TechnicalSkillsPage() {
                     Back to Dashboard
                   </Button>
                 </div>
-                <h1 className="text-3xl lg:text-4xl font-display font-bold mb-2 bg-gradient-to-r from-primary to-orange bg-clip-text text-transparent">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-display font-bold mb-2 bg-gradient-to-r from-primary to-orange bg-clip-text text-transparent">
                   Technical Skills Tests
                 </h1>
-                <p className="text-muted-foreground text-lg">
+                <p className="text-muted-foreground text-sm sm:text-base lg:text-lg">
                   {currentCareer?.specialisation 
                     ? `Tests tailored for ${formatSpecialisation(currentCareer.specialisation)}`
                     : "Complete your profile to see personalised tests"

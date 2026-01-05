@@ -222,10 +222,10 @@ export default function SoftSkillsPage() {
     return (
       <div className="min-h-screen bg-background">
         <div className="flex">
-          <main className="flex-1 p-4 lg:p-8 pt-8">
-            <div className="max-w-4xl mx-auto space-y-8">
+          <main className="flex-1 px-3 sm:px-4 lg:px-8 py-4 lg:py-8">
+            <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8">
               <ScrollReveal>
-                <div className="mb-8">
+                <div className="mb-6 sm:mb-8">
                   <Button
                     variant="ghost"
                     onClick={() => router.push("/dashboard")}
@@ -234,10 +234,10 @@ export default function SoftSkillsPage() {
                     <ArrowLeft className="h-4 w-4 mr-2" />
                     Back to Dashboard
                   </Button>
-                  <h1 className="text-3xl lg:text-4xl font-display font-bold mb-2 bg-gradient-to-r from-primary to-orange bg-clip-text text-transparent">
+                  <h1 className="text-2xl sm:text-3xl lg:text-4xl font-display font-bold mb-2 bg-gradient-to-r from-primary to-orange bg-clip-text text-transparent">
                     Soft Skills Assessment
                   </h1>
-                  <p className="text-muted-foreground text-lg">
+                  <p className="text-muted-foreground text-sm sm:text-base lg:text-lg">
                     Evaluate your interpersonal and professional skills
                   </p>
                 </div>
@@ -245,43 +245,43 @@ export default function SoftSkillsPage() {
 
               <ScrollReveal delay={0.1}>
                 <Card className="border-2">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Users className="h-6 w-6 text-primary" />
+                  <CardHeader className="pb-2 sm:pb-4">
+                    <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                      <Users className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
                       About This Assessment
                     </CardTitle>
-                    <CardDescription>
+                    <CardDescription className="text-xs sm:text-sm">
                       {quizData.description || "This comprehensive test evaluates your soft skills across multiple areas"}
                     </CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-6">
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div className="flex items-start gap-3 p-4 rounded-lg bg-muted/50">
-                        <Clock className="h-5 w-5 text-primary mt-0.5" />
+                  <CardContent className="space-y-4 sm:space-y-6">
+                    <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                      <div className="flex items-start gap-2 sm:gap-3 p-3 sm:p-4 rounded-lg bg-muted/50">
+                        <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-primary mt-0.5 shrink-0" />
                         <div>
-                          <p className="font-medium">Duration</p>
-                          <p className="text-sm text-muted-foreground">{quizData.time_limit_minutes} minutes</p>
+                          <p className="text-sm sm:text-base font-medium">Duration</p>
+                          <p className="text-xs sm:text-sm text-muted-foreground">{quizData.time_limit_minutes} mins</p>
                         </div>
                       </div>
-                      <div className="flex items-start gap-3 p-4 rounded-lg bg-muted/50">
-                        <MessageSquare className="h-5 w-5 text-primary mt-0.5" />
+                      <div className="flex items-start gap-2 sm:gap-3 p-3 sm:p-4 rounded-lg bg-muted/50">
+                        <MessageSquare className="h-4 w-4 sm:h-5 sm:w-5 text-primary mt-0.5 shrink-0" />
                         <div>
-                          <p className="font-medium">Questions</p>
-                          <p className="text-sm text-muted-foreground">{quizData.question_count} questions</p>
+                          <p className="text-sm sm:text-base font-medium">Questions</p>
+                          <p className="text-xs sm:text-sm text-muted-foreground">{quizData.question_count} questions</p>
                         </div>
                       </div>
-                      <div className="flex items-start gap-3 p-4 rounded-lg bg-muted/50">
-                        <Target className="h-5 w-5 text-primary mt-0.5" />
+                      <div className="flex items-start gap-2 sm:gap-3 p-3 sm:p-4 rounded-lg bg-muted/50">
+                        <Target className="h-4 w-4 sm:h-5 sm:w-5 text-primary mt-0.5 shrink-0" />
                         <div>
-                          <p className="font-medium">Passing Score</p>
-                          <p className="text-sm text-muted-foreground">{quizData.passing_score}% or higher</p>
+                          <p className="text-sm sm:text-base font-medium">Pass Score</p>
+                          <p className="text-xs sm:text-sm text-muted-foreground">{quizData.passing_score}%+</p>
                         </div>
                       </div>
-                      <div className="flex items-start gap-3 p-4 rounded-lg bg-muted/50">
-                        <TrendingUp className="h-5 w-5 text-primary mt-0.5" />
+                      <div className="flex items-start gap-2 sm:gap-3 p-3 sm:p-4 rounded-lg bg-muted/50">
+                        <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-primary mt-0.5 shrink-0" />
                         <div>
-                          <p className="font-medium">Skills Covered</p>
-                          <p className="text-sm text-muted-foreground">{skillsAreas.length} key areas</p>
+                          <p className="text-sm sm:text-base font-medium">Skills</p>
+                          <p className="text-xs sm:text-sm text-muted-foreground">{skillsAreas.length} key areas</p>
                         </div>
                       </div>
                     </div>
@@ -327,8 +327,8 @@ export default function SoftSkillsPage() {
 
   // Testing state
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-4xl mx-auto p-4 lg:p-8 pt-8">
+    <div className="min-h-screen bg-background overflow-x-hidden">
+      <div className="max-w-4xl mx-auto px-3 sm:px-4 lg:px-8 py-4 lg:py-8">
         {/* Header */}
         <div className="mb-6">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
@@ -354,24 +354,28 @@ export default function SoftSkillsPage() {
         </div>
 
         {/* Question Card */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="text-lg sm:text-xl">{currentQuestion?.question_text}</CardTitle>
+        <Card className="mb-6 overflow-hidden">
+          <CardHeader className="px-3 sm:px-6">
+            <CardTitle className="text-base sm:text-lg md:text-xl leading-relaxed break-words">
+              {currentQuestion?.question_text}
+            </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="px-3 sm:px-6">
             <div className="space-y-3">
               {currentQuestion?.options.map((option) => (
                 <button
                   key={option.key}
                   onClick={() => handleAnswerSelect(option.key)}
-                  className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
+                  className={`w-full text-left p-3 sm:p-4 rounded-lg border-2 transition-all ${
                     selectedAnswers.get(currentQuestion.question_id) === option.key
                       ? "border-primary bg-primary/10"
                       : "border-border hover:border-primary/50"
                   }`}
                 >
-                  <span className="font-medium mr-3">{option.key}.</span>
-                  {option.text}
+                  <div className="flex items-start gap-2 sm:gap-3">
+                    <span className="font-medium text-primary shrink-0">{option.key}.</span>
+                    <span className="break-words text-sm sm:text-base">{option.text}</span>
+                  </div>
                 </button>
               ))}
             </div>

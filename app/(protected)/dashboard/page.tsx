@@ -103,17 +103,17 @@ export default function DashboardPage() {
     <div className="space-y-8">
       {/* Header Section */}
       <ScrollReveal>
-        <div className="mb-8">
-          <h1 className="text-3xl lg:text-4xl font-display font-bold mb-2 bg-gradient-to-r from-primary to-orange bg-clip-text text-transparent">
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-display font-bold mb-2 bg-gradient-to-r from-primary to-orange bg-clip-text text-transparent">
             {welcomeMessage}
           </h1>
           {sector && specialisation && (
             <div className="flex items-center gap-2 mt-2 flex-wrap">
-              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary/10 text-primary border border-primary/20">
+              <span className="inline-flex items-center px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium bg-primary/10 text-primary border border-primary/20">
                 {SECTOR_LABELS[sector as SectorType] || sector}
               </span>
-              <span className="text-muted-foreground">•</span>
-              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-orange/10 text-orange border border-orange/20">
+              <span className="text-muted-foreground hidden sm:inline">•</span>
+              <span className="inline-flex items-center px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium bg-orange/10 text-orange border border-orange/20">
                 {formatSpecialisation(specialisation)}
               </span>
             </div>
@@ -145,21 +145,21 @@ export default function DashboardPage() {
         
         <ScrollReveal delay={0.25}>
           <Card className="border-2 border-primary/20 bg-white shadow-lg hover:shadow-xl transition-shadow">
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground mb-1">Goals Set</p>
-                  <p className="text-3xl font-bold text-primary">
+                  <p className="text-xs sm:text-sm font-medium text-muted-foreground mb-1">Goals Set</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-primary">
                     {dashboardLoading ? (
-                      <Loader2 className="h-6 w-6 animate-spin inline" />
+                      <Loader2 className="h-5 w-5 sm:h-6 sm:w-6 animate-spin inline" />
                     ) : (
                       goalsCount
                     )}
                   </p>
                   <p className="text-xs text-muted-foreground mt-1">Track your progress</p>
                 </div>
-                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
-                  <Target className="h-7 w-7 text-primary" />
+                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Target className="h-6 w-6 sm:h-7 sm:w-7 text-primary" />
                 </div>
               </div>
             </CardContent>
@@ -170,14 +170,14 @@ export default function DashboardPage() {
       {/* Readiness Score Card */}
       <ScrollReveal delay={0.3}>
         <Card className="border-2 border-primary/20 bg-gradient-to-br from-white to-primary/5 shadow-xl">
-          <CardHeader>
-            <CardTitle className="text-xl flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-primary" />
+          <CardHeader className="pb-2 sm:pb-4">
+            <CardTitle className="text-base sm:text-xl flex items-center gap-2">
+              <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
               My Readiness Score
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex justify-center py-6">
+            <div className="flex justify-center py-4 sm:py-6">
               <ReadinessGauge score={readinessScore} />
             </div>
           </CardContent>
@@ -187,26 +187,26 @@ export default function DashboardPage() {
       {/* Career Overview */}
       <ScrollReveal delay={0.35}>
         <Card className="border-2 border-primary/20 bg-white shadow-lg">
-          <CardHeader>
-            <CardTitle className="text-xl">Career Overview</CardTitle>
+          <CardHeader className="pb-2 sm:pb-4">
+            <CardTitle className="text-base sm:text-xl">Career Overview</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="p-4 rounded-lg bg-muted/30">
-                <p className="text-sm text-muted-foreground mb-1">Sector</p>
-                <p className="font-semibold capitalize">{sector?.replace(/_/g, " ") || "N/A"}</p>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+              <div className="p-3 sm:p-4 rounded-lg bg-muted/30">
+                <p className="text-xs sm:text-sm text-muted-foreground mb-1">Sector</p>
+                <p className="text-sm sm:text-base font-semibold capitalize truncate">{sector?.replace(/_/g, " ") || "N/A"}</p>
               </div>
-              <div className="p-4 rounded-lg bg-muted/30">
-                <p className="text-sm text-muted-foreground mb-1">Field</p>
-                <p className="font-semibold capitalize">{field?.replace(/_/g, " ") || "N/A"}</p>
+              <div className="p-3 sm:p-4 rounded-lg bg-muted/30">
+                <p className="text-xs sm:text-sm text-muted-foreground mb-1">Field</p>
+                <p className="text-sm sm:text-base font-semibold capitalize truncate">{field?.replace(/_/g, " ") || "N/A"}</p>
               </div>
-              <div className="p-4 rounded-lg bg-muted/30">
-                <p className="text-sm text-muted-foreground mb-1">Specialisation</p>
-                <p className="font-semibold">{specialisation ? formatSpecialisation(specialisation) : "N/A"}</p>
+              <div className="p-3 sm:p-4 rounded-lg bg-muted/30">
+                <p className="text-xs sm:text-sm text-muted-foreground mb-1">Specialisation</p>
+                <p className="text-sm sm:text-base font-semibold truncate">{specialisation ? formatSpecialisation(specialisation) : "N/A"}</p>
               </div>
-              <div className="p-4 rounded-lg bg-muted/30">
-                <p className="text-sm text-muted-foreground mb-1">Career Profiles</p>
-                <p className="font-semibold">{totalCareers}</p>
+              <div className="p-3 sm:p-4 rounded-lg bg-muted/30">
+                <p className="text-xs sm:text-sm text-muted-foreground mb-1">Career Profiles</p>
+                <p className="text-sm sm:text-base font-semibold">{totalCareers}</p>
               </div>
             </div>
           </CardContent>
