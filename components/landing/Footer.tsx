@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { ArrowUpRight } from 'lucide-react';
 
 const footerLinks = {
@@ -13,10 +14,9 @@ const footerLinks = {
 		// { name: "Careers", href: "#" },
 		{ name: 'Contact', href: '#' }
 	],
-	resources: [
-		{ name: 'Documentation', href: '#' },
-		{ name: 'Help Center', href: '#' },
-		{ name: 'API Reference', href: '#' }
+	legal: [
+		{ name: 'Privacy Policy', href: '/privacy' },
+		{ name: 'Terms of Service', href: '/terms' }
 	]
 };
 
@@ -110,13 +110,13 @@ const Footer = () => {
 						© {new Date().getFullYear()} ReadinessAI. All rights reserved.
 					</p>
 					<div className='flex gap-6'>
-						{['Privacy', 'Terms'].map((link) => (
-							<a
-								key={link}
-								href='#'
+						{footerLinks.legal.map((link) => (
+							<Link
+								key={link.name}
+								href={link.href}
 								className='text-white/40 hover:text-white text-sm transition-colors'>
-								{link}
-							</a>
+								{link.name}
+							</Link>
 						))}
 					</div>
 				</div>
