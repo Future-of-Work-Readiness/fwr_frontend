@@ -72,7 +72,7 @@ export default function TechnicalSkillsPage() {
   const { isLoading: authLoading } = useAuth();
   const { currentCareer, isLoading: careerLoading } = useCareerStore();
   
-  // Fetch attempt summary for the current specialization
+  // Fetch attempt summary for the current specialisation
   const { 
     data: attemptSummary, 
     isLoading: summaryLoading 

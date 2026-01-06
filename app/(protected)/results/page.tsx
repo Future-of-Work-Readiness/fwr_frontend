@@ -149,7 +149,7 @@ export default function ResultsPage() {
                     <p className="text-2xl font-bold text-primary">
                       {passedCount}
                     </p>
-                    <p className="text-sm text-muted-foreground">Passed (This Page)</p>
+                    <p className="text-sm text-muted-foreground">Passed</p>
                   </CardContent>
                 </Card>
                 <Card>
@@ -157,7 +157,7 @@ export default function ResultsPage() {
                     <p className="text-2xl font-bold text-orange">
                       {avgScore}%
                     </p>
-                    <p className="text-sm text-muted-foreground">Avg Score (This Page)</p>
+                    <p className="text-sm text-muted-foreground">Avg Score</p>
                   </CardContent>
                 </Card>
                 <Card>
@@ -167,7 +167,7 @@ export default function ResultsPage() {
                         ? Math.round((passedCount / assessmentHistory.length) * 100) 
                         : 0}%
                     </p>
-                    <p className="text-sm text-muted-foreground">Pass Rate (This Page)</p>
+                    <p className="text-sm text-muted-foreground">Pass Rate</p>
                   </CardContent>
                 </Card>
               </div>

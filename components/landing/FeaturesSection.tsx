@@ -14,7 +14,7 @@ const features = [
   {
     icon: Target,
     title: "Careers",
-    description: "Explore clearly defined career paths across sectors. Each career test is mapped to role-specific expectations used in assess candidates for the job market.",
+    description: "Explore clearly defined career paths across sectors. Each career test is mapped to role-specific expectations used in accessing candidates for the job market.",
     gradient: "from-primary to-orange",
   },
   {

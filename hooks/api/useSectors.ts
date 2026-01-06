@@ -1,5 +1,5 @@
 /**
- * Sector, Branch, and Specialization API hooks.
+ * Sector, Branch, and Specialisation API hooks.
  * Fetches career hierarchy data from the backend.
  */
 
@@ -78,7 +78,7 @@ export function useSectorsQuery() {
 }
 
 /**
- * Fetch complete hierarchy (all sectors with branches and specializations)
+ * Fetch complete hierarchy (all sectors with branches and specialisations)
  */
 export function useSectorsHierarchyQuery() {
   return useQuery({
@@ -140,7 +140,7 @@ export function useSectorHierarchyQuery(sectorId: string | null) {
 }
 
 /**
- * Fetch specializations for a specific branch
+ * Fetch specialisations for a specific branch
  */
 export function useSpecializationsQuery(branchId: string | null) {
   return useQuery({
@@ -158,7 +158,7 @@ export function useSpecializationsQuery(branchId: string | null) {
 // ============ HELPER FUNCTIONS ============
 
 /**
- * Format a specialization name for display
+ * Format a specialisation name for display
  * Converts SNAKE_CASE to Title Case
  */
 export function formatSpecializationName(name: string): string {

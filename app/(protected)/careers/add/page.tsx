@@ -58,7 +58,7 @@ export default function AddCareerPage() {
 		// Check if this career already exists
 		if (existingSpecialisations.includes(specialization.name.toUpperCase())) {
 			toast.error(
-				'You already have this career profile. Please select a different specialization.'
+				'You already have this career profile. Please select a different specialisation.'
 			);
 			return;
 		}
