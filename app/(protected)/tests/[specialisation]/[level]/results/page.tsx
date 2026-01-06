@@ -242,12 +242,12 @@ export default function TestResultsPage() {
           </CardContent>
         </Card>
 
-        {/* Personalized Feedback */}
+        {/* Personalised Feedback */}
         {/* <Card className="mb-6">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <TrendingUp className="h-5 w-5" />
-              Personalized Feedback
+              Personalised Feedback
             </CardTitle>
           </CardHeader>
           <CardContent>

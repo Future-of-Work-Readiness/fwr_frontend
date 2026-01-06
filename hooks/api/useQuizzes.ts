@@ -319,7 +319,7 @@ export const quizQueryKeys = {
 // ============ QUERIES ============
 
 /**
- * Fetch all quizzes, optionally filtered by specialization
+ * Fetch all quizzes, optionally filtered by specialisation
  */
 export function useQuizzesQuery(
   specializationId?: string,
@@ -345,7 +345,7 @@ export function useQuizzesQuery(
 }
 
 /**
- * Fetch quizzes by specialization ID
+ * Fetch quizzes by specialisation ID
  */
 export function useQuizzesBySpecializationQuery(
   specializationId: string,
@@ -388,7 +388,7 @@ export function useQuizDetailQuery(
 }
 
 /**
- * Find quiz by specialization name and difficulty level
+ * Find quiz by specialisation name and difficulty level
  */
 export function useFindQuizQuery(
   specializationName: string,
@@ -825,7 +825,7 @@ function transformAttemptSummary(
 }
 
 /**
- * Hook to fetch quiz attempt summary for a specialization.
+ * Hook to fetch quiz attempt summary for a specialisation.
  * 
  * Returns attempt status for each difficulty level (1-5):
  * - attempted: Whether the user has attempted this level
@@ -834,7 +834,7 @@ function transformAttemptSummary(
  * - attemptCount: Number of attempts at this level
  * - lastAttemptAt: ISO timestamp of last attempt
  * 
- * @param specializationName - The specialization name (e.g., "FRONTEND_DEVELOPER")
+ * @param specializationName - The specialisation name (e.g., "FRONTEND_DEVELOPER")
  * @param options - Additional query options
  */
 export function useQuizAttemptSummary(

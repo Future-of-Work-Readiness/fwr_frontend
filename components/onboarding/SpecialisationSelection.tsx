@@ -27,7 +27,7 @@ const SpecialisationSelection = ({
   const [selected, setSelected] = useState<string | null>(null);
   const { data: specializations, isLoading, error } = useSpecializationsQuery(branchId);
   
-  // Filter out already-selected specializations
+  // Filter out already-selected specialisations
   const availableSpecializations = specializations?.filter(
     spec => !excludedSpecialisations.includes(spec.name.toUpperCase())
   );

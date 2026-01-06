@@ -151,7 +151,7 @@ export default function BenchmarkingPage() {
                   Peer Benchmarking
                 </h1>
                 <p className="text-muted-foreground text-sm sm:text-base">
-                  Compare your performance with peers in your specialization
+                  Compare your performance with peers in your specialisation
                 </p>
               </div>
             </ScrollReveal>
@@ -190,7 +190,7 @@ export default function BenchmarkingPage() {
                     <div>
                       <h3 className="font-semibold mb-1">Not Enough Peer Data</h3>
                       <p className="text-sm text-muted-foreground mb-4">
-                        We need more users in your specialization to provide meaningful peer comparisons.
+                        We need more users in your specialisation to provide meaningful peer comparisons.
                         Complete more tests to help build the benchmark data!
                       </p>
                       <Button variant="outline" asChild>
@@ -217,7 +217,7 @@ export default function BenchmarkingPage() {
                           <div>
                             <CardTitle className="text-base sm:text-lg">Your Standing</CardTitle>
                             <CardDescription className="text-xs sm:text-sm">
-                              {peerBenchmark.specialization_name || "Your Specialization"}
+                              {peerBenchmark.specialization_name || "Your Specialisation"}
                             </CardDescription>
                           </div>
                         </div>

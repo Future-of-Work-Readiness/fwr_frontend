@@ -279,7 +279,7 @@ export default function SoftSkillsResultsPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <TrendingUp className="h-5 w-5 text-primary" />
-                Personalized Feedback
+                Personalised Feedback
               </CardTitle>
             </CardHeader>
             <CardContent>

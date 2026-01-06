@@ -4,7 +4,7 @@ import { ApiError } from '@/lib/api/types';
 /**
  * QueryClient Configuration
  *
- * Optimized defaults for:
+ * Optimised defaults for:
  * - Smart retry logic (skip auth errors)
  * - Sensible stale times
  * - Error logging in development
