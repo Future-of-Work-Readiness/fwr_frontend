@@ -197,7 +197,9 @@ function AuthContent() {
                     <Label htmlFor="login-email">Email</Label>
                     <Input
                       id="login-email"
+                      name="email"
                       type="email"
+                      autoComplete="email"
                       placeholder="you@example.com"
                       value={loginEmail}
                       onChange={(e) => setLoginEmail(e.target.value)}
@@ -212,7 +214,9 @@ function AuthContent() {
                     <Label htmlFor="login-password">Password</Label>
                     <Input
                       id="login-password"
+                      name="password"
                       type="password"
+                      autoComplete="current-password"
                       placeholder="••••••••"
                       value={loginPassword}
                       onChange={(e) => setLoginPassword(e.target.value)}
@@ -237,7 +241,9 @@ function AuthContent() {
                     <Label htmlFor="signup-name">Full Name</Label>
                     <Input
                       id="signup-name"
+                      name="name"
                       type="text"
+                      autoComplete="name"
                       placeholder="John Doe"
                       value={signupFullName}
                       onChange={(e) => setSignupFullName(e.target.value)}
@@ -251,7 +257,9 @@ function AuthContent() {
                     <Label htmlFor="signup-email">Email</Label>
                     <Input
                       id="signup-email"
+                      name="email"
                       type="email"
+                      autoComplete="email"
                       placeholder="you@example.com"
                       value={signupEmail}
                       onChange={(e) => setSignupEmail(e.target.value)}
@@ -266,7 +274,9 @@ function AuthContent() {
                     <Label htmlFor="signup-password">Password</Label>
                     <Input
                       id="signup-password"
+                      name="password"
                       type="password"
+                      autoComplete="new-password"
                       placeholder="••••••••"
                       value={signupPassword}
                       onChange={(e) => setSignupPassword(e.target.value)}
@@ -281,7 +291,9 @@ function AuthContent() {
                     <Label htmlFor="signup-confirm">Confirm Password</Label>
                     <Input
                       id="signup-confirm"
+                      name="confirmPassword"
                       type="password"
+                      autoComplete="new-password"
                       placeholder="••••••••"
                       value={signupConfirmPassword}
                       onChange={(e) => setSignupConfirmPassword(e.target.value)}
