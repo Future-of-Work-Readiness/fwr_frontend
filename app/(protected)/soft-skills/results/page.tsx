@@ -181,7 +181,10 @@ export default function SoftSkillsResultsPage() {
 									<p className='text-xs sm:text-sm text-muted-foreground mb-2'>
 										Overall Score
 									</p>
-									<p className={`text-4xl sm:text-5xl font-bold ${getScoreColor(score)}`}>
+									<p
+										className={`text-4xl sm:text-5xl font-bold ${getScoreColor(
+											score
+										)}`}>
 										{score}%
 									</p>
 									<Badge
@@ -234,7 +237,9 @@ export default function SoftSkillsResultsPage() {
 							<div className='grid grid-cols-1 sm:grid-cols-3 gap-4'>
 								<div>
 									<div className='flex justify-between items-center mb-1'>
-										<span className='text-xs sm:text-sm font-medium'>Overall</span>
+										<span className='text-xs sm:text-sm font-medium'>
+											Overall
+										</span>
 										<span
 											className={`text-xs sm:text-sm font-bold ${getScoreColor(
 												readiness.overall
@@ -246,7 +251,9 @@ export default function SoftSkillsResultsPage() {
 								</div>
 								<div>
 									<div className='flex justify-between items-center mb-1'>
-										<span className='text-xs sm:text-sm font-medium'>Technical</span>
+										<span className='text-xs sm:text-sm font-medium'>
+											Technical
+										</span>
 										<span
 											className={`text-xs sm:text-sm font-bold ${getScoreColor(
 												readiness.technical
@@ -258,7 +265,9 @@ export default function SoftSkillsResultsPage() {
 								</div>
 								<div>
 									<div className='flex justify-between items-center mb-1'>
-										<span className='text-xs sm:text-sm font-medium'>Soft Skills</span>
+										<span className='text-xs sm:text-sm font-medium'>
+											Soft Skills
+										</span>
 										<span
 											className={`text-xs sm:text-sm font-bold ${getScoreColor(
 												readiness.soft
@@ -348,7 +357,9 @@ export default function SoftSkillsResultsPage() {
 														</Badge>
 													)}
 												</div>
-												<p className='mb-4 text-sm sm:text-base break-words'>{result.question_text}</p>
+												<p className='mb-4 text-sm sm:text-base break-words'>
+													{result.question_text}
+												</p>
 												<div className='space-y-2 mb-4'>
 													{result.options.map((option) => {
 														const isUserAnswer =
@@ -387,7 +398,8 @@ export default function SoftSkillsResultsPage() {
 																			}`}>
 																			{option.text}
 																		</span>
-																		{(isCorrectAnswer || (isUserAnswer && !isCorrectAnswer)) && (
+																		{(isCorrectAnswer ||
+																			(isUserAnswer && !isCorrectAnswer)) && (
 																			<div className='mt-1'>
 																				{isCorrectAnswer && (
 																					<Badge className='bg-primary text-primary-foreground text-[10px] sm:text-xs'>
