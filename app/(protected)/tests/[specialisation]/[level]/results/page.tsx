@@ -21,9 +21,12 @@ import {
 	Clock,
 	Target,
 	TrendingUp,
-	BookOpen
+	BookOpen,
+	MessageSquare
 } from 'lucide-react';
-import { formatSpecialisation, SKILL_LEVELS } from '@/lib/constants';
+import { formatSpecialisation, getLevelNumber, SKILL_LEVELS } from '@/lib/constants';
+import { FeedbackModal } from '@/components/feedback';
+import { useSubmitFeedbackMutation } from '@/hooks/api';
 import type {
 	QuizSubmitResponse,
 	QuestionResult,
@@ -34,6 +37,8 @@ interface StoredQuizResult extends QuizSubmitResponse {
 	level: string;
 	specialisation: string;
 	timeTaken: number;
+	attempt_id?: string;
+	quiz_id?: string;
 }
 
 export default function TestResultsPage() {
@@ -46,6 +51,11 @@ export default function TestResultsPage() {
 
 	const [loading, setLoading] = useState(true);
 	const [quizResult, setQuizResult] = useState<StoredQuizResult | null>(null);
+	const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
+	const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
+
+	// Feedback mutation
+	const submitFeedbackMutation = useSubmitFeedbackMutation();
 
 	// Use ref to prevent double-processing in React Strict Mode
 	const hasProcessedRef = useRef(false);
@@ -443,6 +453,43 @@ export default function TestResultsPage() {
 					</Card>
 				)}
 
+				{/* Feedback CTA */}
+				{!feedbackSubmitted && (
+					<Card className='mb-6 border-amber-500/20 bg-gradient-to-r from-amber-500/5 to-orange-500/5'>
+						<CardContent className='p-4 sm:p-6'>
+							<div className='flex flex-col sm:flex-row items-center justify-between gap-4'>
+								<div className='flex items-center gap-3'>
+									<div className='p-2 rounded-full bg-gradient-to-br from-amber-500/20 to-orange-500/20 border border-amber-500/30'>
+										<MessageSquare className='w-5 h-5 text-amber-400' />
+									</div>
+									<div>
+										<h3 className='font-semibold text-foreground'>How was this quiz?</h3>
+										<p className='text-sm text-muted-foreground'>Your feedback helps us improve</p>
+									</div>
+								</div>
+								<Button
+									onClick={() => setFeedbackModalOpen(true)}
+									className='bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg shadow-amber-500/25'
+								>
+									<MessageSquare className='w-4 h-4 mr-2' />
+									Give Feedback
+								</Button>
+							</div>
+						</CardContent>
+					</Card>
+				)}
+
+				{feedbackSubmitted && (
+					<Card className='mb-6 border-green-500/20 bg-gradient-to-r from-green-500/5 to-emerald-500/5'>
+						<CardContent className='p-4 sm:p-6'>
+							<div className='flex items-center gap-3'>
+								<CheckCircle2 className='w-5 h-5 text-green-500' />
+								<p className='text-green-600 font-medium'>Thank you for your feedback!</p>
+							</div>
+						</CardContent>
+					</Card>
+				)}
+
 				{/* Action Buttons */}
 				<div className='flex flex-col sm:flex-row gap-4'>
 					{passed && getNextLevel() && (
@@ -467,6 +514,37 @@ export default function TestResultsPage() {
 						Retake Test
 					</Button>
 				</div>
+
+				{/* Feedback Modal */}
+				<FeedbackModal
+					isOpen={feedbackModalOpen}
+					onClose={() => setFeedbackModalOpen(false)}
+					onSubmit={async ({ rating, feedbackText }) => {
+						// Debug: Log the attempt_id being used
+						console.log('[Feedback Debug] quizResult:', quizResult);
+						console.log('[Feedback Debug] attempt_id:', quizResult.attempt_id);
+						console.log('[Feedback Debug] quiz_id:', quizResult.quiz_id);
+						
+						if (!quizResult.attempt_id) {
+							console.error('[Feedback Error] attempt_id is missing from quizResult!');
+							throw new Error('Quiz attempt ID is missing. Please retake the quiz.');
+						}
+						
+						await submitFeedbackMutation.mutateAsync({
+							attemptId: quizResult.attempt_id,
+							rating,
+							feedbackText,
+							quizId: quizResult.quiz_id,
+							quizTitle: quiz_title,
+							difficultyLevel: getLevelNumber(testLevel),
+							category: 'technical',
+							specializationName: testSpec,
+						});
+						setFeedbackSubmitted(true);
+					}}
+					quizTitle={quiz_title || `${formatSpecialisation(testSpec)} – ${levelDisplay}`}
+					isLoading={submitFeedbackMutation.isPending}
+				/>
 			</div>
 		</div>
 	);
