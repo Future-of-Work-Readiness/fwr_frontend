@@ -32,8 +32,9 @@ export const DashboardNav = () => {
   const logoutMutation = useLogout();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Hide sidebar on Technical Skills and Soft Skills pages
-  const hideSidebar = pathname === "/technical-skills" || pathname === "/soft-skills";
+  // Hide sidebar on Technical Skills, Soft Skills, and test question pages (but not results)
+  const isTestQuestionPage = pathname.startsWith("/tests/") && !pathname.endsWith("/results");
+  const hideSidebar = pathname === "/technical-skills" || pathname === "/soft-skills" || isTestQuestionPage;
 
   const handleSignOut = async () => {
     await logoutMutation.mutateAsync();
