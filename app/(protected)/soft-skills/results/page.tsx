@@ -25,20 +25,30 @@ import {
 	BarChart3,
 	BookOpen,
 	TrendingUp,
-	Loader2
+	Loader2,
+	MessageSquare
 } from 'lucide-react';
+import { FeedbackModal } from '@/components/feedback';
+import { useSubmitFeedbackMutation } from '@/hooks/api';
 import type { QuizSubmitResponse, QuestionResult } from '@/hooks';
 
 interface StoredQuizResult extends QuizSubmitResponse {
 	level: string;
 	specialisation: string;
 	timeTaken: number;
+	attempt_id?: string;
+	quiz_id?: string;
 }
 
 export default function SoftSkillsResultsPage() {
 	const router = useRouter();
 	const [loading, setLoading] = useState(true);
 	const [quizResult, setQuizResult] = useState<StoredQuizResult | null>(null);
+	const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
+	const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
+
+	// Feedback mutation
+	const submitFeedbackMutation = useSubmitFeedbackMutation();
 
 	// Use ref to prevent double-processing in React Strict Mode
 	const hasProcessedRef = useRef(false);
@@ -435,6 +445,43 @@ export default function SoftSkillsResultsPage() {
 					</ScrollReveal>
 				)}
 
+					{/* Feedback CTA */}
+				<ScrollReveal delay={0.3}>
+					{!feedbackSubmitted ? (
+						<Card className='mb-6 border-amber-500/20 bg-gradient-to-r from-amber-500/5 to-orange-500/5'>
+							<CardContent className='p-4 sm:p-6'>
+								<div className='flex flex-col sm:flex-row items-center justify-between gap-4'>
+									<div className='flex items-center gap-3'>
+										<div className='p-2 rounded-full bg-gradient-to-br from-amber-500/20 to-orange-500/20 border border-amber-500/30'>
+											<MessageSquare className='w-5 h-5 text-amber-400' />
+										</div>
+										<div>
+											<h3 className='font-semibold text-foreground'>How was this quiz?</h3>
+											<p className='text-sm text-muted-foreground'>Your feedback helps us improve</p>
+										</div>
+									</div>
+									<Button
+										onClick={() => setFeedbackModalOpen(true)}
+										className='bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg shadow-amber-500/25'
+									>
+										<MessageSquare className='w-4 h-4 mr-2' />
+										Give Feedback
+									</Button>
+								</div>
+							</CardContent>
+						</Card>
+					) : (
+						<Card className='mb-6 border-green-500/20 bg-gradient-to-r from-green-500/5 to-emerald-500/5'>
+							<CardContent className='p-4 sm:p-6'>
+								<div className='flex items-center gap-3'>
+									<CheckCircle2 className='w-5 h-5 text-green-500' />
+									<p className='text-green-600 font-medium'>Thank you for your feedback!</p>
+								</div>
+							</CardContent>
+						</Card>
+					)}
+				</ScrollReveal>
+
 				<div className='flex flex-col sm:flex-row gap-4 justify-center mt-6'>
 					<Button
 						variant='outline'
@@ -448,6 +495,26 @@ export default function SoftSkillsResultsPage() {
 						Back to Dashboard
 					</Button>
 				</div>
+
+				{/* Feedback Modal */}
+				<FeedbackModal
+					isOpen={feedbackModalOpen}
+					onClose={() => setFeedbackModalOpen(false)}
+					onSubmit={async ({ rating, feedbackText }) => {
+						await submitFeedbackMutation.mutateAsync({
+							attemptId: quizResult.attempt_id || '',
+							rating,
+							feedbackText,
+							quizId: quizResult.quiz_id,
+							quizTitle: quiz_title || 'Soft Skills Assessment',
+							category: 'soft_skill',
+							specializationName: 'SOFT_SKILLS',
+						});
+						setFeedbackSubmitted(true);
+					}}
+					quizTitle={quiz_title || 'Soft Skills Assessment'}
+					isLoading={submitFeedbackMutation.isPending}
+				/>
 			</div>
 		</div>
 	);

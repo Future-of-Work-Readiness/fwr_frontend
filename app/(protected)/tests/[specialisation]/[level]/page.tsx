@@ -132,12 +132,14 @@ export default function TestPage() {
     try {
       const result = await submitQuizMutation.mutateAsync({ attemptId, answers });
       
-      // Store result for results page
+      // Store result for results page (include attempt_id and quiz_id for feedback submission)
       sessionStorage.setItem("quizResult", JSON.stringify({
         ...result,
         level,
         specialisation,
         timeTaken: startTime ? Math.floor((Date.now() - startTime) / 1000) : 0,
+        attempt_id: attemptId,
+        quiz_id: quizData?.quiz_id,
       }));
       
       router.push(`/tests/${specialisation}/${level}/results`);

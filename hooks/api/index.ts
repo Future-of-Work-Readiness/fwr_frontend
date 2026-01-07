@@ -158,6 +158,12 @@ export {
   type SectorHierarchy,
 } from './useSectors';
 
+// ============ FEEDBACK HOOKS ============
+export {
+  useSubmitFeedbackMutation,
+  useFeedbackCheck,
+} from './useFeedback';
+
 // ============ LEGACY ASSESSMENT HOOKS (DEPRECATED) ============
 // These are re-exported for backward compatibility but should be migrated to useQuizzes
 export {
