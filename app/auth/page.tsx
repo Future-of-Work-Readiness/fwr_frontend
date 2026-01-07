@@ -1,319 +1,422 @@
-"use client";
+'use client';
 
-import { useState, useEffect, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import Link from "next/link";
-import Image from "next/image";
-import { useAuth } from "@/components/providers";
-import { useLogin, useRegister } from "@/hooks";
-import { loginSchema, signUpSchema } from "@/lib/validations/auth";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, ArrowLeft } from "lucide-react";
-import { toast } from "sonner";
-import { z } from "zod";
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
+import Image from 'next/image';
+import { useAuth } from '@/components/providers';
+import { useLogin, useRegister } from '@/hooks';
+import { loginSchema, signUpSchema } from '@/lib/validations/auth';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Loader2, ArrowLeft, Eye, EyeOff } from 'lucide-react';
+import { toast } from 'sonner';
+import { z } from 'zod';
 
 function AuthContent() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const { isAuthenticated, user } = useAuth();
-  
-  // Mutations
-  const loginMutation = useLogin();
-  const signUpMutation = useRegister();
-  
-  // Tab state from URL params
-  const [activeTab, setActiveTab] = useState(() => {
-    const tab = searchParams.get("tab");
-    return tab === "signup" ? "signup" : "login";
-  });
-  
-  // Login form state
-  const [loginEmail, setLoginEmail] = useState("");
-  const [loginPassword, setLoginPassword] = useState("");
-  
-  // Signup form state
-  const [signupEmail, setSignupEmail] = useState("");
-  const [signupPassword, setSignupPassword] = useState("");
-  const [signupConfirmPassword, setSignupConfirmPassword] = useState("");
-  const [signupFullName, setSignupFullName] = useState("");
-  
-  // Field-level errors
-  const [loginErrors, setLoginErrors] = useState<Record<string, string>>({});
-  const [signupErrors, setSignupErrors] = useState<Record<string, string>>({});
+	const router = useRouter();
+	const searchParams = useSearchParams();
+	const { isAuthenticated, user } = useAuth();
 
-  // Update tab from URL params
-  useEffect(() => {
-    const tab = searchParams.get("tab");
-    if (tab === "signup") {
-      setActiveTab("signup");
-    } else if (tab === "login") {
-      setActiveTab("login");
-    }
-  }, [searchParams]);
+	// Mutations
+	const loginMutation = useLogin();
+	const signUpMutation = useRegister();
 
-  // Redirect if already authenticated
-  useEffect(() => {
-    if (isAuthenticated && user) {
-      // Redirect based on onboarding status
-      if (user.onboardingCompleted) {
-        router.replace("/dashboard");
-      } else {
-        router.replace("/onboarding");
-      }
-    }
-  }, [isAuthenticated, user, router]);
+	// Tab state from URL params
+	const [activeTab, setActiveTab] = useState(() => {
+		const tab = searchParams.get('tab');
+		return tab === 'signup' ? 'signup' : 'login';
+	});
 
-  // Handle login success/error
-  useEffect(() => {
-    if (loginMutation.isSuccess && loginMutation.data) {
-      toast.success("Welcome back!");
-      if (loginMutation.data.user.onboardingCompleted) {
-        router.replace("/dashboard");
-      } else {
-        router.replace("/onboarding");
-      }
-    }
-    if (loginMutation.isError) {
-      toast.error(loginMutation.error.message || "Login failed");
-    }
-  }, [loginMutation.isSuccess, loginMutation.isError, loginMutation.data, loginMutation.error, router]);
+	// Login form state
+	const [loginEmail, setLoginEmail] = useState('');
+	const [loginPassword, setLoginPassword] = useState('');
 
-  // Handle signup success/error
-  useEffect(() => {
-    if (signUpMutation.isSuccess && signUpMutation.data) {
-      toast.success("Account created successfully!");
-      router.replace("/onboarding");
-    }
-    if (signUpMutation.isError) {
-      toast.error(signUpMutation.error.message || "Sign up failed");
-    }
-  }, [signUpMutation.isSuccess, signUpMutation.isError, signUpMutation.data, signUpMutation.error, router]);
+	// Signup form state
+	const [signupEmail, setSignupEmail] = useState('');
+	const [signupPassword, setSignupPassword] = useState('');
+	const [signupConfirmPassword, setSignupConfirmPassword] = useState('');
+	const [signupFullName, setSignupFullName] = useState('');
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoginErrors({});
+	// Field-level errors
+	const [loginErrors, setLoginErrors] = useState<Record<string, string>>({});
+	const [signupErrors, setSignupErrors] = useState<Record<string, string>>({});
 
-    // Validate with Zod
-    try {
-      loginSchema.parse({ email: loginEmail, password: loginPassword });
-    } catch (err) {
-      if (err instanceof z.ZodError) {
-        const errors: Record<string, string> = {};
-        err.issues.forEach((error) => {
-          if (error.path[0]) {
-            errors[error.path[0] as string] = error.message;
-          }
-        });
-        setLoginErrors(errors);
-        return;
-      }
-    }
+	// Password visibility toggles
+	const [showLoginPassword, setShowLoginPassword] = useState(false);
+	const [showSignupPassword, setShowSignupPassword] = useState(false);
+	const [showSignupConfirmPassword, setShowSignupConfirmPassword] =
+		useState(false);
 
-    loginMutation.mutate({ email: loginEmail, password: loginPassword });
-  };
+	// Update tab from URL params
+	useEffect(() => {
+		const tab = searchParams.get('tab');
+		if (tab === 'signup') {
+			setActiveTab('signup');
+		} else if (tab === 'login') {
+			setActiveTab('login');
+		}
+	}, [searchParams]);
 
-  const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSignupErrors({});
+	// Redirect if already authenticated
+	useEffect(() => {
+		if (isAuthenticated && user) {
+			// Redirect based on onboarding status
+			if (user.onboardingCompleted) {
+				router.replace('/dashboard');
+			} else {
+				router.replace('/onboarding');
+			}
+		}
+	}, [isAuthenticated, user, router]);
 
-    // Validate with Zod
-    try {
-      signUpSchema.parse({
-        email: signupEmail,
-        password: signupPassword,
-        confirmPassword: signupConfirmPassword,
-        fullName: signupFullName || undefined,
-      });
-    } catch (err) {
-      if (err instanceof z.ZodError) {
-        const errors: Record<string, string> = {};
-        err.issues.forEach((error) => {
-          if (error.path[0]) {
-            errors[error.path[0] as string] = error.message;
-          }
-        });
-        setSignupErrors(errors);
-        return;
-      }
-    }
+	// Handle login success/error
+	useEffect(() => {
+		if (loginMutation.isSuccess && loginMutation.data) {
+			toast.success('Welcome back!');
+			if (loginMutation.data.user.onboardingCompleted) {
+				router.replace('/dashboard');
+			} else {
+				router.replace('/onboarding');
+			}
+		}
+		if (loginMutation.isError) {
+			toast.error(loginMutation.error.message || 'Login failed');
+		}
+	}, [
+		loginMutation.isSuccess,
+		loginMutation.isError,
+		loginMutation.data,
+		loginMutation.error,
+		router
+	]);
 
-    signUpMutation.mutate({
-      email: signupEmail,
-      password: signupPassword,
-      confirmPassword: signupConfirmPassword,
-      fullName: signupFullName || undefined,
-    });
-  };
+	// Handle signup success/error
+	useEffect(() => {
+		if (signUpMutation.isSuccess && signUpMutation.data) {
+			toast.success('Account created successfully!');
+			router.replace('/onboarding');
+		}
+		if (signUpMutation.isError) {
+			toast.error(signUpMutation.error.message || 'Sign up failed');
+		}
+	}, [
+		signUpMutation.isSuccess,
+		signUpMutation.isError,
+		signUpMutation.data,
+		signUpMutation.error,
+		router
+	]);
 
-  const handleGoogleAuth = () => {
-    toast.info("Google sign-in is not configured. Please use email/password.");
-  };
+	const handleLogin = async (e: React.FormEvent) => {
+		e.preventDefault();
+		setLoginErrors({});
 
-  const handleLinkedInAuth = () => {
-    toast.info("LinkedIn sign-in is not configured. Please use email/password.");
-  };
+		// Validate with Zod
+		try {
+			loginSchema.parse({ email: loginEmail, password: loginPassword });
+		} catch (err) {
+			if (err instanceof z.ZodError) {
+				const errors: Record<string, string> = {};
+				err.issues.forEach((error) => {
+					if (error.path[0]) {
+						errors[error.path[0] as string] = error.message;
+					}
+				});
+				setLoginErrors(errors);
+				return;
+			}
+		}
 
-  const isLoading = loginMutation.isPending || signUpMutation.isPending;
+		loginMutation.mutate({ email: loginEmail, password: loginPassword });
+	};
 
-  return (
-    <div className="min-h-screen gradient-hero flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        {/* Back to home link */}
-        <Link 
-          href="/" 
-          className="inline-flex items-center gap-2 text-white/80 hover:text-white mb-8 transition-colors"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back to home
-        </Link>
-        
-        <Card className="border-0 shadow-xl">
-          <CardHeader className="text-center pb-2">
-            <div className="flex justify-center mb-4">
-              <Image
-                src="/assets/RAI-Logo2-nobg.png"
-                alt="ReadinessAI Logo"
-                width={66}
-                height={66}
-              />
-            </div>
-            <CardTitle className="text-2xl font-display">Welcome</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-2 mb-6">
-                <TabsTrigger value="login">Log In</TabsTrigger>
-                <TabsTrigger value="signup">Sign Up</TabsTrigger>
-              </TabsList>
+	const handleSignup = async (e: React.FormEvent) => {
+		e.preventDefault();
+		setSignupErrors({});
 
-              {/* Login Tab */}
-              <TabsContent value="login" className="space-y-4">
-                <form onSubmit={handleLogin} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="login-email">Email</Label>
-                    <Input
-                      id="login-email"
-                      name="email"
-                      type="email"
-                      autoComplete="email"
-                      placeholder="you@example.com"
-                      value={loginEmail}
-                      onChange={(e) => setLoginEmail(e.target.value)}
-                      className={loginErrors.email ? "border-destructive" : ""}
-                      required
-                    />
-                    {loginErrors.email && (
-                      <p className="text-sm text-destructive">{loginErrors.email}</p>
-                    )}
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="login-password">Password</Label>
-                    <Input
-                      id="login-password"
-                      name="password"
-                      type="password"
-                      autoComplete="current-password"
-                      placeholder="••••••••"
-                      value={loginPassword}
-                      onChange={(e) => setLoginPassword(e.target.value)}
-                      className={loginErrors.password ? "border-destructive" : ""}
-                      required
-                    />
-                    {loginErrors.password && (
-                      <p className="text-sm text-destructive">{loginErrors.password}</p>
-                    )}
-                  </div>
-                  <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-                    Log In
-                  </Button>
-                </form>
-              </TabsContent>
+		// Validate with Zod
+		try {
+			signUpSchema.parse({
+				email: signupEmail,
+				password: signupPassword,
+				confirmPassword: signupConfirmPassword,
+				fullName: signupFullName || undefined
+			});
+		} catch (err) {
+			if (err instanceof z.ZodError) {
+				const errors: Record<string, string> = {};
+				err.issues.forEach((error) => {
+					if (error.path[0]) {
+						errors[error.path[0] as string] = error.message;
+					}
+				});
+				setSignupErrors(errors);
+				return;
+			}
+		}
 
-              {/* Signup Tab */}
-              <TabsContent value="signup" className="space-y-4">
-                <form onSubmit={handleSignup} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-name">Full Name</Label>
-                    <Input
-                      id="signup-name"
-                      name="name"
-                      type="text"
-                      autoComplete="name"
-                      placeholder="John Doe"
-                      value={signupFullName}
-                      onChange={(e) => setSignupFullName(e.target.value)}
-                      className={signupErrors.fullName ? "border-destructive" : ""}
-                    />
-                    {signupErrors.fullName && (
-                      <p className="text-sm text-destructive">{signupErrors.fullName}</p>
-                    )}
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-email">Email</Label>
-                    <Input
-                      id="signup-email"
-                      name="email"
-                      type="email"
-                      autoComplete="email"
-                      placeholder="you@example.com"
-                      value={signupEmail}
-                      onChange={(e) => setSignupEmail(e.target.value)}
-                      className={signupErrors.email ? "border-destructive" : ""}
-                      required
-                    />
-                    {signupErrors.email && (
-                      <p className="text-sm text-destructive">{signupErrors.email}</p>
-                    )}
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-password">Password</Label>
-                    <Input
-                      id="signup-password"
-                      name="password"
-                      type="password"
-                      autoComplete="new-password"
-                      placeholder="••••••••"
-                      value={signupPassword}
-                      onChange={(e) => setSignupPassword(e.target.value)}
-                      className={signupErrors.password ? "border-destructive" : ""}
-                      required
-                    />
-                    {signupErrors.password && (
-                      <p className="text-sm text-destructive">{signupErrors.password}</p>
-                    )}
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-confirm">Confirm Password</Label>
-                    <Input
-                      id="signup-confirm"
-                      name="confirmPassword"
-                      type="password"
-                      autoComplete="new-password"
-                      placeholder="••••••••"
-                      value={signupConfirmPassword}
-                      onChange={(e) => setSignupConfirmPassword(e.target.value)}
-                      className={signupErrors.confirmPassword ? "border-destructive" : ""}
-                      required
-                    />
-                    {signupErrors.confirmPassword && (
-                      <p className="text-sm text-destructive">{signupErrors.confirmPassword}</p>
-                    )}
-                  </div>
-                  <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-                    Create Account
-                  </Button>
-                </form>
-              </TabsContent>
-            </Tabs>
+		signUpMutation.mutate({
+			email: signupEmail,
+			password: signupPassword,
+			confirmPassword: signupConfirmPassword,
+			fullName: signupFullName || undefined
+		});
+	};
 
-            {/* Social login divider */}
-            {/* <div className="relative my-6">
+	const handleGoogleAuth = () => {
+		toast.info('Google sign-in is not configured. Please use email/password.');
+	};
+
+	const handleLinkedInAuth = () => {
+		toast.info(
+			'LinkedIn sign-in is not configured. Please use email/password.'
+		);
+	};
+
+	const isLoading = loginMutation.isPending || signUpMutation.isPending;
+
+	return (
+		<div className='min-h-screen gradient-hero flex items-center justify-center p-4'>
+			<div className='w-full max-w-md'>
+				{/* Back to home link */}
+				<Link
+					href='/'
+					className='inline-flex items-center gap-2 text-white/80 hover:text-white mb-8 transition-colors'>
+					<ArrowLeft className='h-4 w-4' />
+					Back to home
+				</Link>
+
+				<Card className='border-0 shadow-xl'>
+					<CardHeader className='text-center pb-2'>
+						<div className='flex justify-center mb-4'>
+							<Image
+								src='/assets/RAI-Logo2-nobg.png'
+								alt='ReadinessAI Logo'
+								width={66}
+								height={66}
+							/>
+						</div>
+						<CardTitle className='text-2xl font-display'>Welcome</CardTitle>
+					</CardHeader>
+					<CardContent>
+						<Tabs
+							value={activeTab}
+							onValueChange={setActiveTab}
+							className='w-full'>
+							<TabsList className='grid w-full grid-cols-2 mb-6'>
+								<TabsTrigger value='login'>Log In</TabsTrigger>
+								<TabsTrigger value='signup'>Sign Up</TabsTrigger>
+							</TabsList>
+
+							{/* Login Tab */}
+							<TabsContent value='login' className='space-y-4'>
+								<form onSubmit={handleLogin} className='space-y-4'>
+									<div className='space-y-2'>
+										<Label htmlFor='login-email'>Email</Label>
+										<Input
+											id='login-email'
+											name='username'
+											type='email'
+											autoComplete='username'
+											placeholder='you@example.com'
+											value={loginEmail}
+											onChange={(e) => setLoginEmail(e.target.value)}
+											className={loginErrors.email ? 'border-destructive' : ''}
+											required
+										/>
+										{loginErrors.email && (
+											<p className='text-sm text-destructive'>
+												{loginErrors.email}
+											</p>
+										)}
+									</div>
+									<div className='space-y-2'>
+										<div className='flex items-center justify-between'>
+											<Label htmlFor='login-password'>Password</Label>
+											<Link
+												href='/forgot-password'
+												className='text-sm text-primary hover:underline'
+												tabIndex={-1}>
+												Forgot password?
+											</Link>
+										</div>
+										<div className='relative'>
+											<Input
+												id='login-password'
+												name='password'
+												type={showLoginPassword ? 'text' : 'password'}
+												autoComplete='current-password'
+												placeholder='••••••••'
+												value={loginPassword}
+												onChange={(e) => setLoginPassword(e.target.value)}
+												className={`pr-10 ${
+													loginErrors.password ? 'border-destructive' : ''
+												}`}
+												required
+											/>
+											<button
+												type='button'
+												onClick={() => setShowLoginPassword(!showLoginPassword)}
+												className='absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground/60 hover:text-foreground transition-colors'
+												tabIndex={-1}>
+												{showLoginPassword ? (
+													<EyeOff className='h-4 w-4' />
+												) : (
+													<Eye className='h-4 w-4' />
+												)}
+											</button>
+										</div>
+										{loginErrors.password && (
+											<p className='text-sm text-destructive'>
+												{loginErrors.password}
+											</p>
+										)}
+									</div>
+									<Button type='submit' className='w-full' disabled={isLoading}>
+										{isLoading ? (
+											<Loader2 className='h-4 w-4 animate-spin mr-2' />
+										) : null}
+										Log In
+									</Button>
+								</form>
+							</TabsContent>
+
+							{/* Signup Tab */}
+							<TabsContent value='signup' className='space-y-4'>
+								<form onSubmit={handleSignup} className='space-y-4'>
+									<div className='space-y-2'>
+										<Label htmlFor='signup-name'>Full Name</Label>
+										<Input
+											id='signup-name'
+											name='name'
+											type='text'
+											autoComplete='name'
+											placeholder='John Doe'
+											value={signupFullName}
+											onChange={(e) => setSignupFullName(e.target.value)}
+											className={
+												signupErrors.fullName ? 'border-destructive' : ''
+											}
+										/>
+										{signupErrors.fullName && (
+											<p className='text-sm text-destructive'>
+												{signupErrors.fullName}
+											</p>
+										)}
+									</div>
+									<div className='space-y-2'>
+										<Label htmlFor='signup-email'>Email</Label>
+										<Input
+											id='signup-email'
+											name='email'
+											type='email'
+											autoComplete='email'
+											placeholder='you@example.com'
+											value={signupEmail}
+											onChange={(e) => setSignupEmail(e.target.value)}
+											className={signupErrors.email ? 'border-destructive' : ''}
+											required
+										/>
+										{signupErrors.email && (
+											<p className='text-sm text-destructive'>
+												{signupErrors.email}
+											</p>
+										)}
+									</div>
+									<div className='space-y-2'>
+										<Label htmlFor='signup-password'>Password</Label>
+										<div className='relative'>
+											<Input
+												id='signup-password'
+												name='password'
+												type={showSignupPassword ? 'text' : 'password'}
+												autoComplete='new-password'
+												placeholder='••••••••'
+												value={signupPassword}
+												onChange={(e) => setSignupPassword(e.target.value)}
+												className={`pr-10 ${
+													signupErrors.password ? 'border-destructive' : ''
+												}`}
+												required
+											/>
+											<button
+												type='button'
+												onClick={() =>
+													setShowSignupPassword(!showSignupPassword)
+												}
+												className='absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground/60 hover:text-foreground transition-colors'
+												tabIndex={-1}>
+												{showSignupPassword ? (
+													<EyeOff className='h-4 w-4' />
+												) : (
+													<Eye className='h-4 w-4' />
+												)}
+											</button>
+										</div>
+										{signupErrors.password && (
+											<p className='text-sm text-destructive'>
+												{signupErrors.password}
+											</p>
+										)}
+									</div>
+									<div className='space-y-2'>
+										<Label htmlFor='signup-confirm'>Confirm Password</Label>
+										<div className='relative'>
+											<Input
+												id='signup-confirm'
+												name='confirmPassword'
+												type={showSignupConfirmPassword ? 'text' : 'password'}
+												autoComplete='new-password'
+												placeholder='••••••••'
+												value={signupConfirmPassword}
+												onChange={(e) =>
+													setSignupConfirmPassword(e.target.value)
+												}
+												className={`pr-10 ${
+													signupErrors.confirmPassword
+														? 'border-destructive'
+														: ''
+												}`}
+												required
+											/>
+											<button
+												type='button'
+												onClick={() =>
+													setShowSignupConfirmPassword(
+														!showSignupConfirmPassword
+													)
+												}
+												className='absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground/60 hover:text-foreground transition-colors'
+												tabIndex={-1}>
+												{showSignupConfirmPassword ? (
+													<EyeOff className='h-4 w-4' />
+												) : (
+													<Eye className='h-4 w-4' />
+												)}
+											</button>
+										</div>
+										{signupErrors.confirmPassword && (
+											<p className='text-sm text-destructive'>
+												{signupErrors.confirmPassword}
+											</p>
+										)}
+									</div>
+									<Button type='submit' className='w-full' disabled={isLoading}>
+										{isLoading ? (
+											<Loader2 className='h-4 w-4 animate-spin mr-2' />
+										) : null}
+										Create Account
+									</Button>
+								</form>
+							</TabsContent>
+						</Tabs>
+
+						{/* Social login divider */}
+						{/* <div className="relative my-6">
               <div className="absolute inset-0 flex items-center">
                 <span className="w-full border-t border-border" />
               </div>
@@ -322,8 +425,8 @@ function AuthContent() {
               </div>
             </div> */}
 
-            {/* Social login buttons */}
-            {/* <div className="grid grid-cols-2 gap-3">
+						{/* Social login buttons */}
+						{/* <div className="grid grid-cols-2 gap-3">
               <Button variant="outline" onClick={handleGoogleAuth} disabled={isLoading}>
                 <svg className="h-4 w-4 mr-2" viewBox="0 0 24 24">
                   <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -340,21 +443,22 @@ function AuthContent() {
                 LinkedIn
               </Button>
             </div> */}
-          </CardContent>
-        </Card>
-      </div>
-    </div>
-  );
+					</CardContent>
+				</Card>
+			</div>
+		</div>
+	);
 }
 
 export default function AuthPage() {
-  return (
-    <Suspense fallback={
-      <div className="min-h-screen gradient-hero flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-white" />
-      </div>
-    }>
-      <AuthContent />
-    </Suspense>
-  );
+	return (
+		<Suspense
+			fallback={
+				<div className='min-h-screen gradient-hero flex items-center justify-center'>
+					<Loader2 className='h-8 w-8 animate-spin text-white' />
+				</div>
+			}>
+			<AuthContent />
+		</Suspense>
+	);
 }
