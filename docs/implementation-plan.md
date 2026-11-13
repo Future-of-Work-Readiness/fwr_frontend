@@ -6,8 +6,8 @@
      five lines; anything durable belongs in decisions.md, architecture.md, or a
      phase's own Summary/Follow-ups instead. See implementation-lifecycle.md. -->
 _Last updated: 2026-11-13_
-Current phase: Phase 9 — Stabilisation (not started). Last code commit 44b77aa (2026-01-07, forgot password); repo idle since.
-Next objective: Fix the score-affecting bugs first — unanswered questions submitted as "A" (tests + soft-skills pages) — then confirm with the backend whether the readiness ceiling (~41) is intended.
+Current phase: Phase 9 — Dependency & security upgrade (not started). Last code commit 44b77aa (2026-01-07); repo idle since.
+Next objective: Owner runs the in-major upgrade (next 16.4.6, react 19.3.1, axios, zod, etc. — commands in Phase 9), then verify tsc/lint/build/dev. Then Phase 10: unanswered questions submitted as "A".
 Blockers: None. (Deployed on Vercel; production branch and backend URL still unrecorded in docs/workflow.md.)
 Not yet migrated: None — Claude docs bootstrapped from code + git history on 2026-11-13 (no Cursor rules existed). README.md is still create-next-app boilerplate; replace with a pointer to docs/ once docs are confirmed.
 
@@ -62,12 +62,26 @@ Follow-ups: Social login buttons only show a "not configured" toast.
 
 ## Phase 8 — Claude Code bootstrap
 Status: done
-Summary: 2026-11-13. Moved the project from Cursor to Claude Code: CLAUDE.md, docs/*, repo-local skills reconstructed from code + git history. No Cursor rules existed to migrate.
-Key files: `CLAUDE.md`, `docs/*`, `.claude/skills/*`
+Summary: 2026-11-13. Moved the project from Cursor to Claude Code: CLAUDE.md, docs/*, repo-local skills reconstructed from code + git history (no Cursor rules existed). Added Vercel + Next DevTools MCP servers and a per-session dependency check.
+Key files: `CLAUDE.md`, `docs/*`, `.claude/skills/*`, `.mcp.json`
 Assumptions: Decision rationales marked "not recorded" where no evidence exists.
 Follow-ups: Record Vercel production branch + backend URL in docs/workflow.md; replace README.md.
 
-## Phase 9 — Stabilisation
+## Phase 9 — Dependency & security upgrade (in-major)
+Status: not started
+Summary: Bring everything to the latest safe version within current majors. Audit on 2026-11-13: 10 vulns (1 critical, 7 high) — `next` ≤16.4.0 (critical: many RSC/middleware/image advisories), `axios` ≤1.19.0 (many advisories), `zod` <4.6.6, plus `postcss`/`sharp` via next and `source-map-js`.
+Key files: `package.json`, `package-lock.json`
+Assumptions: next 16.4.6 (2026-11-09) is taken despite being <14 days old under the security exception in `.claude/skills/fwr-dependency-check`. Vercel's Node version is unknown — keep `@types/node` on 20 until confirmed.
+Follow-ups (owner runs):
+```bash
+npm install next@16.4.6 eslint-config-next@16.4.6 react@19.3.1 react-dom@19.3.1 @types/react@19.3.0 @types/react-dom@19.3.0
+npm update
+npm audit --omit=dev
+npx tsc --noEmit && npm run lint && npm run build
+```
+Majors deliberately held — each its own later phase, if wanted: typescript 5.9 → 7, eslint 9 → 10 (check eslint-config-next support), framer-motion 12 → 14, lucide-react 0.562 → 1.x (icon renames), @types/node 20 → match Vercel's Node. Unused deps (recharts, date-fns, embla-carousel-react, input-otp, react-day-picker, react-resizable-panels, tailwindcss-animate) should be removed, not upgraded.
+
+## Phase 10 — Stabilisation
 Status: not started
 Summary: Fix known functional bugs found during the 2026-11-13 audit, then bring lint to zero errors.
 Key files: see list

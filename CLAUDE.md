@@ -27,6 +27,9 @@ axios · zod · sonner (toasts) · framer-motion.
 3. Whichever of these the current phase actually needs: `docs/architecture.md`,
    `docs/decisions.md`, `docs/project-structure.md`, `docs/workflow.md`.
 Don't read all four reflexively — read what the phase needs.
+4. **Dependency check, every session:** follow `.claude/skills/fwr-dependency-check` — run
+   `npm outdated` + `npm audit --omit=dev`, and propose upgrades to the latest safe versions
+   (Next.js, React and everything else). Suggest only; the owner runs installs.
 
 ## Coding standards
 - All backend calls go through a hook in `hooks/api/*` that uses `api` from
@@ -69,5 +72,9 @@ The generic checklist (verify, sync docs, recommend next steps) lives in
   decision, not a drive-by.
 - Backend payloads are snake_case; some modules (careers, `/users/me`) already return camelCase.
   Transform at the hook boundary (see `lib/api/types.ts`), not in components.
+- **The owner runs git/GitHub write commands and package installs.** Give exact commands for
+  commit, push, PR, `npm install`/`npm update`; don't execute them.
+- MCP servers for this repo are in `.mcp.json`: `vercel` (deployments, build/runtime logs —
+  read-only use unless asked) and `next-devtools` (errors from a running `npm run dev`).
 - Commit on `dev`, PR `dev` → `main`. Conventional-commit prefixes (`feat:`, `fix:`, `chore:`)
   with a meaningful subject.

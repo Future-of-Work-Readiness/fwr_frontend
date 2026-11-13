@@ -49,7 +49,7 @@ quiz_id, quiz_title, difficulty_level, category, specialization_name}`. `useFeed
 - [ ] Invalidate history + careers + dashboard after submit.
 - [ ] Pass `attempt_id`/`quiz_id` through to feedback.
 
-## Known issues (Phase 9 in docs/implementation-plan.md)
+## Known issues (Phase 10 — Stabilisation, in docs/implementation-plan.md)
 - Unanswered questions are submitted as `"A"` (test page ~129, soft-skills ~135). Don't copy.
 - Timer auto-submit calls `handleSubmit` inside a setState updater (test page ~73).
 - Errors toast twice (hook + page catch).

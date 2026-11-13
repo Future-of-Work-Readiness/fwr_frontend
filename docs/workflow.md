@@ -18,6 +18,11 @@ Commands:
 
 React Query devtools are mounted automatically in development.
 
+Claude Code MCP servers (`.mcp.json`, project scope): `vercel` (https://mcp.vercel.com, OAuth —
+run `/mcp` once to sign in) and `next-devtools` (`npx next-devtools-mcp@latest`; needs
+`npm run dev` running). Dependencies are checked at the start of every Claude session
+(`.claude/skills/fwr-dependency-check`).
+
 ## Branching & commits
 - Day-to-day work is committed directly on `dev`; `dev` is merged to `main` via GitHub PR
   ("Merge pull request #N from Future-of-Work-Readiness/dev"), often one PR per commit or small
