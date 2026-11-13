@@ -11,7 +11,7 @@
 Commands:
 - `npm run dev` / `npm run build` / `npm run start`
 - `npm run lint` — ESLint 9, `eslint-config-next` core-web-vitals + typescript, no custom rules.
-  Baseline 2026-11-13: 40 errors / 48 warnings (mostly `react/no-unescaped-entities`, React
+  Baseline 2026-11-13 (post-Phase 9 upgrade): 37 errors / 51 warnings (mostly `react/no-unescaped-entities`, React
   Compiler setState-in-effect, unused vars).
 - `npx tsc --noEmit` — typecheck (no npm script). Baseline: 0 errors.
 - No test runner is configured.

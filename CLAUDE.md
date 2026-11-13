@@ -50,7 +50,7 @@ The generic checklist (verify, sync docs, recommend next steps) lives in
 — not repeated here. Only what's project-specific:
 - Tests: none exist yet. Verify UI changes by running `npm run dev` against a backend.
 - Typecheck: `npx tsc --noEmit` (clean at baseline — keep it clean).
-- Lint: `npm run lint` (baseline 2026-11-13: 40 errors / 48 warnings — don't add new ones).
+- Lint: `npm run lint` (baseline 2026-11-13, post-upgrade: 37 errors / 51 warnings — don't add new ones).
 - Build: `npm run build` before recommending a merge to `main`.
 
 ## Project-specific rules
