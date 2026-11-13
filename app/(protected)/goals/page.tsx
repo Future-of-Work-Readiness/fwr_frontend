@@ -16,7 +16,7 @@ import { Loader2, Target, Plus, Edit2, Trash2, BookOpen, ArrowLeft, Save, X } fr
 import {
   useGoalsQuery,
   useCreateGoal,
-  useUpdateGoal,
+  useUpdateGoalProgress,
   useDeleteGoal,
   useJournalEntriesQuery,
   useCreateJournalEntry,
@@ -46,7 +46,7 @@ export default function GoalsPage() {
 
   // Mutations
   const createGoalMutation = useCreateGoal();
-  const updateGoalMutation = useUpdateGoal();
+  const updateGoalProgressMutation = useUpdateGoalProgress();
   const deleteGoalMutation = useDeleteGoal();
   const createJournalMutation = useCreateJournalEntry();
 
@@ -90,8 +90,10 @@ export default function GoalsPage() {
 
   const handleUpdateProgress = (goal: GoalWithProgress) => {
     if (!user) return;
-    updateGoalMutation.mutate(
-      { goalId: goal.id, data: { progress: editProgress } },
+    // The progress endpoint stores the value as given; PATCH /goals/{id} would recompute it
+    // from current_value / target_value and discard the edit.
+    updateGoalProgressMutation.mutate(
+      { goalId: goal.id, progress: editProgress },
       {
         onSuccess: () => {
           setEditingGoalId(null);
@@ -308,7 +310,7 @@ export default function GoalsPage() {
                                     size="sm"
                                     variant="ghost"
                                     onClick={() => handleUpdateProgress(goal)}
-                                    disabled={updateGoalMutation.isPending}
+                                    disabled={updateGoalProgressMutation.isPending}
                                   >
                                     <Save className="h-4 w-4" />
                                   </Button>

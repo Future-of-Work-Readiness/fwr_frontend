@@ -50,8 +50,13 @@ quiz_id, quiz_title, difficulty_level, category, specialization_name}`. `useFeed
 - [ ] Pass `attempt_id`/`quiz_id` through to feedback.
 
 ## Known issues (Phase 10 — Stabilisation, in docs/implementation-plan.md)
-- Unanswered questions are submitted as `"A"` (test page ~129, soft-skills ~135). Don't copy.
-- Timer auto-submit calls `handleSubmit` inside a setState updater (test page ~73).
-- Errors toast twice (hook + page catch).
+- Unanswered questions are sent as `selected_key: null`; the backend scores over every quiz
+  question (null/missing = wrong) and returns `user_answer: null` → results show "Not answered".
+- Submit returns **409** if the attempt was already submitted: the hook shows an info toast and
+  the page routes to `/results` (the first submission stands; its result isn't re-fetchable with
+  per-question answers — `/attempts/{id}/results` returns `user_answer: ""` and 409s until submitted).
+- `/quizzes/history` currently includes started-but-unsubmitted attempts as 0%/failed (no flag).
+- Timer pattern (keep it): the countdown effect only decrements; a separate effect guarded by
+  `autoSubmittedRef` submits once at 0. Quiz hooks own error toasts — pages don't toast.
 - `useSaveQuizProgress` / `useQuizProgressQuery` (save/resume) exist but aren't wired.
 - `hooks/api/useAssessments.ts` is deprecated — use `useQuizzes.ts`.

@@ -1,9 +1,10 @@
 import { z } from "zod";
 
 // Login Schema
+// Login only checks presence: accounts created under the old 6-character minimum must still sign in.
 export const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  password: z.string().min(1, "Password is required"),
 });
 
 export type LoginSchema = z.infer<typeof loginSchema>;
@@ -11,7 +12,7 @@ export type LoginSchema = z.infer<typeof loginSchema>;
 // Sign Up Schema
 export const signUpSchema = z.object({
   email: z.string().email("Invalid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
   confirmPassword: z.string(),
   fullName: z.string().min(2, "Name must be at least 2 characters").optional(),
 }).refine((data) => data.password === data.confirmPassword, {
@@ -30,7 +31,7 @@ export type ForgotPasswordSchema = z.infer<typeof forgotPasswordSchema>;
 
 // Reset Password Schema
 export const resetPasswordSchema = z.object({
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
   confirmPassword: z.string(),
   token: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {

@@ -58,13 +58,14 @@ export const useCareerStore = create<CareerState>()(
           return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
         });
         
-        set({ careers: sorted });
-        
-        // Set current career to primary or first
-        const primary = sorted.find((c) => c.isPrimary) || sorted[0];
-        if (primary) {
-          set({ currentCareer: primary });
-        }
+        // Keep the user's selected career across refetches (using its fresh data); fall back
+        // to primary/first only when nothing is selected or the selection no longer exists.
+        const selectedId = get().currentCareer?.id;
+        const stillExists = selectedId ? sorted.find((c) => c.id === selectedId) : undefined;
+        const currentCareer =
+          stillExists ?? sorted.find((c) => c.isPrimary) ?? sorted[0] ?? null;
+
+        set({ careers: sorted, currentCareer });
       },
 
       setLoading: (loading) =>

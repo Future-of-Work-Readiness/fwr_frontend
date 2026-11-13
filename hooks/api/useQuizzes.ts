@@ -87,7 +87,7 @@ export interface QuizStartResponse {
  */
 export interface QuizAnswer {
 	question_id: string;
-	selected_key: string; // A, B, C, D, E
+	selected_key: string | null; // A–E, or null = unanswered (scored as wrong by the backend)
 }
 
 /**
@@ -96,7 +96,7 @@ export interface QuizAnswer {
 export interface QuestionResult {
 	question_id: string;
 	question_text: string;
-	user_answer: string;
+	user_answer: string | null; // null = not answered
 	correct_answer: string;
 	is_correct: boolean;
 	points: number;
@@ -587,10 +587,8 @@ export function useSubmitQuiz() {
 				throw new Error('At least one answer is required');
 			}
 
-			// Validate all answers have required fields
-			const invalidAnswers = answers.filter(
-				(a) => !a.question_id || !a.selected_key
-			);
+			// Every answer needs a question_id; selected_key may be null (unanswered)
+			const invalidAnswers = answers.filter((a) => !a.question_id);
 			if (invalidAnswers.length > 0) {
 				throw new Error('Invalid answer format detected');
 			}
@@ -627,6 +625,13 @@ export function useSubmitQuiz() {
 		},
 		onError: (error) => {
 			console.error('Failed to submit quiz:', error);
+			// 409: this attempt was already submitted (e.g. a retry after a timeout whose first
+			// request actually succeeded). The first submission stands; the page sends the user to
+			// their results history.
+			if (error instanceof ApiError && error.status === 409) {
+				toast.info('This attempt was already submitted. Showing your results history.');
+				return;
+			}
 			toast.error(
 				error instanceof ApiError
 					? error.message

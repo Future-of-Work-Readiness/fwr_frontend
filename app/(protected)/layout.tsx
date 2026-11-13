@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/components/providers";
 import { DashboardNav } from "@/components/dashboard";
 
@@ -11,14 +11,15 @@ interface ProtectedLayoutProps {
 
 export default function ProtectedLayout({ children }: ProtectedLayoutProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const { isAuthenticated, isLoading } = useAuth();
 
   useEffect(() => {
     // Wait for auth state to be determined
     if (!isLoading && !isAuthenticated) {
-      router.replace("/auth");
+      router.replace(`/auth?returnUrl=${encodeURIComponent(pathname)}`);
     }
-  }, [isAuthenticated, isLoading, router]);
+  }, [isAuthenticated, isLoading, router, pathname]);
 
   // Show loading state while checking auth
   if (isLoading) {

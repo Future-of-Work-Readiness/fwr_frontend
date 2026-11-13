@@ -11,7 +11,9 @@ description: How FWR readiness, technical and soft-skill scores, pass marks and 
 `/users/{id}/peer-benchmark`. If a score looks wrong, fix it in the backend, not with frontend math.
 
 ## Backend formulas (verified 2026-11-13; re-check line numbers before relying on them)
-- **Pass:** `percentage >= quiz.passing_score` (default 70) — service.py ~503.
+- **Pass:** `percentage >= quiz.passing_score` (default 70) — service.py ~503. Percentage is over
+  every active question in the quiz; unanswered (`null`) counts as wrong.
+- Started-but-unsubmitted attempts don't count towards scores (backend change 2026-11-13).
 - **Points per quiz:** `(percentage / 20) × LEVEL_MULTIPLIERS[level]`,
   multipliers `{1: 0.6, 2: 0.8, 3: 1.0, 4: 1.3, 5: 1.6}` — service.py ~36–72.
 - **Technical score:** sum of points from the *latest* attempt on each quiz in the
@@ -23,9 +25,10 @@ description: How FWR readiness, technical and soft-skill scores, pass marks and 
 - **Which career updates:** technical quiz → career with matching `specialization_id`, else
   primary; soft-skills quiz → primary. If the updated career is primary, user-level score fields
   are mirrored.
-- **Known ceiling:** `/quizzes/find` returns the first active quiz per (spec, level), so with one
-  quiz per level technical maxes at 5 × (0.6+0.8+1.0+1.3+1.6) = 26.5 → readiness ≈ 41. Treat as a
-  suspected design bug; confirm with the backend owner before "fixing" displays.
+- **Known ceiling (confirmed by backend 2026-11-13):** one quiz per level, so technical maxes at
+  5 × (0.6+0.8+1.0+1.3+1.6) = 26.5 → readiness 41.2. Backend has proposed a weighted %-of-max
+  formula (perfect run = 100, ~3.8× lift, one-off recompute) pending a product decision. Frontend
+  bands already assume 0–100; don't add frontend scaling.
 - **Level naming mismatch:** backend docstrings say Foundational/Beginner/Intermediate/Advanced/
   Expert; frontend `lib/constants/skillLevels.ts` says Beginner/Intermediate/Proficient/Master/
   Expert. Both map to `difficulty_level` 1–5.
