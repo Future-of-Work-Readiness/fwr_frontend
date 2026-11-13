@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { 
   useQuizHistoryQuery, 
+  useQuizHistoryStatsQuery,
   type QuizAttemptHistory,
   type QuizHistoryFilters 
 } from "@/hooks";
@@ -52,6 +53,12 @@ export default function ResultsPage() {
     isLoading: resultsLoading,
     isFetching 
   } = useQuizHistoryQuery(filters);
+
+  // Stats cover every submitted attempt matching the filters (backend aggregate, not this page)
+  const { data: stats } = useQuizHistoryStatsQuery({
+    ...(filters.passed !== undefined && { passed: filters.passed }),
+    ...(filters.category && { category: filters.category }),
+  });
 
   const assessmentHistory = historyData?.attempts || [];
   const totalItems = historyData?.total || 0;
@@ -105,10 +112,10 @@ export default function ResultsPage() {
     );
   }
 
-  // Calculate stats from current page data (or use API total for accurate counts)
-  const passedCount = assessmentHistory.filter((a) => a.passed).length;
-  const avgScore = assessmentHistory.length > 0
-    ? Math.round(assessmentHistory.reduce((acc, a) => acc + a.score, 0) / assessmentHistory.length)
+  const passedCount = stats?.passedCount ?? 0;
+  const avgScore = Math.round(stats?.averagePercentage ?? 0);
+  const passRate = stats && stats.total > 0
+    ? Math.round((stats.passedCount / stats.total) * 100)
     : 0;
 
   return (
@@ -163,9 +170,7 @@ export default function ResultsPage() {
                 <Card>
                   <CardContent className="p-4 text-center">
                     <p className="text-2xl font-bold text-cyan">
-                      {assessmentHistory.length > 0 
-                        ? Math.round((passedCount / assessmentHistory.length) * 100) 
-                        : 0}%
+                      {passRate}%
                     </p>
                     <p className="text-sm text-muted-foreground">Pass Rate</p>
                   </CardContent>
@@ -316,7 +321,7 @@ export default function ResultsPage() {
                                     : "text-destructive"
                                 }`}
                               >
-                                {Math.round(assessment.score)}%
+                                {Math.round(assessment.percentage)}%
                               </div>
                               <Badge
                                 variant={assessment.passed ? "default" : "destructive"}

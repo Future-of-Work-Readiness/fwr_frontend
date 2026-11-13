@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -16,10 +16,28 @@ import { Loader2, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
 import { z } from 'zod';
 
+// Only same-origin app paths are honoured: rejects absolute URLs, protocol-relative
+// ("//host", "/\\host") and loops back to /auth.
+function getSafeReturnUrl(raw: string | null): string | null {
+	if (!raw || !raw.startsWith('/') || raw.startsWith('//') || raw.startsWith('/\\')) {
+		return null;
+	}
+	if (raw === '/auth' || raw.startsWith('/auth?') || raw.startsWith('/auth/')) {
+		return null;
+	}
+	return raw;
+}
+
 function AuthContent() {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const { isAuthenticated, user } = useAuth();
+	const returnUrl = getSafeReturnUrl(searchParams.get('returnUrl'));
+	const postLoginPath = useCallback(
+		(onboardingCompleted: boolean) =>
+			onboardingCompleted ? returnUrl ?? '/dashboard' : '/onboarding',
+		[returnUrl]
+	);
 
 	// Mutations
 	const loginMutation = useLogin();
@@ -65,23 +83,15 @@ function AuthContent() {
 	useEffect(() => {
 		if (isAuthenticated && user) {
 			// Redirect based on onboarding status
-			if (user.onboardingCompleted) {
-				router.replace('/dashboard');
-			} else {
-				router.replace('/onboarding');
-			}
+			router.replace(postLoginPath(user.onboardingCompleted));
 		}
-	}, [isAuthenticated, user, router]);
+	}, [isAuthenticated, user, router, postLoginPath]);
 
 	// Handle login success/error
 	useEffect(() => {
 		if (loginMutation.isSuccess && loginMutation.data) {
 			toast.success('Welcome back!');
-			if (loginMutation.data.user.onboardingCompleted) {
-				router.replace('/dashboard');
-			} else {
-				router.replace('/onboarding');
-			}
+			router.replace(postLoginPath(loginMutation.data.user.onboardingCompleted));
 		}
 		if (loginMutation.isError) {
 			toast.error(loginMutation.error.message || 'Login failed');
@@ -91,7 +101,8 @@ function AuthContent() {
 		loginMutation.isError,
 		loginMutation.data,
 		loginMutation.error,
-		router
+		router,
+		postLoginPath
 	]);
 
 	// Handle signup success/error

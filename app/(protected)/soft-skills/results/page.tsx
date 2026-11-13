@@ -16,6 +16,7 @@ import ScrollReveal from '@/components/ui/scroll-reveal';
 import {
 	CheckCircle2,
 	XCircle,
+	MinusCircle,
 	ArrowLeft,
 	Home,
 	RefreshCcw,
@@ -360,6 +361,11 @@ export default function SoftSkillsResultsPage() {
 															<CheckCircle2 className='h-3 w-3 mr-1' />
 															Correct
 														</Badge>
+													) : result.user_answer == null ? (
+														<Badge className='bg-muted text-muted-foreground border-border w-fit text-xs'>
+															<MinusCircle className='h-3 w-3 mr-1' />
+															Not answered
+														</Badge>
 													) : (
 														<Badge className='bg-destructive/10 text-destructive border-destructive/20 w-fit text-xs'>
 															<XCircle className='h-3 w-3 mr-1' />
@@ -501,8 +507,12 @@ export default function SoftSkillsResultsPage() {
 					isOpen={feedbackModalOpen}
 					onClose={() => setFeedbackModalOpen(false)}
 					onSubmit={async ({ rating, feedbackText }) => {
+						// FeedbackModal shows a thrown error inline
+						if (!quizResult.attempt_id) {
+							throw new Error('Assessment attempt ID is missing. Please retake the assessment.');
+						}
 						await submitFeedbackMutation.mutateAsync({
-							attemptId: quizResult.attempt_id || '',
+							attemptId: quizResult.attempt_id,
 							rating,
 							feedbackText,
 							quizId: quizResult.quiz_id,

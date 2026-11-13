@@ -65,7 +65,11 @@ export const queryKeys = {
   goals: {
     all: ['goals'] as const,
     lists: () => [...queryKeys.goals.all, 'list'] as const,
-    list: (userId: string) => [...queryKeys.goals.lists(), userId] as const,
+    // careerId is appended (not interleaved) so invalidating list(userId) still matches every career's list.
+    list: (userId: string, careerId?: string) =>
+      careerId
+        ? ([...queryKeys.goals.lists(), userId, careerId] as const)
+        : ([...queryKeys.goals.lists(), userId] as const),
     details: () => [...queryKeys.goals.all, 'detail'] as const,
     detail: (id: string) => [...queryKeys.goals.details(), id] as const,
   },
@@ -114,6 +118,10 @@ export const queryKeys = {
     find: (specName: string, level: number) => [...queryKeys.quizzes.all, 'find', specName, level] as const,
     history: (userId: string, filters?: Record<string, unknown>) => 
       [...queryKeys.quizzes.all, 'history', userId, filters] as const,
+    // Under the ['quizzes', 'history', userId] prefix on purpose: useSubmitQuiz invalidates that
+    // prefix, which refreshes these stats too.
+    historyStats: (userId: string, filters?: Record<string, unknown>) =>
+      [...queryKeys.quizzes.all, 'history', userId, 'stats', filters ?? {}] as const,
     progress: (attemptId: string) => [...queryKeys.quizzes.all, 'progress', attemptId] as const,
   },
 

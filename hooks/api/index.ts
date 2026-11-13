@@ -71,6 +71,7 @@ export {
   useFindQuizQuery,
   useQuizHistoryQuery,
   useQuizHistoryAttemptsQuery,
+  useQuizHistoryStatsQuery,
   useQuizProgressQuery,
   useQuizAttemptSummary,
   // Mutation hooks
@@ -88,6 +89,8 @@ export {
   type QuizStartResponse,
   type QuizAnswer,
   type QuestionResult,
+  type QuizHistoryStats,
+  type QuizHistoryStatsFilters,
   type ReadinessSnapshot,
   type QuizFeedback,
   type ScoreImpact,

@@ -87,7 +87,7 @@ export interface QuizStartResponse {
  */
 export interface QuizAnswer {
 	question_id: string;
-	selected_key: string; // A, B, C, D, E
+	selected_key: string | null; // A–E, or null = unanswered (scored as wrong by the backend)
 }
 
 /**
@@ -96,7 +96,7 @@ export interface QuizAnswer {
 export interface QuestionResult {
 	question_id: string;
 	question_text: string;
-	user_answer: string;
+	user_answer: string | null; // null = not answered
 	correct_answer: string;
 	is_correct: boolean;
 	points: number;
@@ -484,6 +484,60 @@ export function useQuizHistoryQuery(
 	});
 }
 
+// ============ HISTORY STATS ============
+
+/** Filters for GET /quizzes/history/stats — same as /history, without pagination */
+export type QuizHistoryStatsFilters = Omit<QuizHistoryFilters, 'limit' | 'offset'>;
+
+interface QuizHistoryStatsBackend {
+	total: number;
+	passed_count: number;
+	average_percentage: number; // 2 dp, 0.0 when there are no attempts
+}
+
+export interface QuizHistoryStats {
+	total: number;
+	passedCount: number;
+	averagePercentage: number;
+}
+
+/**
+ * Aggregate stats over every submitted attempt matching the filters (no 100-item cap).
+ * Pass rate is passedCount / total — computed by the caller.
+ */
+export function useQuizHistoryStatsQuery(
+	filters?: QuizHistoryStatsFilters,
+	options?: Omit<UseQueryOptions<QuizHistoryStats, ApiError>, 'queryKey' | 'queryFn'>
+) {
+	const { user } = useAuth();
+
+	return useQuery({
+		queryKey: queryKeys.quizzes.historyStats(user?.id || '', { ...filters }),
+		queryFn: async () => {
+			const params = new URLSearchParams();
+			if (filters?.passed !== undefined) params.append('passed', String(filters.passed));
+			if (filters?.category) params.append('category', filters.category);
+			if (filters?.dateFrom) params.append('date_from', filters.dateFrom);
+			if (filters?.dateTo) params.append('date_to', filters.dateTo);
+			if (filters?.specializationName) {
+				params.append('specialization_name', filters.specializationName);
+			}
+			const qs = params.toString();
+			const response = await api.get<QuizHistoryStatsBackend>(
+				qs ? `/quizzes/history/stats?${qs}` : '/quizzes/history/stats'
+			);
+			return {
+				total: response.total,
+				passedCount: response.passed_count,
+				averagePercentage: response.average_percentage
+			};
+		},
+		enabled: !!user?.id,
+		staleTime: 2 * 60 * 1000,
+		...options
+	});
+}
+
 /**
  * Convenience hook to get just the attempts array (for backward compatibility)
  */
@@ -587,10 +641,8 @@ export function useSubmitQuiz() {
 				throw new Error('At least one answer is required');
 			}
 
-			// Validate all answers have required fields
-			const invalidAnswers = answers.filter(
-				(a) => !a.question_id || !a.selected_key
-			);
+			// Every answer needs a question_id; selected_key may be null (unanswered)
+			const invalidAnswers = answers.filter((a) => !a.question_id);
 			if (invalidAnswers.length > 0) {
 				throw new Error('Invalid answer format detected');
 			}
@@ -627,6 +679,13 @@ export function useSubmitQuiz() {
 		},
 		onError: (error) => {
 			console.error('Failed to submit quiz:', error);
+			// 409: this attempt was already submitted (e.g. a retry after a timeout whose first
+			// request actually succeeded). The first submission stands; the page sends the user to
+			// their results history.
+			if (error instanceof ApiError && error.status === 409) {
+				toast.info('This attempt was already submitted. Showing your results history.');
+				return;
+			}
 			toast.error(
 				error instanceof ApiError
 					? error.message

@@ -1,16 +1,16 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useAuth } from "@/components/providers";
 import { useCareerStore } from "@/stores/useCareerStore";
+import { ApiError } from "@/lib/api/types";
 import { useFindQuizQuery, useStartQuiz, useSubmitQuiz, type QuizAnswer } from "@/hooks";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Loader2, ArrowLeft, Clock, ChevronLeft, ChevronRight, AlertCircle } from "lucide-react";
 import { formatSpecialisation, getLevelNumber } from "@/lib/constants";
-import { toast } from "sonner";
 
 export default function TestPage() {
   const router = useRouter();
@@ -46,6 +46,7 @@ export default function TestPage() {
   const [startTime, setStartTime] = useState<number | null>(null);
   const [quizStarted, setQuizStarted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const autoSubmittedRef = useRef(false);
 
   // Derived values
   const questions = quizData?.questions || [];
@@ -63,21 +64,15 @@ export default function TestPage() {
     }
   }, [quizStarted, quizData, timeRemaining]);
 
-  // Timer countdown
+  // Timer countdown — only counts down; submission on expiry is handled by the effect below
   useEffect(() => {
     if (timeRemaining === null || timeRemaining <= 0 || !quizStarted) return;
-    
-    const timer = setInterval(() => {
-      setTimeRemaining((prev) => {
-        if (prev === null || prev <= 1) {
-          handleSubmit();
-          return 0;
-        }
-        return prev - 1;
-      });
+
+    const timer = setTimeout(() => {
+      setTimeRemaining((prev) => (prev === null ? prev : Math.max(0, prev - 1)));
     }, 1000);
-    
-    return () => clearInterval(timer);
+
+    return () => clearTimeout(timer);
   }, [timeRemaining, quizStarted]);
 
   // Start quiz
@@ -87,10 +82,11 @@ export default function TestPage() {
     try {
       const response = await startQuizMutation.mutateAsync(quizData.quiz_id);
       setAttemptId(response.attempt_id);
+      autoSubmittedRef.current = false;
       setQuizStarted(true);
     } catch (error) {
+      // useStartQuiz already shows the error toast
       console.error("Failed to start quiz:", error);
-      toast.error("Failed to start quiz. Please try again.");
     }
   }, [quizData, startQuizMutation]);
 
@@ -126,7 +122,7 @@ export default function TestPage() {
     // Build answers array
     const answers: QuizAnswer[] = questions.map((q) => ({
       question_id: q.question_id,
-      selected_key: selectedAnswers.get(q.question_id) || "A", // Default to A if not answered
+      selected_key: selectedAnswers.get(q.question_id) ?? null, // null = unanswered, scored as wrong
     }));
     
     try {
@@ -144,11 +140,24 @@ export default function TestPage() {
       
       router.push(`/tests/${specialisation}/${level}/results`);
     } catch (error) {
+      // useSubmitQuiz already shows the toast
       console.error("Failed to submit quiz:", error);
-      toast.error("Failed to submit quiz. Please try again.");
+      if (error instanceof ApiError && error.status === 409) {
+        router.push("/results");
+        return;
+      }
       setIsSubmitting(false);
     }
   }, [attemptId, questions, selectedAnswers, submitQuizMutation, router, specialisation, level, startTime, isSubmitting]);
+
+  // Auto-submit once when the timer reaches zero. The ref stops a failed submit from
+  // retrying in a loop (timeRemaining stays 0); the user can still submit manually.
+  useEffect(() => {
+    if (quizStarted && timeRemaining === 0 && !isSubmitting && !autoSubmittedRef.current) {
+      autoSubmittedRef.current = true;
+      handleSubmit();
+    }
+  }, [quizStarted, timeRemaining, isSubmitting, handleSubmit]);
 
   // Format time display
   const formatTime = useCallback((seconds: number) => {

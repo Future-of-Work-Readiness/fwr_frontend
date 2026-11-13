@@ -248,7 +248,7 @@ function ResetPasswordContent() {
             </div>
             <CardTitle className="text-2xl font-display">Set new password</CardTitle>
             <CardDescription className="text-base mt-2">
-              Your new password must be at least 6 characters.
+              Your new password must be at least 8 characters.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -315,8 +315,8 @@ function ResetPasswordContent() {
 
               {/* Password requirements hint */}
               <div className="text-xs text-muted-foreground space-y-1">
-                <p className={password.length >= 6 ? "text-primary" : ""}>
-                  {password.length >= 6 ? "✓" : "○"} At least 6 characters
+                <p className={password.length >= 8 ? "text-primary" : ""}>
+                  {password.length >= 8 ? "✓" : "○"} At least 8 characters
                 </p>
                 <p className={password === confirmPassword && confirmPassword.length > 0 ? "text-primary" : ""}>
                   {password === confirmPassword && confirmPassword.length > 0 ? "✓" : "○"} Passwords match

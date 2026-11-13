@@ -18,6 +18,7 @@ import {
 	ArrowLeft,
 	CheckCircle2,
 	XCircle,
+	MinusCircle,
 	Clock,
 	Target,
 	TrendingUp,
@@ -364,6 +365,11 @@ export default function TestResultsPage() {
 														<CheckCircle2 className='h-3 w-3 mr-1' />
 														Correct (+{result.earned_points} pts)
 													</Badge>
+												) : result.user_answer == null ? (
+													<Badge className='bg-muted text-muted-foreground border-border w-fit text-xs'>
+														<MinusCircle className='h-3 w-3 mr-1' />
+														Not answered
+													</Badge>
 												) : (
 													<Badge className='bg-destructive/10 text-destructive border-destructive/20 w-fit text-xs'>
 														<XCircle className='h-3 w-3 mr-1' />
@@ -520,13 +526,8 @@ export default function TestResultsPage() {
 					isOpen={feedbackModalOpen}
 					onClose={() => setFeedbackModalOpen(false)}
 					onSubmit={async ({ rating, feedbackText }) => {
-						// Debug: Log the attempt_id being used
-						console.log('[Feedback Debug] quizResult:', quizResult);
-						console.log('[Feedback Debug] attempt_id:', quizResult.attempt_id);
-						console.log('[Feedback Debug] quiz_id:', quizResult.quiz_id);
-						
+						// FeedbackModal shows a thrown error inline
 						if (!quizResult.attempt_id) {
-							console.error('[Feedback Error] attempt_id is missing from quizResult!');
 							throw new Error('Quiz attempt ID is missing. Please retake the quiz.');
 						}
 						

@@ -91,7 +91,7 @@ export default function DashboardPage() {
         <div className="text-center">
           <h2 className="text-2xl font-bold mb-4">No Career Profile</h2>
           <p className="text-muted-foreground mb-6">Please create a career profile to continue.</p>
-          <Button onClick={() => router.push("/add-career")} className="bg-primary hover:bg-primary/90">
+          <Button onClick={() => router.push("/careers/add")} className="bg-primary hover:bg-primary/90">
             Add Career Profile
           </Button>
         </div>

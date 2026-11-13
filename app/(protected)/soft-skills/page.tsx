@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/providers";
 import { useCareerStore } from "@/stores/useCareerStore";
+import { ApiError } from "@/lib/api/types";
 import { useFindQuizQuery, useStartQuiz, useSubmitQuiz, type QuizAnswer } from "@/hooks";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,7 +15,6 @@ import {
   Loader2, ChevronRight, ChevronLeft, ArrowLeft, Clock, Users, 
   MessageSquare, Target, TrendingUp, AlertCircle, Play
 } from "lucide-react";
-import { toast } from "sonner";
 
 type TestState = "intro" | "testing" | "submitting";
 
@@ -42,6 +42,7 @@ export default function SoftSkillsPage() {
   const [selectedAnswers, setSelectedAnswers] = useState<Map<string, string>>(new Map());
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
   const [startTime, setStartTime] = useState<number | null>(null);
+  const autoSubmittedRef = useRef(false);
 
   // Derived values
   const questions = quizData?.questions || [];
@@ -66,21 +67,15 @@ export default function SoftSkillsPage() {
     }
   }, [testState, quizData, timeRemaining]);
 
-  // Timer countdown
+  // Timer countdown — only counts down; submission on expiry is handled by the effect below
   useEffect(() => {
     if (timeRemaining === null || timeRemaining <= 0 || testState !== "testing") return;
-    
-    const timer = setInterval(() => {
-      setTimeRemaining((prev) => {
-        if (prev === null || prev <= 1) {
-          handleSubmit();
-          return 0;
-        }
-        return prev - 1;
-      });
+
+    const timer = setTimeout(() => {
+      setTimeRemaining((prev) => (prev === null ? prev : Math.max(0, prev - 1)));
     }, 1000);
-    
-    return () => clearInterval(timer);
+
+    return () => clearTimeout(timer);
   }, [timeRemaining, testState]);
 
   // Start test
@@ -93,10 +88,11 @@ export default function SoftSkillsPage() {
       setSelectedAnswers(new Map());
       setCurrentQuestionIndex(0);
       setTimeRemaining(null); // Will be set by effect
+      autoSubmittedRef.current = false;
       setTestState("testing");
     } catch (error) {
+      // useStartQuiz already shows the error toast
       console.error("Failed to start quiz:", error);
-      toast.error("Failed to start assessment. Please try again.");
     }
   }, [quizData, startQuizMutation]);
 
@@ -132,7 +128,7 @@ export default function SoftSkillsPage() {
     // Build answers array
     const answers: QuizAnswer[] = questions.map((q) => ({
       question_id: q.question_id,
-      selected_key: selectedAnswers.get(q.question_id) || "A", // Default to A if not answered
+      selected_key: selectedAnswers.get(q.question_id) ?? null, // null = unanswered, scored as wrong
     }));
     
     try {
@@ -150,11 +146,24 @@ export default function SoftSkillsPage() {
       
       router.push("/soft-skills/results");
     } catch (error) {
+      // useSubmitQuiz already shows the toast
       console.error("Failed to submit assessment:", error);
-      toast.error("Failed to submit assessment. Please try again.");
+      if (error instanceof ApiError && error.status === 409) {
+        router.push("/results");
+        return;
+      }
       setTestState("testing");
     }
   }, [attemptId, questions, selectedAnswers, submitQuizMutation, router, startTime, testState]);
+
+  // Auto-submit once when the timer reaches zero. The ref stops a failed submit from
+  // retrying in a loop (timeRemaining stays 0); the user can still submit manually.
+  useEffect(() => {
+    if (testState === "testing" && timeRemaining === 0 && !autoSubmittedRef.current) {
+      autoSubmittedRef.current = true;
+      handleSubmit();
+    }
+  }, [testState, timeRemaining, handleSubmit]);
 
   // Format time
   const formatTime = (seconds: number) => {

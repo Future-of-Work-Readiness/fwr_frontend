@@ -102,9 +102,9 @@ export function useGoalsQuery(
   const { user } = useAuth();
 
   return useQuery({
-    queryKey: queryKeys.goals.list(user?.id || ''),
+    queryKey: queryKeys.goals.list(user?.id || '', careerId),
     queryFn: async () => {
-      const params = careerId ? `?careerId=${careerId}` : '';
+      const params = careerId ? `?careerId=${encodeURIComponent(careerId)}` : '';
       const response = await api.get<GoalListResponse | GoalWithProgress[]>(`/goals${params}`);
       
       // Handle both wrapped and direct array responses
@@ -312,10 +312,12 @@ export function useUpdateGoalProgress() {
     }: {
       goalId: string;
       progress: number;
-    }) => api.patch<GoalWithProgress>(`/goals/${goalId}/progress?progress=${progress}`),
+    }) => api.patch(`/goals/${goalId}/progress?progress=${progress}`),
 
-    onSuccess: (data, variables) => {
-      queryClient.setQueryData(queryKeys.goals.detail(variables.goalId), data);
+    onSuccess: (_data, variables) => {
+      // The endpoint returns a partial progress summary, not a full goal — refetch instead of
+      // writing it into the detail cache.
+      queryClient.invalidateQueries({ queryKey: queryKeys.goals.detail(variables.goalId) });
 
       if (user?.id) {
         queryClient.invalidateQueries({
