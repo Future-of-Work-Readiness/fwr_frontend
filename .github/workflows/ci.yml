@@ -1,0 +1,99 @@
+name: CI
+
+# Vercel deploys through its own GitHub App (main → production, dev → preview/staging); those
+# show up as deployments and commit statuses, not Actions runs. This workflow is the code-quality
+# gate that runs alongside them.
+on:
+  push:
+    branches: [dev, main]
+  pull_request:
+    branches: [main, dev]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: "22"
+  # Lint must not get worse than this. Lower it as errors are fixed; remove the gate (and use a
+  # plain `npm run lint`) once it reaches 0. Baseline set 2026-11-13.
+  LINT_ERROR_BASELINE: "37"
+
+jobs:
+  typecheck-and-build:
+    name: Typecheck & build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      - name: Typecheck
+        run: npx tsc --noEmit
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
+
+  lint:
+    name: Lint (no new errors)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      - name: ESLint
+        # eslint exits non-zero while baseline errors exist; the next step decides pass/fail.
+        run: npx eslint . -f json -o eslint-report.json || true
+      - name: Compare with baseline
+        run: |
+          node -e '
+            const report = require("./eslint-report.json");
+            let errors = 0, warnings = 0;
+            for (const file of report) {
+              for (const m of file.messages) {
+                if (m.severity === 2) {
+                  errors++;
+                  const path = file.filePath.replace(process.cwd() + "/", "");
+                  // Plain log lines, not annotations: baseline errors would otherwise flag every PR.
+                  console.log(`${path}:${m.line}:${m.column}  ${m.ruleId}  ${m.message.split("\n")[0]}`);
+                } else {
+                  warnings++;
+                }
+              }
+            }
+            const baseline = Number(process.env.LINT_ERROR_BASELINE);
+            console.log(`ESLint: ${errors} errors, ${warnings} warnings (error baseline ${baseline})`);
+            if (errors > baseline) {
+              console.log(`::error::Lint errors increased: ${errors} > baseline ${baseline}. Fix the new errors.`);
+              process.exit(1);
+            }
+            if (errors < baseline) {
+              console.log(`::notice::Lint errors dropped to ${errors}. Lower LINT_ERROR_BASELINE in .github/workflows/ci.yml to ${errors}.`);
+            }
+          '
+
+  audit:
+    name: Security audit (production deps)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      # Reads package-lock.json only; no install needed. Fails on high/critical advisories in
+      # production dependencies (dev-only advisories are tracked in the per-session dependency check).
+      - run: npm audit --omit=dev --audit-level=high

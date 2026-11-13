@@ -11,7 +11,7 @@
 Commands:
 - `npm run dev` / `npm run build` / `npm run start`
 - `npm run lint` — ESLint 9, `eslint-config-next` core-web-vitals + typescript, no custom rules.
-  Baseline 2026-11-13 (post-Phase 9 upgrade): 37 errors / 51 warnings (mostly `react/no-unescaped-entities`, React
+  Baseline 2026-11-13 (post-Phase 10 fixes): 37 errors / 49 warnings (mostly `react/no-unescaped-entities`, React
   Compiler setState-in-effect, unused vars).
 - `npx tsc --noEmit` — typecheck (no npm script). Baseline: 0 errors.
 - No test runner is configured.
@@ -33,15 +33,23 @@ run `/mcp` once to sign in) and `next-devtools` (`npx next-devtools-mcp@latest`;
 - Remote: `git@github.com:Future-of-Work-Readiness/fwr_frontend.git`.
 
 ## CI
-None. No `.github/workflows`. Run `npx tsc --noEmit`, `npm run lint` and `npm run build`
-locally before opening a dev → main PR.
+GitHub Actions, `.github/workflows/ci.yml` (added 2026-11-13). Runs on push to `dev`/`main`, on
+PRs into `main`/`dev`, and manually (`workflow_dispatch`). Node 22, `npm ci`. Three jobs:
+- **Typecheck & build** — `npx tsc --noEmit`, `npm run build`.
+- **Lint (no new errors)** — fails only if ESLint errors exceed `LINT_ERROR_BASELINE` (37). When
+  errors drop, the job prints a notice: lower the baseline in the same PR. At 0, replace the gate
+  with a plain `npm run lint`.
+- **Security audit** — `npm audit --omit=dev --audit-level=high`. Can turn red without a code change
+  when a new advisory is published; fix with the dependency-check skill.
+Vercel's builds are separate (its GitHub App posts deployments/commit statuses; they never appear
+under Actions). Still run the checks locally before pushing — CI reports, it doesn't fix.
 
 ## Release / deployment
 Deployed on **Vercel** via its Git integration (confirmed by the owner 2026-11-13). There is no
 `vercel.json`; Vercel's Next.js defaults apply (`npm run build`). `NEXT_PUBLIC_API_URL` must be
 set in the Vercel project's environment variables (it's inlined at build time, so changing it
 needs a redeploy).
-Not yet recorded: which branch is production (presumably `main`, with `dev` as preview) and
-the production/backend URLs — fill in when confirmed.
-Because there's no CI, Vercel's build is the only automated check on a merge — run
-`npx tsc --noEmit` and `npm run build` locally before merging `dev` → `main`.
+Branches (confirmed by the owner 2026-11-13): **`main` → production**, **`dev` → Vercel preview,
+used as staging**. Not yet recorded: the production/staging/backend URLs — fill in when known.
+Merge `dev` → `main` only when CI is green and any backend change the frontend depends on is
+already live in production (e.g. nullable `selected_key`, Phase 10).

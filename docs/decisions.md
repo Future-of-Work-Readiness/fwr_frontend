@@ -5,6 +5,17 @@
      ../skyblue-nectar-haven-1237efe5-main/MIGRATION_PROMPT.md. "Not recorded" means no evidence
      of the rationale exists — fill it in if known. -->
 
+## 2026-11-13 — GitHub Actions CI with a lint-baseline gate
+Context: The only automated check was Vercel's build, which doesn't typecheck separately, lint, or
+audit, and doesn't appear under GitHub Actions. Lint had 37 pre-existing errors.
+Decision: `.github/workflows/ci.yml` — typecheck + build, a lint job that fails only when errors
+exceed a baseline (`LINT_ERROR_BASELINE`), and `npm audit --omit=dev --audit-level=high`. Node 22.
+Alternatives considered: plain `npm run lint` in CI; lint as non-blocking (`continue-on-error`);
+pinning Node via `engines` in package.json.
+Why rejected: plain lint would be red on every run until Phase 10 #12; non-blocking lint lets new
+errors in silently. `engines` is also read by Vercel and could change the production build's Node
+version — kept CI on 22 (local version) until Vercel's Node version is confirmed.
+
 ## 2025-11-27 — Convert the frontend from JavaScript to TypeScript
 Context: The Vite React app (Oct–Nov 2025) was plain JSX.
 Decision: Convert to TypeScript (commits `e1e57b2`, `798b898`).
