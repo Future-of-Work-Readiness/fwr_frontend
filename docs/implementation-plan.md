@@ -6,9 +6,9 @@
      five lines; anything durable belongs in decisions.md, architecture.md, or a
      phase's own Summary/Follow-ups instead. See implementation-lifecycle.md. -->
 _Last updated: 2026-11-13_
-Current phase: Phase 10 — Stabilisation (in progress; bugs 1, 3–11 done + browser-verified, uncommitted).
-Next objective: Commit stats wiring; wait for backend production deploy before merging dev → main; decide #2; then lint-to-zero (#12) and hydration (#13).
-Blockers: None — backend release (nullable `selected_key`, 409s, `/history/stats`) live in production 2026-11-13 15:41 UTC; PR #28 (dev → main) ready to merge after a staging smoke test. CI added 2026-11-13 (`.github/workflows/ci.yml`).
+Current phase: Phase 10 — Stabilisation (in progress). Phases 9 + 10 bug fixes + CI released to production 2026-11-13 (PR #28, merge b50af6b).
+Next objective: Phase 10 #12 lint to zero (lower `LINT_ERROR_BASELINE` as you go) and #13 hydration mismatch; #2 readiness formula awaits a product decision.
+Blockers: None. `main` has a ruleset ("push-protection") that only org admins can bypass — merge with `gh pr merge N --merge --admin`, or adopt the PR + required-checks ruleset suggested 2026-11-13.
 Not yet migrated: None — Claude docs bootstrapped from code + git history on 2026-11-13 (no Cursor rules existed). README.md is still create-next-app boilerplate; replace with a pointer to docs/ once docs are confirmed.
 
 ## Phase 1 — Vite JS prototype
