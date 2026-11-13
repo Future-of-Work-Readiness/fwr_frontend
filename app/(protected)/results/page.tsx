@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { 
   useQuizHistoryQuery, 
+  useQuizHistoryStatsQuery,
   type QuizAttemptHistory,
   type QuizHistoryFilters 
 } from "@/hooks";
@@ -53,12 +54,8 @@ export default function ResultsPage() {
     isFetching 
   } = useQuizHistoryQuery(filters);
 
-  // Stats cover every attempt matching the filters, not just the current page. The backend
-  // caps a page at 100, so beyond that the stats describe the latest 100 (labelled below).
-  const STATS_LIMIT = 100;
-  const { data: statsData } = useQuizHistoryQuery({
-    limit: STATS_LIMIT,
-    offset: 0,
+  // Stats cover every submitted attempt matching the filters (backend aggregate, not this page)
+  const { data: stats } = useQuizHistoryStatsQuery({
     ...(filters.passed !== undefined && { passed: filters.passed }),
     ...(filters.category && { category: filters.category }),
   });
@@ -115,15 +112,10 @@ export default function ResultsPage() {
     );
   }
 
-  // `score` is raw points; `percentage` is what the UI shows as "%".
-  const statsAttempts = statsData?.attempts || [];
-  const statsTruncated = (statsData?.total ?? 0) > statsAttempts.length;
-  const passedCount = statsAttempts.filter((a) => a.passed).length;
-  const avgScore = statsAttempts.length > 0
-    ? Math.round(statsAttempts.reduce((acc, a) => acc + a.percentage, 0) / statsAttempts.length)
-    : 0;
-  const passRate = statsAttempts.length > 0
-    ? Math.round((passedCount / statsAttempts.length) * 100)
+  const passedCount = stats?.passedCount ?? 0;
+  const avgScore = Math.round(stats?.averagePercentage ?? 0);
+  const passRate = stats && stats.total > 0
+    ? Math.round((stats.passedCount / stats.total) * 100)
     : 0;
 
   return (
@@ -164,9 +156,7 @@ export default function ResultsPage() {
                     <p className="text-2xl font-bold text-primary">
                       {passedCount}
                     </p>
-                    <p className="text-sm text-muted-foreground">
-                      Passed{statsTruncated && ` (latest ${STATS_LIMIT})`}
-                    </p>
+                    <p className="text-sm text-muted-foreground">Passed</p>
                   </CardContent>
                 </Card>
                 <Card>
@@ -174,9 +164,7 @@ export default function ResultsPage() {
                     <p className="text-2xl font-bold text-orange">
                       {avgScore}%
                     </p>
-                    <p className="text-sm text-muted-foreground">
-                      Avg Score{statsTruncated && ` (latest ${STATS_LIMIT})`}
-                    </p>
+                    <p className="text-sm text-muted-foreground">Avg Score</p>
                   </CardContent>
                 </Card>
                 <Card>
@@ -184,9 +172,7 @@ export default function ResultsPage() {
                     <p className="text-2xl font-bold text-cyan">
                       {passRate}%
                     </p>
-                    <p className="text-sm text-muted-foreground">
-                      Pass Rate{statsTruncated && ` (latest ${STATS_LIMIT})`}
-                    </p>
+                    <p className="text-sm text-muted-foreground">Pass Rate</p>
                   </CardContent>
                 </Card>
               </div>

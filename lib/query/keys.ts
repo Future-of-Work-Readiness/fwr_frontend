@@ -118,6 +118,10 @@ export const queryKeys = {
     find: (specName: string, level: number) => [...queryKeys.quizzes.all, 'find', specName, level] as const,
     history: (userId: string, filters?: Record<string, unknown>) => 
       [...queryKeys.quizzes.all, 'history', userId, filters] as const,
+    // Under the ['quizzes', 'history', userId] prefix on purpose: useSubmitQuiz invalidates that
+    // prefix, which refreshes these stats too.
+    historyStats: (userId: string, filters?: Record<string, unknown>) =>
+      [...queryKeys.quizzes.all, 'history', userId, 'stats', filters ?? {}] as const,
     progress: (attemptId: string) => [...queryKeys.quizzes.all, 'progress', attemptId] as const,
   },
 

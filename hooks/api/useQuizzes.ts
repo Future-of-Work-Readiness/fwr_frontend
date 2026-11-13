@@ -484,6 +484,60 @@ export function useQuizHistoryQuery(
 	});
 }
 
+// ============ HISTORY STATS ============
+
+/** Filters for GET /quizzes/history/stats — same as /history, without pagination */
+export type QuizHistoryStatsFilters = Omit<QuizHistoryFilters, 'limit' | 'offset'>;
+
+interface QuizHistoryStatsBackend {
+	total: number;
+	passed_count: number;
+	average_percentage: number; // 2 dp, 0.0 when there are no attempts
+}
+
+export interface QuizHistoryStats {
+	total: number;
+	passedCount: number;
+	averagePercentage: number;
+}
+
+/**
+ * Aggregate stats over every submitted attempt matching the filters (no 100-item cap).
+ * Pass rate is passedCount / total — computed by the caller.
+ */
+export function useQuizHistoryStatsQuery(
+	filters?: QuizHistoryStatsFilters,
+	options?: Omit<UseQueryOptions<QuizHistoryStats, ApiError>, 'queryKey' | 'queryFn'>
+) {
+	const { user } = useAuth();
+
+	return useQuery({
+		queryKey: queryKeys.quizzes.historyStats(user?.id || '', { ...filters }),
+		queryFn: async () => {
+			const params = new URLSearchParams();
+			if (filters?.passed !== undefined) params.append('passed', String(filters.passed));
+			if (filters?.category) params.append('category', filters.category);
+			if (filters?.dateFrom) params.append('date_from', filters.dateFrom);
+			if (filters?.dateTo) params.append('date_to', filters.dateTo);
+			if (filters?.specializationName) {
+				params.append('specialization_name', filters.specializationName);
+			}
+			const qs = params.toString();
+			const response = await api.get<QuizHistoryStatsBackend>(
+				qs ? `/quizzes/history/stats?${qs}` : '/quizzes/history/stats'
+			);
+			return {
+				total: response.total,
+				passedCount: response.passed_count,
+				averagePercentage: response.average_percentage
+			};
+		},
+		enabled: !!user?.id,
+		staleTime: 2 * 60 * 1000,
+		...options
+	});
+}
+
 /**
  * Convenience hook to get just the attempts array (for backward compatibility)
  */

@@ -55,7 +55,8 @@ quiz_id, quiz_title, difficulty_level, category, specialization_name}`. `useFeed
 - Submit returns **409** if the attempt was already submitted: the hook shows an info toast and
   the page routes to `/results` (the first submission stands; its result isn't re-fetchable with
   per-question answers — `/attempts/{id}/results` returns `user_answer: ""` and 409s until submitted).
-- `/quizzes/history` currently includes started-but-unsubmitted attempts as 0%/failed (no flag).
+- `/quizzes/history` returns submitted attempts only; aggregate stats come from
+  `/quizzes/history/stats` (`useQuizHistoryStatsQuery`) — don't compute them from a history page.
 - Timer pattern (keep it): the countdown effect only decrements; a separate effect guarded by
   `autoSubmittedRef` submits once at 0. Quiz hooks own error toasts — pages don't toast.
 - `useSaveQuizProgress` / `useQuizProgressQuery` (save/resume) exist but aren't wired.

@@ -7,7 +7,7 @@
      phase's own Summary/Follow-ups instead. See implementation-lifecycle.md. -->
 _Last updated: 2026-11-13_
 Current phase: Phase 10 — Stabilisation (in progress; bugs 1, 3–11 done + browser-verified, uncommitted).
-Next objective: Commit Phase 10; answer backend on #14 and decide #2; then lint-to-zero (#12) and hydration (#13).
+Next objective: Commit stats wiring; wait for backend production deploy before merging dev → main; decide #2; then lint-to-zero (#12) and hydration (#13).
 Blockers: Don't merge dev → main until the backend scoring fix (nullable `selected_key`) is live in production. CI added 2026-11-13 (`.github/workflows/ci.yml`).
 Not yet migrated: None — Claude docs bootstrapped from code + git history on 2026-11-13 (no Cursor rules existed). README.md is still create-next-app boilerplate; replace with a pointer to docs/ once docs are confirmed.
 
@@ -76,14 +76,14 @@ Follow-ups: 8 moderate dev-only advisories remain (minimatch via typescript-esli
 Majors deliberately held — each its own later phase, if wanted: typescript 5.9 → 7, eslint 9 → 10 (check eslint-config-next support), framer-motion 12 → 14, lucide-react 0.562 → 1.x (icon renames), @types/node 20 → match Vercel's Node. Unused deps (recharts, date-fns, embla-carousel-react, input-otp, react-day-picker, react-resizable-panels, tailwindcss-animate) should be removed, not upgraded.
 
 ## Phase 10 — Stabilisation
-Status: in progress — items 3–11 done and browser-verified 2026-11-13 against local backend (throwaway user `phase10-test-*@example.com`); tsc clean, build passes, lint 37 E / 49 W. #1 done after backend fix. Open: #2 (product decision), #12 lint, #13 hydration, #14 (backend history).
+Status: in progress — items 3–11 done and browser-verified 2026-11-13 against local backend (throwaway user `phase10-test-*@example.com`); tsc clean, build passes, lint 37 E / 49 W. #1, #14 done after backend fixes. Open: #2 (product decision), #12 lint, #13 hydration.
 Summary: Fix known functional bugs found during the 2026-11-13 audit, then bring lint to zero errors.
 Key files: see list
 Assumptions: Password rule is frontend-only (backend has none): sign-up/reset now ≥8, login only checks presence so existing 6–7 char passwords still work.
 Bug list (status):
 1. Done — backend fixed scoring (scores over every quiz question; `selected_key` nullable; duplicates/foreign ids ignored; 409 on resubmit). Frontend now sends `null` for unanswered, results show "Not answered", and a 409 on submit shows an info toast and routes to `/results`. Verified: 1/20 answered → 1/20 (was 7/20); soft skills with none answered → 0% (was 5%); forced 409 → one toast + redirect.
 2. **Awaiting product decision.** Readiness ceiling confirmed by backend: technical max 26.5, readiness max 41.2. Backend proposes weighted %-of-max (perfect run = 100, ~3.8× lift on stored scores, one-off recompute). No frontend change needed — gauge bands (40/60/80) and benchmarking `floor(technical/20)` already assume a 0–100 scale and are unreachable today.
-14. **Backend question open:** `/quizzes/history` lists started-but-unsubmitted attempts as 0%/failed with no distinguishing field, skewing history stats and totals. Recommended: backend drops them from history (frontend doesn't resume quizzes). Optional: backend aggregate stats endpoint to replace the 100-row stats query in `app/(protected)/results/page.tsx`.
+14. Done (backend + frontend, local) — `/quizzes/history` (and dashboard recent attempts) now return submitted attempts only; stats endpoint wired. Verified locally: 4 tests / 11% avg overall, technical filter 2 / 20%, matching `/history`.
 3. Done — dashboard empty state → `/careers/add`.
 4. Done — goals page uses `useUpdateGoalProgress` (`PATCH /goals/{id}/progress`); generic PATCH recomputed progress from current/target value. Progress hook now invalidates the detail query instead of caching the partial response.
 5. Done — `setCareers` keeps the selected career (refreshed) if it still exists.
@@ -91,7 +91,7 @@ Bug list (status):
 7. Done — `/auth` honours a validated same-origin `returnUrl`; protected layout now passes the current path.
 8. Done — page-level error toasts removed from quiz pages (hooks toast); timer only decrements, a separate once-only effect auto-submits at 0.
 9. Done — soft-skills feedback refuses an empty `attempt_id` (modal shows the error); `[Feedback Debug]` logs removed.
-10. Done — results stats from an unpaginated query (≤100, labelled "latest 100" beyond). Also fixed: rows and average showed raw points (`score`) as "%"; now `percentage`.
+10. Done — results stats come from backend `GET /quizzes/history/stats` (`useQuizHistoryStatsQuery`; all submitted attempts, same filters; pass rate = passed/total). Also fixed: rows and average showed raw points (`score`) as "%"; now `percentage`.
 11. Done — see Assumptions.
 12. Lint to zero errors — not started (37 errors: 23 `react/no-unescaped-entities`, 11 `react-hooks/set-state-in-effect`, 2 `no-empty-object-type`, 1 `no-html-link-for-pages`).
 13. Pre-existing (confirmed against the committed layout): hydration mismatch on every protected page — `app/(protected)/layout.tsx` server-renders the auth spinner, the client renders the app shell from persisted auth in localStorage. Recoverable, but React re-renders the tree. Fix: render the spinner until mounted (or move auth gating out of first render).
