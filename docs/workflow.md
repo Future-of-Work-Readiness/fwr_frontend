@@ -50,6 +50,17 @@ Deployed on **Vercel** via its Git integration (confirmed by the owner 2026-11-1
 set in the Vercel project's environment variables (it's inlined at build time, so changing it
 needs a redeploy).
 Branches (confirmed by the owner 2026-11-13): **`main` → production**, **`dev` → Vercel preview,
-used as staging**. Not yet recorded: the production/staging/backend URLs — fill in when known.
+used as staging**.
+The Vercel team is on the **Hobby** plan, which cannot deploy from a *private* repo owned by a GitHub
+organization ("Cannot deploy from a private GitHub organization repository on the Hobby plan").
+The repo was made **public** on 2026-11-13 to keep deploying (history scanned for secrets first —
+none found). Don't make it private again without moving Vercel to Pro. Never commit secrets: CI runs
+on fork PRs and the code is world-readable. A blocked deploy isn't retried automatically — push a
+new commit or redeploy from the Vercel dashboard.
+
+URLs (2026-11-13): production frontend `https://fwr-frontend.vercel.app` → backend
+`https://fwr-backend-crhc.onrender.com/api/v1` (Render; read from the production bundle). Staging
+preview URLs are per-deployment — see the Vercel bot comment on the PR. Which backend the Preview
+environment's `NEXT_PUBLIC_API_URL` points to is not yet recorded.
 Merge `dev` → `main` only when CI is green and any backend change the frontend depends on is
 already live in production (e.g. nullable `selected_key`, Phase 10).

@@ -8,7 +8,7 @@
 _Last updated: 2026-11-13_
 Current phase: Phase 10 — Stabilisation (in progress; bugs 1, 3–11 done + browser-verified, uncommitted).
 Next objective: Commit stats wiring; wait for backend production deploy before merging dev → main; decide #2; then lint-to-zero (#12) and hydration (#13).
-Blockers: Don't merge dev → main until the backend scoring fix (nullable `selected_key`) is live in production. CI added 2026-11-13 (`.github/workflows/ci.yml`).
+Blockers: None — backend release (nullable `selected_key`, 409s, `/history/stats`) live in production 2026-11-13 15:41 UTC; PR #28 (dev → main) ready to merge after a staging smoke test. CI added 2026-11-13 (`.github/workflows/ci.yml`).
 Not yet migrated: None — Claude docs bootstrapped from code + git history on 2026-11-13 (no Cursor rules existed). README.md is still create-next-app boilerplate; replace with a pointer to docs/ once docs are confirmed.
 
 ## Phase 1 — Vite JS prototype
@@ -65,7 +65,7 @@ Status: done
 Summary: 2026-11-13. Moved the project from Cursor to Claude Code: CLAUDE.md, docs/*, repo-local skills reconstructed from code + git history (no Cursor rules existed). Added Vercel + Next DevTools MCP servers and a per-session dependency check.
 Key files: `CLAUDE.md`, `docs/*`, `.claude/skills/*`, `.mcp.json`
 Assumptions: Decision rationales marked "not recorded" where no evidence exists.
-Follow-ups: ~~Record Vercel production branch~~ (done 2026-11-13: main → prod, dev → preview/staging); record production/backend URLs in docs/workflow.md; replace README.md.
+Follow-ups: ~~Record Vercel production branch~~ (done 2026-11-13: main → prod, dev → preview/staging); ~~record production/backend URLs~~ (done 2026-11-13); replace README.md.
 
 ## Phase 9 — Dependency & security upgrade (in-major)
 Status: done (pending a browser click-through against a running backend)
