@@ -7,7 +7,7 @@
      phase's own Summary/Follow-ups instead. See implementation-lifecycle.md. -->
 _Last updated: 2026-11-13_
 Current phase: Phase 10 — Stabilisation (in progress). Phases 9 + 10 bug fixes + CI released to production 2026-11-13 (PR #28, merge b50af6b).
-Next objective: Phase 10 #12 lint to zero (lower `LINT_ERROR_BASELINE` as you go) and #13 hydration mismatch; #2 readiness formula awaits a product decision.
+Next objective: Phase 10 #12 lint to zero (lower `LINT_ERROR_BASELINE` as you go) and #13 hydration mismatch. (#2 readiness formula resolved by backend 2026-11-13.)
 Blockers: None. `main` has a ruleset ("push-protection") that only org admins can bypass — merge with `gh pr merge N --merge --admin`, or adopt the PR + required-checks ruleset suggested 2026-11-13.
 Not yet migrated: None — Claude docs bootstrapped from code + git history on 2026-11-13 (no Cursor rules existed). README.md is still create-next-app boilerplate; replace with a pointer to docs/ once docs are confirmed.
 
@@ -76,13 +76,13 @@ Follow-ups: 8 moderate dev-only advisories remain (minimatch via typescript-esli
 Majors deliberately held — each its own later phase, if wanted: typescript 5.9 → 7, eslint 9 → 10 (check eslint-config-next support), framer-motion 12 → 14, lucide-react 0.562 → 1.x (icon renames), @types/node 20 → match Vercel's Node. Unused deps (recharts, date-fns, embla-carousel-react, input-otp, react-day-picker, react-resizable-panels, tailwindcss-animate) should be removed, not upgraded.
 
 ## Phase 10 — Stabilisation
-Status: in progress — items 3–11 done and browser-verified 2026-11-13 against local backend (throwaway user `phase10-test-*@example.com`); tsc clean, build passes, lint 37 E / 49 W. #1, #14 done after backend fixes. Open: #2 (product decision), #12 lint, #13 hydration.
+Status: in progress — items 3–11 done and browser-verified 2026-11-13 against local backend (throwaway user `phase10-test-*@example.com`); tsc clean, build passes, lint 37 E / 49 W. #1, #14 done after backend fixes; #2 resolved by backend formula change. Open: #12 lint, #13 hydration.
 Summary: Fix known functional bugs found during the 2026-11-13 audit, then bring lint to zero errors.
 Key files: see list
 Assumptions: Password rule is frontend-only (backend has none): sign-up/reset now ≥8, login only checks presence so existing 6–7 char passwords still work.
 Bug list (status):
 1. Done — backend fixed scoring (scores over every quiz question; `selected_key` nullable; duplicates/foreign ids ignored; 409 on resubmit). Frontend now sends `null` for unanswered, results show "Not answered", and a 409 on submit shows an info toast and routes to `/results`. Verified: 1/20 answered → 1/20 (was 7/20); soft skills with none answered → 0% (was 5%); forced 409 → one toast + redirect.
-2. **Awaiting product decision.** Readiness ceiling confirmed by backend: technical max 26.5, readiness max 41.2. Backend proposes weighted %-of-max (perfect run = 100, ~3.8× lift on stored scores, one-off recompute). No frontend change needed — gauge bands (40/60/80) and benchmarking `floor(technical/20)` already assume a 0–100 scale and are unreachable today.
+2. **Done (backend, live 2026-11-13).** Technical is now a level-weighted %-of-max (perfect run = 100; was capped at 26.5 → readiness 41.2). Stored scores recomputed (~3.77×, rankings unchanged, goals untouched); readiness now 2-dp on submit too. Frontend audit: no change needed — gauge (80/60/40) and results colour bands were built for 0–100; `score_impact.quiz_points` isn't displayed; benchmarking `completedLevels` is computed but never rendered.
 14. Done (backend + frontend, local) — `/quizzes/history` (and dashboard recent attempts) now return submitted attempts only; stats endpoint wired. Verified locally: 4 tests / 11% avg overall, technical filter 2 / 20%, matching `/history`.
 3. Done — dashboard empty state → `/careers/add`.
 4. Done — goals page uses `useUpdateGoalProgress` (`PATCH /goals/{id}/progress`); generic PATCH recomputed progress from current/target value. Progress hook now invalidates the detail query instead of caching the partial response.
