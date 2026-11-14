@@ -6,8 +6,8 @@
      five lines; anything durable belongs in decisions.md, architecture.md, or a
      phase's own Summary/Follow-ups instead. See implementation-lifecycle.md. -->
 _Last updated: 2026-11-13_
-Current phase: Phase 10 — Stabilisation (in progress). Phases 9 + 10 bug fixes + CI released to production 2026-11-13 (PR #28, merge b50af6b).
-Next objective: Phase 10 complete pending release of #12/#13 (dev → main). Optional follow-up: clear the 49 lint warnings (mostly unused imports/vars).
+Current phase: Phase 10 — Stabilisation (complete). Released to production: bug fixes + CI 2026-11-13 (PR #28, merge b50af6b); #12 lint + #13 hydration 2026-11-14 (PR #29, merge da25833).
+Next objective: Phase 10 is done — pick the next phase. Optional follow-up: clear the 49 lint warnings (mostly unused imports/vars).
 Blockers: None. `main` has a ruleset ("push-protection") that only org admins can bypass — merge with `gh pr merge N --merge --admin`, or adopt the PR + required-checks ruleset suggested 2026-11-13.
 Not yet migrated: None — Claude docs bootstrapped from code + git history on 2026-11-13 (no Cursor rules existed). README.md is still create-next-app boilerplate; replace with a pointer to docs/ once docs are confirmed.
 
@@ -76,7 +76,7 @@ Follow-ups: 8 moderate dev-only advisories remain (minimatch via typescript-esli
 Majors deliberately held — each its own later phase, if wanted: typescript 5.9 → 7, eslint 9 → 10 (check eslint-config-next support), framer-motion 12 → 14, lucide-react 0.562 → 1.x (icon renames), @types/node 20 → match Vercel's Node. Unused deps (recharts, date-fns, embla-carousel-react, input-otp, react-day-picker, react-resizable-panels, tailwindcss-animate) should be removed, not upgraded.
 
 ## Phase 10 — Stabilisation
-Status: in progress — items 3–11 done and browser-verified 2026-11-13 against local backend (throwaway user `phase10-test-*@example.com`); tsc clean, build passes, lint 37 E / 49 W. #1, #14 done after backend fixes; #2 resolved by backend formula change. #12, #13 done 2026-11-13.
+Status: complete (released 2026-11-14, PR #29) — items 3–11 done and browser-verified 2026-11-13 against local backend (throwaway user `phase10-test-*@example.com`); tsc clean, build passes, lint 37 E / 49 W. #1, #14 done after backend fixes; #2 resolved by backend formula change. #12, #13 done 2026-11-13.
 Summary: Fix known functional bugs found during the 2026-11-13 audit, then bring lint to zero errors.
 Key files: see list
 Assumptions: Password rule is frontend-only (backend has none): sign-up/reset now ≥8, login only checks presence so existing 6–7 char passwords still work.
