@@ -57,16 +57,15 @@ export default function GoalsPage() {
     }
   }, [user, authLoading, router]);
 
-  // Load selected entry content
-  useEffect(() => {
-    if (selectedEntryId) {
-      const entry = journalEntries.find((e) => e.id === selectedEntryId);
-      if (entry) {
-        setJournalContent(entry.content);
-        setCurrentPrompt(entry.prompt || JOURNAL_PROMPTS[0]);
-      }
+  // Load a previous entry into the editor when it's picked
+  const handleSelectEntry = (entryId: string) => {
+    setSelectedEntryId(entryId);
+    const entry = journalEntries.find((e) => e.id === entryId);
+    if (entry) {
+      setJournalContent(entry.content);
+      setCurrentPrompt(entry.prompt || JOURNAL_PROMPTS[0]);
     }
-  }, [selectedEntryId, journalEntries]);
+  };
 
   const handleAddGoal = () => {
     if (!newGoalTitle || !newGoalTarget || !user) return;
@@ -357,7 +356,7 @@ export default function GoalsPage() {
                     <div>
                       <Select
                         value={selectedEntryId || undefined}
-                        onValueChange={setSelectedEntryId}
+                        onValueChange={handleSelectEntry}
                       >
                         <SelectTrigger className="w-full">
                           <SelectValue placeholder="Select a previous entry to view" />

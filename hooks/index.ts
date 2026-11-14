@@ -6,6 +6,7 @@
 
 // Utility hooks
 export { useIsMobile } from './use-mobile';
+export { useIsClient } from './use-is-client';
 export { useToast, toast } from './use-toast';
 
 // API hooks (TanStack Query)

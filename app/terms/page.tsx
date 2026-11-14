@@ -28,11 +28,11 @@ export default function TermsOfServicePage() {
           <p className="text-muted-foreground mb-6">
             <strong>Effective date:</strong> 1st January 2026<br />
             <strong>Contact:</strong> info@readinessai.io<br />
-            <strong>Operated by:</strong> ReadinessAI, a UK sole trader ("we", "us", "our").
+            <strong>Operated by:</strong> ReadinessAI, a UK sole trader (&quot;we&quot;, &quot;us&quot;, &quot;our&quot;).
           </p>
 
           <p className="mb-8">
-            By creating an account, accessing, or using the ReadinessAI website and services (the "Service"), you agree to these Terms of Service (the "Terms"). If you do not agree, do not use the Service.
+            By creating an account, accessing, or using the ReadinessAI website and services (the &quot;Service&quot;), you agree to these Terms of Service (the &quot;Terms&quot;). If you do not agree, do not use the Service.
           </p>
 
           <h2 className="text-xl sm:text-2xl font-display font-bold mt-8 mb-4">1. Eligibility</h2>
@@ -65,7 +65,7 @@ export default function TermsOfServicePage() {
             <li>use the Service unlawfully or to harm others;</li>
             <li>attempt to bypass security or access data you are not authorised to access;</li>
             <li>reverse engineer, decompile, scrape, or attempt to copy the Service or its content except where permitted by law;</li>
-            <li>upload malware, abuse rate limits, or interfere with the Service's performance;</li>
+            <li>upload malware, abuse rate limits, or interfere with the Service&apos;s performance;</li>
             <li>use scores, Peer Benchmarking, or outputs to evaluate, rank, or make decisions about other individuals (for example, employment screening);</li>
             <li>submit content that infringes intellectual property, privacy, or other rights.</li>
           </ul>
@@ -73,15 +73,15 @@ export default function TermsOfServicePage() {
 
           <h2 className="text-xl sm:text-2xl font-display font-bold mt-8 mb-4">5. Your content (Goals and Journaling)</h2>
           <p>
-            You may submit content such as goals, journal entries, and notes ("User Content"). You retain ownership of your User Content. You grant us a limited, non-exclusive licence to host, store, process, and display your User Content solely to operate the Service and provide features you request (such as saving entries and showing your history).
+            You may submit content such as goals, journal entries, and notes (&quot;User Content&quot;). You retain ownership of your User Content. You grant us a limited, non-exclusive licence to host, store, process, and display your User Content solely to operate the Service and provide features you request (such as saving entries and showing your history).
           </p>
           <p>
-            You are responsible for your User Content. Do not submit illegal content or content that violates others' rights.
+            You are responsible for your User Content. Do not submit illegal content or content that violates others&apos; rights.
           </p>
 
           <h2 className="text-xl sm:text-2xl font-display font-bold mt-8 mb-4">6. Peer Benchmarking</h2>
           <p>
-            Peer Benchmarking compares your performance to aggregated statistics from other users (for example, average scores by sector, career, or level). We do not display other users' identities or individual results.
+            Peer Benchmarking compares your performance to aggregated statistics from other users (for example, average scores by sector, career, or level). We do not display other users&apos; identities or individual results.
           </p>
           <p>
             Benchmarking depends on available data and may change over time as more users participate.
@@ -104,7 +104,7 @@ export default function TermsOfServicePage() {
 
           <h2 className="text-xl sm:text-2xl font-display font-bold mt-8 mb-4">10. Disclaimers</h2>
           <p>
-            The Service is provided "as is" and "as available". To the extent permitted by law, we disclaim all warranties, including fitness for a particular purpose and non-infringement.
+            The Service is provided &quot;as is&quot; and &quot;as available&quot;. To the extent permitted by law, we disclaim all warranties, including fitness for a particular purpose and non-infringement.
           </p>
 
           <h2 className="text-xl sm:text-2xl font-display font-bold mt-8 mb-4">11. Limitation of liability</h2>

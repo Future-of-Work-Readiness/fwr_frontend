@@ -43,11 +43,16 @@ function AuthContent() {
 	const loginMutation = useLogin();
 	const signUpMutation = useRegister();
 
-	// Tab state from URL params
-	const [activeTab, setActiveTab] = useState(() => {
-		const tab = searchParams.get('tab');
-		return tab === 'signup' ? 'signup' : 'login';
-	});
+	// Tab state, seeded from ?tab= and re-synced when that param changes (e.g. clicking a
+	// "Sign up" link while already on /auth). Adjusting state during render, per React docs,
+	// instead of an effect.
+	const urlTab = searchParams.get('tab');
+	const [activeTab, setActiveTab] = useState(urlTab === 'signup' ? 'signup' : 'login');
+	const [syncedUrlTab, setSyncedUrlTab] = useState(urlTab);
+	if (urlTab !== syncedUrlTab) {
+		setSyncedUrlTab(urlTab);
+		if (urlTab === 'signup' || urlTab === 'login') setActiveTab(urlTab);
+	}
 
 	// Login form state
 	const [loginEmail, setLoginEmail] = useState('');
@@ -68,16 +73,6 @@ function AuthContent() {
 	const [showSignupPassword, setShowSignupPassword] = useState(false);
 	const [showSignupConfirmPassword, setShowSignupConfirmPassword] =
 		useState(false);
-
-	// Update tab from URL params
-	useEffect(() => {
-		const tab = searchParams.get('tab');
-		if (tab === 'signup') {
-			setActiveTab('signup');
-		} else if (tab === 'login') {
-			setActiveTab('login');
-		}
-	}, [searchParams]);
 
 	// Redirect if already authenticated
 	useEffect(() => {

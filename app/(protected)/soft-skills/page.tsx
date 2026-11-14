@@ -59,14 +59,6 @@ export default function SoftSkillsPage() {
     "Professionalism", "Ethical Judgment"
   ];
 
-  // Initialize timer when quiz starts
-  useEffect(() => {
-    if (testState === "testing" && quizData && timeRemaining === null) {
-      setTimeRemaining(quizData.time_limit_minutes * 60);
-      setStartTime(Date.now());
-    }
-  }, [testState, quizData, timeRemaining]);
-
   // Timer countdown — only counts down; submission on expiry is handled by the effect below
   useEffect(() => {
     if (timeRemaining === null || timeRemaining <= 0 || testState !== "testing") return;
@@ -87,7 +79,8 @@ export default function SoftSkillsPage() {
       setAttemptId(response.attempt_id);
       setSelectedAnswers(new Map());
       setCurrentQuestionIndex(0);
-      setTimeRemaining(null); // Will be set by effect
+      setTimeRemaining(quizData.time_limit_minutes * 60);
+      setStartTime(Date.now());
       autoSubmittedRef.current = false;
       setTestState("testing");
     } catch (error) {

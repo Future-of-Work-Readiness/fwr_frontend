@@ -39,6 +39,16 @@ export default function ResultsPage() {
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState(1);
 
+  // Changing a filter always goes back to page 1
+  const handlePassedFilterChange = (value: string) => {
+    setPassedFilter(value);
+    setCurrentPage(1);
+  };
+  const handleCategoryFilterChange = (value: string) => {
+    setCategoryFilter(value);
+    setCurrentPage(1);
+  };
+
   // Build filters object
   const filters: QuizHistoryFilters = {
     limit: ITEMS_PER_PAGE,
@@ -64,11 +74,6 @@ export default function ResultsPage() {
   const totalItems = historyData?.total || 0;
   const hasMore = historyData?.hasMore || false;
   const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
-
-  // Reset to page 1 when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [passedFilter, categoryFilter]);
 
   // Auth redirect
   useEffect(() => {
@@ -198,7 +203,7 @@ export default function ResultsPage() {
                   <div className="flex flex-wrap gap-4">
                     <div className="flex flex-col gap-1.5">
                       <label className="text-sm text-muted-foreground">Status</label>
-                      <Select value={passedFilter} onValueChange={setPassedFilter}>
+                      <Select value={passedFilter} onValueChange={handlePassedFilterChange}>
                         <SelectTrigger className="w-[140px]">
                           <SelectValue placeholder="All" />
                         </SelectTrigger>
@@ -211,7 +216,7 @@ export default function ResultsPage() {
                     </div>
                     <div className="flex flex-col gap-1.5">
                       <label className="text-sm text-muted-foreground">Category</label>
-                      <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                      <Select value={categoryFilter} onValueChange={handleCategoryFilterChange}>
                         <SelectTrigger className="w-[160px]">
                           <SelectValue placeholder="All Categories" />
                         </SelectTrigger>

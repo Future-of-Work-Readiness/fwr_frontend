@@ -18,7 +18,7 @@ export default function NotFound() {
         </CardHeader>
         <CardContent className="space-y-6">
           <p className="text-muted-foreground text-center">
-            The page you're looking for doesn't exist or has been moved.
+            The page you&apos;re looking for doesn&apos;t exist or has been moved.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-3">

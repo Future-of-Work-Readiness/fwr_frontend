@@ -6,9 +6,9 @@
      five lines; anything durable belongs in decisions.md, architecture.md, or a
      phase's own Summary/Follow-ups instead. See implementation-lifecycle.md. -->
 _Last updated: 2026-11-13_
-Current phase: Phase 10 — Stabilisation (in progress; bugs 1, 3–11 done + browser-verified, uncommitted).
-Next objective: Commit stats wiring; wait for backend production deploy before merging dev → main; decide #2; then lint-to-zero (#12) and hydration (#13).
-Blockers: None — backend release (nullable `selected_key`, 409s, `/history/stats`) live in production 2026-11-13 15:41 UTC; PR #28 (dev → main) ready to merge after a staging smoke test. CI added 2026-11-13 (`.github/workflows/ci.yml`).
+Current phase: Phase 10 — Stabilisation (in progress). Phases 9 + 10 bug fixes + CI released to production 2026-11-13 (PR #28, merge b50af6b).
+Next objective: Phase 10 complete pending release of #12/#13 (dev → main). Optional follow-up: clear the 49 lint warnings (mostly unused imports/vars).
+Blockers: None. `main` has a ruleset ("push-protection") that only org admins can bypass — merge with `gh pr merge N --merge --admin`, or adopt the PR + required-checks ruleset suggested 2026-11-13.
 Not yet migrated: None — Claude docs bootstrapped from code + git history on 2026-11-13 (no Cursor rules existed). README.md is still create-next-app boilerplate; replace with a pointer to docs/ once docs are confirmed.
 
 ## Phase 1 — Vite JS prototype
@@ -76,13 +76,13 @@ Follow-ups: 8 moderate dev-only advisories remain (minimatch via typescript-esli
 Majors deliberately held — each its own later phase, if wanted: typescript 5.9 → 7, eslint 9 → 10 (check eslint-config-next support), framer-motion 12 → 14, lucide-react 0.562 → 1.x (icon renames), @types/node 20 → match Vercel's Node. Unused deps (recharts, date-fns, embla-carousel-react, input-otp, react-day-picker, react-resizable-panels, tailwindcss-animate) should be removed, not upgraded.
 
 ## Phase 10 — Stabilisation
-Status: in progress — items 3–11 done and browser-verified 2026-11-13 against local backend (throwaway user `phase10-test-*@example.com`); tsc clean, build passes, lint 37 E / 49 W. #1, #14 done after backend fixes. Open: #2 (product decision), #12 lint, #13 hydration.
+Status: in progress — items 3–11 done and browser-verified 2026-11-13 against local backend (throwaway user `phase10-test-*@example.com`); tsc clean, build passes, lint 37 E / 49 W. #1, #14 done after backend fixes; #2 resolved by backend formula change. #12, #13 done 2026-11-13.
 Summary: Fix known functional bugs found during the 2026-11-13 audit, then bring lint to zero errors.
 Key files: see list
 Assumptions: Password rule is frontend-only (backend has none): sign-up/reset now ≥8, login only checks presence so existing 6–7 char passwords still work.
 Bug list (status):
 1. Done — backend fixed scoring (scores over every quiz question; `selected_key` nullable; duplicates/foreign ids ignored; 409 on resubmit). Frontend now sends `null` for unanswered, results show "Not answered", and a 409 on submit shows an info toast and routes to `/results`. Verified: 1/20 answered → 1/20 (was 7/20); soft skills with none answered → 0% (was 5%); forced 409 → one toast + redirect.
-2. **Awaiting product decision.** Readiness ceiling confirmed by backend: technical max 26.5, readiness max 41.2. Backend proposes weighted %-of-max (perfect run = 100, ~3.8× lift on stored scores, one-off recompute). No frontend change needed — gauge bands (40/60/80) and benchmarking `floor(technical/20)` already assume a 0–100 scale and are unreachable today.
+2. **Done (backend, live 2026-11-13).** Technical is now a level-weighted %-of-max (perfect run = 100; was capped at 26.5 → readiness 41.2). Stored scores recomputed (~3.77×, rankings unchanged, goals untouched); readiness now 2-dp on submit too. Frontend audit: no change needed — gauge (80/60/40) and results colour bands were built for 0–100; `score_impact.quiz_points` isn't displayed; benchmarking `completedLevels` is computed but never rendered.
 14. Done (backend + frontend, local) — `/quizzes/history` (and dashboard recent attempts) now return submitted attempts only; stats endpoint wired. Verified locally: 4 tests / 11% avg overall, technical filter 2 / 20%, matching `/history`.
 3. Done — dashboard empty state → `/careers/add`.
 4. Done — goals page uses `useUpdateGoalProgress` (`PATCH /goals/{id}/progress`); generic PATCH recomputed progress from current/target value. Progress hook now invalidates the detail query instead of caching the partial response.
@@ -93,6 +93,6 @@ Bug list (status):
 9. Done — soft-skills feedback refuses an empty `attempt_id` (modal shows the error); `[Feedback Debug]` logs removed.
 10. Done — results stats come from backend `GET /quizzes/history/stats` (`useQuizHistoryStatsQuery`; all submitted attempts, same filters; pass rate = passed/total). Also fixed: rows and average showed raw points (`score`) as "%"; now `percentage`.
 11. Done — see Assumptions.
-12. Lint to zero errors — not started (37 errors: 23 `react/no-unescaped-entities`, 11 `react-hooks/set-state-in-effect`, 2 `no-empty-object-type`, 1 `no-html-link-for-pages`).
-13. Pre-existing (confirmed against the committed layout): hydration mismatch on every protected page — `app/(protected)/layout.tsx` server-renders the auth spinner, the client renders the app shell from persisted auth in localStorage. Recoverable, but React re-renders the tree. Fix: render the spinner until mounted (or move auth gating out of first render).
+12. **Done 2026-11-13.** 37 → 0 errors (warnings unchanged at 49). Unescaped quotes → `&apos;`/`&quot;` (renders identically); Footer `<a>` → `Link`; empty interfaces → type aliases; 11 set-state-in-effect fixed by deriving (benchmarking selection/loading, dashboard `isNewUser`), event handlers (results filter → page 1, quiz timer init on start, journal entry select), `useState` initializer (results pages' sessionStorage), render-time adjust (auth `?tab=`), `useSyncExternalStore` (`use-mobile`). CI gate replaced by plain `npm run lint`. Browser-verified 2026-11-14 against local backend (throwaway user `phase10b-test-*@example.com`): dashboard Welcome/Welcome Back at the 5-min boundary; benchmarking defaults to primary and keeps a manual pick across refetch; journal select loads each entry; both quiz timers start at the limit, auto-submit once, results render, refresh redirects to the hub; results pass/category filters reset page 2 → 1; next-devtools `get_errors` empty.
+13. **Done 2026-11-13.** `hooks/use-is-client.ts` gates `app/(protected)/layout.tsx` to the spinner until hydrated. Verified via next-devtools `get_errors`: mismatch reproduced with the gate removed, none with it.
 Verification notes: timer auto-submit tested by speeding up 1 s timeouts in-page (30 min → ~9 s) on both quiz pages — one submit each; with 1/20 answered the technical quiz scored 7/20, a live demonstration of #1. Duplicate-toast fix tested by forcing a start failure: one toast.

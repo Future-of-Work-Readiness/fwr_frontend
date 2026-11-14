@@ -14,21 +14,23 @@ description: How FWR readiness, technical and soft-skill scores, pass marks and 
 - **Pass:** `percentage >= quiz.passing_score` (default 70) — service.py ~503. Percentage is over
   every active question in the quiz; unanswered (`null`) counts as wrong.
 - Started-but-unsubmitted attempts don't count towards scores (backend change 2026-11-13).
-- **Points per quiz:** `(percentage / 20) × LEVEL_MULTIPLIERS[level]`,
-  multipliers `{1: 0.6, 2: 0.8, 3: 1.0, 4: 1.3, 5: 1.6}` — service.py ~36–72.
-- **Technical score:** sum of points from the *latest* attempt on each quiz in the
-  specialisation, capped at 100.
+- **Level weights:** `{1: 0.6, 2: 0.8, 3: 1.0, 4: 1.3, 5: 1.6}`.
+- **Technical score (live 2026-11-13):** level-weighted % of the maximum —
+  `Σ(latest % on each quiz × level weight) / Σ(weights of all the career's quizzes)`. Untaken
+  quizzes count as 0. 100% on every level = 100; Level 1 alone at 100% = 11.32.
 - **Soft-skills score:** latest attempt percentage on any quiz whose specialisation name
   contains `"SOFT"`.
-- **Readiness:** `0.8 × technical + 0.2 × soft`. Submit path truncates with `int()` (~633);
-  recompute path uses `round(…, 2)` (~841, ~906). Inconsistent rounding is a known issue.
+- **Readiness:** `0.8 × technical + 0.2 × soft`, stored with 2 decimals on both the submit and
+  recompute paths (the old `int()` truncation on submit is gone). Perfect run = 100.
+- **`score_impact` (submit response):** `quiz_points` = this quiz's contribution (out of 100) to
+  the technical score; `level_multiplier` = level weight. Typed in `hooks/api/useQuizzes.ts`,
+  not displayed anywhere yet.
 - **Which career updates:** technical quiz → career with matching `specialization_id`, else
   primary; soft-skills quiz → primary. If the updated career is primary, user-level score fields
   are mirrored.
-- **Known ceiling (confirmed by backend 2026-11-13):** one quiz per level, so technical maxes at
-  5 × (0.6+0.8+1.0+1.3+1.6) = 26.5 → readiness 41.2. Backend has proposed a weighted %-of-max
-  formula (perfect run = 100, ~3.8× lift, one-off recompute) pending a product decision. Frontend
-  bands already assume 0–100; don't add frontend scaling.
+- **History:** before 2026-11-13 the formula was `(percentage/20) × weight` summed, which capped
+  technical at 26.5 and readiness at 41.2. All stored scores were recomputed (~3.77× lift,
+  rankings unchanged; goals not touched). Frontend bands always assumed 0–100 and needed no change.
 - **Level naming mismatch:** backend docstrings say Foundational/Beginner/Intermediate/Advanced/
   Expert; frontend `lib/constants/skillLevels.ts` says Beginner/Intermediate/Proficient/Master/
   Expert. Both map to `difficulty_level` 1–5.
@@ -39,7 +41,9 @@ description: How FWR readiness, technical and soft-skill scores, pass marks and 
 - `app/(protected)/soft-skills/results/page.tsx` (~111–153): colours at 80/70/50; messages at
   90/80/70/50; recommendations split at 70/85.
 - `app/(protected)/tests/[specialisation]/[level]/results/page.tsx`: fallback recommendations at 90/70.
-- `app/(protected)/benchmarking/page.tsx` (~107): `completedLevels = floor(technicalScore / 20)`.
+- `app/(protected)/benchmarking/page.tsx` (~107): `completedLevels = floor(technicalScore / 20)` —
+  computed but never rendered (dead). It's not a real level count under either formula; delete it
+  rather than display it.
 - If you change a band, change it everywhere it appears — they aren't centralised.
 
 ## Benchmarking rules (backend `modules/benchmarks/service.py`; older summary in `../Future_of_work_readiness/PEER_BENCHMARKING_SUMMARY.md`)

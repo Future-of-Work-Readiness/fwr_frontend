@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useAuth } from '@/components/providers';
 import { Button } from '@/components/ui/button';
@@ -42,6 +42,18 @@ interface StoredQuizResult extends QuizSubmitResponse {
 	quiz_id?: string;
 }
 
+const QUIZ_RESULT_KEY = 'quizResult';
+
+function readStoredQuizResult(): StoredQuizResult | null {
+	if (typeof window === 'undefined') return null;
+	try {
+		const raw = sessionStorage.getItem(QUIZ_RESULT_KEY);
+		return raw ? (JSON.parse(raw) as StoredQuizResult) : null;
+	} catch {
+		return null;
+	}
+}
+
 export default function TestResultsPage() {
 	const router = useRouter();
 	const params = useParams();
@@ -50,44 +62,25 @@ export default function TestResultsPage() {
 
 	const { isLoading: authLoading } = useAuth();
 
-	const [loading, setLoading] = useState(true);
-	const [quizResult, setQuizResult] = useState<StoredQuizResult | null>(null);
+	// Handed over by the quiz page via sessionStorage. Safe to read during render: the protected
+	// layout only renders pages on the client (see useIsClient in app/(protected)/layout.tsx).
+	const [quizResult] = useState<StoredQuizResult | null>(readStoredQuizResult);
 	const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
 	const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
 
 	// Feedback mutation
 	const submitFeedbackMutation = useSubmitFeedbackMutation();
 
-	// Use ref to prevent double-processing in React Strict Mode
-	const hasProcessedRef = useRef(false);
-
 	useEffect(() => {
-		// Prevent double-processing due to React Strict Mode
-		if (hasProcessedRef.current) {
-			return;
+		if (quizResult) {
+			// One-shot hand-off: a refresh shouldn't show a stale result
+			sessionStorage.removeItem(QUIZ_RESULT_KEY);
+		} else {
+			router.replace('/technical-skills');
 		}
+	}, [quizResult, router]);
 
-		const storedData = sessionStorage.getItem('quizResult');
-		if (storedData) {
-			hasProcessedRef.current = true;
-			const data = JSON.parse(storedData) as StoredQuizResult;
-			setQuizResult(data);
-			setLoading(false);
-			// Clear session storage after reading
-			sessionStorage.removeItem('quizResult');
-		} else if (!hasProcessedRef.current) {
-			// Only redirect if we haven't processed data and there's nothing in storage
-			// Use a small delay to ensure we're not in the middle of a Strict Mode remount
-			const timeoutId = setTimeout(() => {
-				if (!hasProcessedRef.current) {
-					router.push('/technical-skills');
-				}
-			}, 100);
-			return () => clearTimeout(timeoutId);
-		}
-	}, [router]);
-
-	if (authLoading || loading || !quizResult) {
+	if (authLoading || !quizResult) {
 		return (
 			<div className='min-h-screen flex items-center justify-center'>
 				<Loader2 className='h-8 w-8 animate-spin text-primary' />
