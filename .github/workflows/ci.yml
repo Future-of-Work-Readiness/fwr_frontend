@@ -19,9 +19,6 @@ concurrency:
 
 env:
   NODE_VERSION: "22"
-  # Lint must not get worse than this. Lower it as errors are fixed; remove the gate (and use a
-  # plain `npm run lint`) once it reaches 0. Baseline set 2026-11-13.
-  LINT_ERROR_BASELINE: "37"
 
 jobs:
   typecheck-and-build:
@@ -43,7 +40,7 @@ jobs:
           NEXT_TELEMETRY_DISABLED: "1"
 
   lint:
-    name: Lint (no new errors)
+    name: Lint
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -53,36 +50,9 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
       - run: npm ci
-      - name: ESLint
-        # eslint exits non-zero while baseline errors exist; the next step decides pass/fail.
-        run: npx eslint . -f json -o eslint-report.json || true
-      - name: Compare with baseline
-        run: |
-          node -e '
-            const report = require("./eslint-report.json");
-            let errors = 0, warnings = 0;
-            for (const file of report) {
-              for (const m of file.messages) {
-                if (m.severity === 2) {
-                  errors++;
-                  const path = file.filePath.replace(process.cwd() + "/", "");
-                  // Plain log lines, not annotations: baseline errors would otherwise flag every PR.
-                  console.log(`${path}:${m.line}:${m.column}  ${m.ruleId}  ${m.message.split("\n")[0]}`);
-                } else {
-                  warnings++;
-                }
-              }
-            }
-            const baseline = Number(process.env.LINT_ERROR_BASELINE);
-            console.log(`ESLint: ${errors} errors, ${warnings} warnings (error baseline ${baseline})`);
-            if (errors > baseline) {
-              console.log(`::error::Lint errors increased: ${errors} > baseline ${baseline}. Fix the new errors.`);
-              process.exit(1);
-            }
-            if (errors < baseline) {
-              console.log(`::notice::Lint errors dropped to ${errors}. Lower LINT_ERROR_BASELINE in .github/workflows/ci.yml to ${errors}.`);
-            }
-          '
+      # Zero errors since 2026-11-13 (Phase 10 #12): any ESLint error fails the job. Warnings are
+      # reported but don't fail it.
+      - run: npm run lint
 
   audit:
     name: Security audit (production deps)

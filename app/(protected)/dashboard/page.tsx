@@ -43,7 +43,8 @@ export default function DashboardPage() {
   const dashboardData = shouldFetchSpecific ? specificDashboardData : primaryDashboardData;
   const dashboardLoading = shouldFetchSpecific ? specificDashboardLoading : primaryDashboardLoading;
   
-  const [isNewUser, setIsNewUser] = useState(false);
+  // Captured once on mount (render must stay pure, so no Date.now() in the body)
+  const [mountedAt] = useState(() => Date.now());
 
   // Use dashboard data if available, fallback to career store
   const goalsCount = dashboardData?.goalsCount ?? 0;
@@ -55,14 +56,8 @@ export default function DashboardPage() {
   const field = dashboardData?.field ?? currentCareer?.field;
   const specialisation = dashboardData?.specialisation ?? currentCareer?.specialisation;
 
-  // Check if user is new (created within last 5 minutes)
-  useEffect(() => {
-    if (user?.createdAt) {
-      const createdAt = new Date(user.createdAt);
-      const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
-      setIsNewUser(createdAt > fiveMinutesAgo);
-    }
-  }, [user]);
+  // New user = account created within 5 minutes of opening the dashboard
+  const isNewUser = !!user?.createdAt && new Date(user.createdAt).getTime() > mountedAt - 5 * 60 * 1000;
 
   // Redirect to onboarding if not completed
   // Wait for fresh data (not just cached) before redirecting

@@ -36,7 +36,7 @@ export default function PrivacyPolicyPage() {
           </p>
           <p>
             <strong>Email:</strong> info@readinessai.io<br />
-            <strong>ICO status:</strong> Applying/registered with the UK Information Commissioner's Office (ICO).<br />
+            <strong>ICO status:</strong> Applying/registered with the UK Information Commissioner&apos;s Office (ICO).<br />
             <strong>ICO application reference:</strong> C1859969.
           </p>
 
@@ -116,7 +116,7 @@ export default function PrivacyPolicyPage() {
 
           <h2 className="text-xl sm:text-2xl font-display font-bold mt-8 mb-4">5. Peer Benchmarking and aggregation</h2>
           <p>
-            Peer Benchmarking compares your performance to aggregated peer statistics. We do not display other users' identities or individual results. Benchmarking outputs may change as more users contribute data.
+            Peer Benchmarking compares your performance to aggregated peer statistics. We do not display other users&apos; identities or individual results. Benchmarking outputs may change as more users contribute data.
           </p>
 
           <h2 className="text-xl sm:text-2xl font-display font-bold mt-8 mb-4">6. Journaling and sensitive personal data</h2>

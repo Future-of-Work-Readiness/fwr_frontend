@@ -11,8 +11,8 @@
 Commands:
 - `npm run dev` / `npm run build` / `npm run start`
 - `npm run lint` — ESLint 9, `eslint-config-next` core-web-vitals + typescript, no custom rules.
-  Baseline 2026-11-13 (post-Phase 10 fixes): 37 errors / 49 warnings (mostly `react/no-unescaped-entities`, React
-  Compiler setState-in-effect, unused vars).
+  0 errors since 2026-11-13 (Phase 10 #12); 49 warnings (mostly unused vars/imports).
+  Exits non-zero on any error.
 - `npx tsc --noEmit` — typecheck (no npm script). Baseline: 0 errors.
 - No test runner is configured.
 
@@ -36,9 +36,8 @@ run `/mcp` once to sign in) and `next-devtools` (`npx next-devtools-mcp@latest`;
 GitHub Actions, `.github/workflows/ci.yml` (added 2026-11-13). Runs on push to `dev`/`main`, on
 PRs into `main`/`dev`, and manually (`workflow_dispatch`). Node 22, `npm ci`. Three jobs:
 - **Typecheck & build** — `npx tsc --noEmit`, `npm run build`.
-- **Lint (no new errors)** — fails only if ESLint errors exceed `LINT_ERROR_BASELINE` (37). When
-  errors drop, the job prints a notice: lower the baseline in the same PR. At 0, replace the gate
-  with a plain `npm run lint`.
+- **Lint** — `npm run lint`; fails on any ESLint error, warnings don't fail it. (Was a
+  `LINT_ERROR_BASELINE` gate at 37 errors until Phase 10 #12 brought errors to 0.)
 - **Security audit** — `npm audit --omit=dev --audit-level=high`. Can turn red without a code change
   when a new advisory is published; fix with the dependency-check skill.
 Vercel's builds are separate (its GitHub App posts deployments/commit statuses; they never appear

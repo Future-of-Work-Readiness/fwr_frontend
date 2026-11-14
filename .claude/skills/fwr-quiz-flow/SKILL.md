@@ -20,7 +20,8 @@ description: The FWR test-taking flow — levels, URL scheme, find/start/submit 
    "Practice Again" (passed).
 2. Test page: `useFindQuizQuery(spec, level)` → `GET /quizzes/find`.
 3. `useStartQuiz` → `POST /quizzes/{id}/start` returns the attempt + questions.
-4. Client countdown from `time_limit_minutes`; auto-submits at 0.
+4. Client countdown from `time_limit_minutes`, initialised in the start handler (not an effect);
+   auto-submits once at 0 (`autoSubmittedRef`).
 5. `useSubmitQuiz` → `POST /quizzes/attempts/{id}/submit` with
    `answers: [{question_id, selected_key}]`.
 6. The response (`QuizSubmitResponse`: `readiness`, `score_impact`, `updated_goals`,

@@ -54,7 +54,6 @@ export default function BenchmarkingPage() {
   const router = useRouter();
   const { user, isLoading: authLoading } = useAuth();
   const { careers, currentCareer } = useCareerStore();
-  const [loading, setLoading] = useState(true);
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [selectedCareerId, setSelectedCareerId] = useState<string | null>(null);
 
@@ -65,20 +64,17 @@ export default function BenchmarkingPage() {
     isError: benchmarkError 
   } = usePeerBenchmarkQuery();
 
-  // Initialize selected career when careers load
-  useEffect(() => {
-    if (careers.length > 0) {
-      const primaryCareer = careers.find((c) => c.isPrimary);
-      setSelectedCareerId(primaryCareer?.id || careers[0].id);
-    }
-  }, [careers]);
+  // Selected career: the user's pick if it still exists, else primary, else first
+  const activeCareerId =
+    (selectedCareerId && careers.some((c) => c.id === selectedCareerId) ? selectedCareerId : null) ??
+    careers.find((c) => c.isPrimary)?.id ??
+    careers[0]?.id ??
+    null;
 
   // Handle auth redirect
   useEffect(() => {
     if (!authLoading && !user) {
       router.replace("/auth");
-    } else if (user) {
-      setLoading(false);
     }
   }, [user, authLoading, router]);
 
@@ -110,7 +106,7 @@ export default function BenchmarkingPage() {
   }, [careers, peerBenchmark]);
 
   // Get selected career
-  const selectedCareer = allCareerScores.find((cs) => cs.career.id === selectedCareerId);
+  const selectedCareer = allCareerScores.find((cs) => cs.career.id === activeCareerId);
 
   // Get status badge color
   const getStatusColor = (status: string) => {
@@ -124,7 +120,7 @@ export default function BenchmarkingPage() {
     }
   };
 
-  if (authLoading || loading) {
+  if (authLoading || !user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -392,7 +388,7 @@ export default function BenchmarkingPage() {
                         {/* Career Dropdown */}
                         <div className="p-4 bg-muted/30 border-b border-border">
                           <Select
-                            value={selectedCareerId || undefined}
+                            value={activeCareerId || undefined}
                             onValueChange={setSelectedCareerId}
                           >
                             <SelectTrigger className="w-full">

@@ -56,14 +56,6 @@ export default function TestPage() {
   const levelDisplay = level.charAt(0).toUpperCase() + level.slice(1);
   const canProceed = currentQuestion && selectedAnswers.has(currentQuestion.question_id);
 
-  // Initialize timer when quiz starts
-  useEffect(() => {
-    if (quizStarted && quizData && timeRemaining === null) {
-      setTimeRemaining(quizData.time_limit_minutes * 60);
-      setStartTime(Date.now());
-    }
-  }, [quizStarted, quizData, timeRemaining]);
-
   // Timer countdown — only counts down; submission on expiry is handled by the effect below
   useEffect(() => {
     if (timeRemaining === null || timeRemaining <= 0 || !quizStarted) return;
@@ -82,6 +74,8 @@ export default function TestPage() {
     try {
       const response = await startQuizMutation.mutateAsync(quizData.quiz_id);
       setAttemptId(response.attempt_id);
+      setTimeRemaining(quizData.time_limit_minutes * 60);
+      setStartTime(Date.now());
       autoSubmittedRef.current = false;
       setQuizStarted(true);
     } catch (error) {

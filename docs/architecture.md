@@ -35,7 +35,11 @@ Query in the browser. Scoring and business rules live in the backend; the fronte
   `/auth` and renders `DashboardNav`; `/onboarding` repeats the check itself; only `/dashboard`
   sends non-onboarded users to `/onboarding`.
 - **Cross-page hand-off** — `sessionStorage.quizResult` carries the quiz submit response from a
-  test page to its results page.
+  test page to its results page, which reads it in a `useState` initializer and deletes the key in
+  an effect (no data → redirect back to the hub).
+- **No SSR of protected content** — `app/(protected)/layout.tsx` renders its spinner until
+  `useIsClient()` is true, so server HTML matches the first client render; protected pages only
+  ever render in the browser.
 
 ## Data flow
 1. Page calls a hook from `@/hooks` (e.g. `useFindQuizQuery`).

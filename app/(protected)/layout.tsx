@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/components/providers";
 import { DashboardNav } from "@/components/dashboard";
+import { useIsClient } from "@/hooks/use-is-client";
 
 interface ProtectedLayoutProps {
   children: React.ReactNode;
@@ -13,6 +14,9 @@ export default function ProtectedLayout({ children }: ProtectedLayoutProps) {
   const router = useRouter();
   const pathname = usePathname();
   const { isAuthenticated, isLoading } = useAuth();
+  // Auth is seeded from localStorage, which the server can't see: without this gate the server
+  // renders "Redirecting to login..." while the client renders the shell → hydration mismatch.
+  const isClient = useIsClient();
 
   useEffect(() => {
     // Wait for auth state to be determined
@@ -22,7 +26,7 @@ export default function ProtectedLayout({ children }: ProtectedLayoutProps) {
   }, [isAuthenticated, isLoading, router, pathname]);
 
   // Show loading state while checking auth
-  if (isLoading) {
+  if (!isClient || isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="flex flex-col items-center gap-4">

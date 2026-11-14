@@ -30,7 +30,7 @@ const Footer = () => {
 				<div className='grid grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-12'>
 					{/* Brand column */}
 					<div className='col-span-2 lg:col-span-4'>
-						<a href='/' className='inline-flex items-center gap-3 mb-6 group'>
+						<Link href='/' className='inline-flex items-center gap-3 mb-6 group'>
 							<Image
 								src='/assets/RAI-Logo2-nobg.png'
 								alt='ReadinessAI Logo'
@@ -41,7 +41,7 @@ const Footer = () => {
 							<span className='font-display font-bold text-xl group-hover:text-accent transition-colors'>
 								ReadinessAI
 							</span>
-						</a>
+						</Link>
 						<p className='text-white/50 text-sm leading-relaxed mb-6 max-w-xs'>
 							Empowering professionals to thrive in the evolving world of work
 							through personalised assessments and skill development.

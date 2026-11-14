@@ -50,8 +50,11 @@ The generic checklist (verify, sync docs, recommend next steps) lives in
 — not repeated here. Only what's project-specific:
 - Tests: none exist yet. Verify UI changes by running `npm run dev` against a backend.
 - Typecheck: `npx tsc --noEmit` (clean at baseline — keep it clean).
-- Lint: `npm run lint` (baseline 2026-11-13: 37 errors / 49 warnings — don't add new ones; CI
-  enforces the error count via `LINT_ERROR_BASELINE` in `.github/workflows/ci.yml` — lower it when you fix errors).
+- Lint: `npm run lint` — 0 errors since 2026-11-13 (CI fails on any error); 49 warnings, mostly
+  unused vars — don't add new ones.
+- React Compiler lint (`react-hooks/set-state-in-effect`) is an error: derive values in render,
+  set state in event handlers, or use `useSyncExternalStore` — not `useEffect(() => setX(...))`.
+  For browser-only state on first render use `useIsClient()` (`hooks/use-is-client.ts`).
 - Build: `npm run build` before recommending a merge to `main`.
 
 ## Project-specific rules

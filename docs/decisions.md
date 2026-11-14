@@ -5,6 +5,22 @@
      ../skyblue-nectar-haven-1237efe5-main/MIGRATION_PROMPT.md. "Not recorded" means no evidence
      of the rationale exists — fill it in if known. -->
 
+## 2026-11-13 — `useIsClient()` gate for browser-only first render; no setState in effects
+Context: The protected layout seeds auth from localStorage, so server HTML ("Redirecting to
+login…") never matched the client's first render (app shell) — a hydration error on every
+protected page. Separately, 11 `react-hooks/set-state-in-effect` lint errors.
+Decision: `hooks/use-is-client.ts` (`useSyncExternalStore`, false on server + hydration render)
+gates `app/(protected)/layout.tsx` to the spinner until the client takes over. Because protected
+pages therefore never SSR, they may read sessionStorage in a `useState` initializer (results
+pages). Effects no longer set state: derive in render, move to event handlers, or use
+`useSyncExternalStore` (`use-mobile`); URL→state sync on `/auth` uses the "adjust state during
+render" pattern.
+Alternatives considered: `useEffect(() => setMounted(true))`; disabling the lint rule;
+`next/dynamic` with `ssr: false` for the layout; moving auth to cookies + `middleware.ts`.
+Why rejected: the mounted-effect trips the same lint rule; disabling hides real cascading-render
+bugs; `dynamic` can't wrap a layout cleanly; cookie auth is a backend + architecture change far
+beyond this fix (still the long-term option if protected pages ever need SSR).
+
 ## 2026-11-13 — GitHub Actions CI with a lint-baseline gate
 Context: The only automated check was Vercel's build, which doesn't typecheck separately, lint, or
 audit, and doesn't appear under GitHub Actions. Lint had 37 pre-existing errors.
@@ -12,6 +28,7 @@ Decision: `.github/workflows/ci.yml` — typecheck + build, a lint job that fail
 exceed a baseline (`LINT_ERROR_BASELINE`), and `npm audit --omit=dev --audit-level=high`. Node 22.
 Alternatives considered: plain `npm run lint` in CI; lint as non-blocking (`continue-on-error`);
 pinning Node via `engines` in package.json.
+Update (same day): Phase 10 #12 reached 0 errors; the gate was replaced by plain `npm run lint`.
 Why rejected: plain lint would be red on every run until Phase 10 #12; non-blocking lint lets new
 errors in silently. `engines` is also read by Vercel and could change the production build's Node
 version — kept CI on 22 (local version) until Vercel's Node version is confirmed.
